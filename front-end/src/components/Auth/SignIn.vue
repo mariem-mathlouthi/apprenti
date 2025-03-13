@@ -113,6 +113,19 @@ export default {
             localStorage.setItem("StudentAccountInfo",JSON.stringify(StudentAccount));
             this.$router.push('/StudentDash');
             }
+        else if(response.data.role === "tuteur"){
+          let TuteurAccount = {
+            id:response.data.user.id,
+            fullname:response.data.user.fullname,
+            email:response.data.user.email,
+            domaine:response.data.user.domaine,
+            specialite:response.data.user.specialite,
+            experience:response.data.user.experience
+          }
+          localStorage.setItem("TuteurAccountInfo", JSON.stringify(TuteurAccount));
+          this.$router.push('/TuteurDashboard');
+        }
+
            else if(response.data.role === "admin"){
               this.$router.push('/Admin');
               toast.success("Admin Account Exist !", {

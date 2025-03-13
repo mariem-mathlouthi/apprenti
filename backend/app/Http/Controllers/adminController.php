@@ -7,6 +7,7 @@ use App\Models\Admin;
 use App\Models\Etudiant;
 use App\Models\Entreprise;
 use App\Models\Offre;
+use App\Models\Tuteur;
 class adminController extends Controller
 {
     //
@@ -154,6 +155,41 @@ class adminController extends Controller
             'message' => 'Entreprise deleted successfully',
         ]);
     }
+
+    public function addTuteur(Request $request)
+{
+    $request->validate([
+        'fullname' => 'required|string|max:255',
+        'email' => 'required|email|unique:tuteurs,email',
+        'password' => 'required|string|min:6',
+        'specialite' => 'required|string|max:255',
+        'experience' => 'required|integer|min:0',
+        'phone' => 'required|string|unique:tuteurs,phone',
+        'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
+
+    // Gestion de l'image (optionnelle)
+    $imagePath = null;
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('tuteurs', 'public');
+    }
+
+    // Création du tuteur
+    $tuteur = new Tuteur();
+    $tuteur->fullname = $request->fullname;
+    $tuteur->email = $request->email;
+    $tuteur->password = Hash::make($request->password);
+    $tuteur->specialite = $request->specialite;
+    $tuteur->experience = $request->experience;
+    $tuteur->phone = $request->phone;
+    $tuteur->image = $imagePath;
+    $tuteur->save();
+
+    return response()->json([
+        'message' => 'Tuteur ajouté avec succès',
+        'tuteur' => $tuteur
+    ], 201);
+}
     
 
 

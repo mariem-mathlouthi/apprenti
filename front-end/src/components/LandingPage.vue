@@ -59,7 +59,7 @@ export default {
   data: function () {
     return {
       navigation: [
-        { title: "Team", router: "/teams" },
+        { title: "Team", router: "/team" },
         { title: "Contact", router: "/contact" },
       ]
     }

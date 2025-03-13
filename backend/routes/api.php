@@ -74,4 +74,5 @@ Route::group(['middleware' => 'cors'], function () {
     Route::delete('/enterprisesAdmin/{id}', [adminController::class, 'deleteEntreprise']);
     Route::get('/studentsAdmin', [adminController::class, 'getAllStudents']);
     Route::delete('/deleteStudentAdmin/{id}', [adminController::class, 'deleteStudent']);
+    Route::post('/admin/tuteur', [AdminController::class, 'addTuteur']);
 });

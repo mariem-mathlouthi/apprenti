@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Entreprise;
 use App\Models\Etudiant;
 use App\Models\Admin;
+use App\Models\Tuteur;
 use Illuminate\Http\Request;
 
 class authController extends Controller
@@ -115,6 +116,16 @@ class authController extends Controller
                 'message' => 'Admin login successful',
                 'admin' => $admin,
                 'role' => 'admin',
+                'check' => true,
+            ]);
+        }
+
+        $tuteur = Tuteur::where('email', $email)->first();
+        if ($tuteur && Hash::check($password, $tuteur->password)) {
+            return response()->json([
+                'message' => 'Tuteur login successful',
+                'user' => $tuteur,
+                'role' => 'tuteur',
                 'check' => true,
             ]);
         }

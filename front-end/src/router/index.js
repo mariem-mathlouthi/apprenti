@@ -41,6 +41,24 @@ import DetailOffreAdmin from "../components/Admin/DetailOffreAdmin.vue";
 import UsersList from "../components/Admin/UsersList.vue";
 import AccountSetting from "../components/Admin/AccountSetting.vue";
 import AddOfferAdmin from "../components/Admin/AddOffer.vue";
+import CreateTuteur from "../components/Admin/CreateTuteur.vue";
+
+
+
+
+import TuteurDashboard from "../components/TuteurDash/TuteurDashboard.vue";
+
+
+
+
+
+
+
+
+
+
+
+
 
 const routes = [
    {
@@ -224,7 +242,20 @@ const routes = [
           path: "/UsersListEtudiants",
           name: "UsersListEtudiants",
           component: UsersListEtudiants,
-    }
+    },
+    {
+      path: "/TuteurDashboard",
+      name: "TuteurDashboard",
+      component: TuteurDashboard,
+},
+
+{
+  path: "/CreateTuteur",
+  name: "CreateTuteur",
+  component:CreateTuteur,
+},
+
+
 
 
 

@@ -17,6 +17,12 @@
 			<li>
 				<a href="#">
 					<i class='bx bxs-shopping-bag-alt'></i>
+					<router-link to="/CreateTuteur"><span class="text">Ajouter Tuteur</span></router-link>
+				</a>
+			</li>
+			<li>
+				<a href="#">
+					<i class='bx bxs-shopping-bag-alt'></i>
 					<router-link to="/OffresListAdmin"><span class="text">Les offres</span></router-link>
 				</a>
 			</li>
