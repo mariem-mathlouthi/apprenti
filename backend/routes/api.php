@@ -10,6 +10,7 @@ use App\Http\Controllers\adminController;
 use App\Http\Controllers\offreController;
 use App\Http\Controllers\notificationController;
 use App\Http\Controllers\attestationController;
+use App\Http\Controllers\CategoryController;
 
 
 /*
@@ -75,4 +76,11 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get('/studentsAdmin', [adminController::class, 'getAllStudents']);
     Route::delete('/deleteStudentAdmin/{id}', [adminController::class, 'deleteStudent']);
     Route::post('/admin/tuteur', [AdminController::class, 'addTuteur']);
+   
+    Route::get('/categories', [CategoryController::class, 'getAllCategories']);
+    Route::post('/categories', [CategoryController::class, 'createCategory']);
+    Route::get('/categories/{id}', [CategoryController::class, 'getCategoryById']);
+    Route::put('/categories/{id}', [CategoryController::class, 'updateCategory']);
+    Route::delete('/categories/{id}', [CategoryController::class, 'deleteCategory']);
+    
 });
