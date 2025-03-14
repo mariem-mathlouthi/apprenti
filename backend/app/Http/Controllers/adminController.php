@@ -144,7 +144,7 @@ class adminController extends Controller
             // Retourner une réponse 404 Not Found si l'entreprise n'est pas trouvée
             return response()->json([
                 'message' => 'Entreprise not found',
-            ], Response::HTTP_NOT_FOUND);
+            ], response()::HTTP_NOT_FOUND);
         }
 
         // Supprimer l'entreprise
