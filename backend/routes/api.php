@@ -11,7 +11,8 @@ use App\Http\Controllers\offreController;
 use App\Http\Controllers\notificationController;
 use App\Http\Controllers\attestationController;
 use App\Http\Controllers\CategoryController;
-
+use App\Http\Controllers\CoursController;
+use App\Http\Controllers\RessourceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -82,5 +83,24 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get('/categories/{id}', [CategoryController::class, 'getCategoryById']);
     Route::put('/categories/{id}', [CategoryController::class, 'updateCategory']);
     Route::delete('/categories/{id}', [CategoryController::class, 'deleteCategory']);
+
+
+
+    Route::get('/cours', [CoursController::class, 'getAllCourses']);         
+    Route::post('/cours', [CoursController::class, 'createCourse']);         
+    Route::get('/cours/{id}', [CoursController::class, 'getCourseById']);    
+    Route::put('/cours/{id}', [CoursController::class, 'updateCourse']);     
+    Route::delete('/cours/{id}', [CoursController::class, 'deleteCourse']); 
+    
+    
+    Route::get('/ressources', [RessourceController::class, 'getAllRessources']);         
+    Route::post('/ressources', [RessourceController::class, 'createRessource']);         
+    Route::get('/ressources/{id}', [RessourceController::class, 'getRessourceById']);    
+    Route::put('/ressources/{id}', [RessourceController::class, 'updateRessource']);     
+    Route::delete('/ressources/{id}', [RessourceController::class, 'deleteRessource']);
+
+
+
+
     
 });
