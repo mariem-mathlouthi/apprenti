@@ -47,11 +47,13 @@ import CreateTuteur from "../components/Admin/CreateTuteur.vue";
 
 
 import TuteurDashboard from "../components/TuteurDash/TuteurDashboard.vue";
+import Cours from "../components/TuteurDash/Cours.vue";
 
 import AddCategory from "../components/Admin/AddCategory.vue";
 import DetailCategory from "../components/Admin/DetailCategory.vue";
 import UpdateCategory from "../components/Admin/UpdateCategory.vue";
 import CategoryList from "../components/Admin/CategoryList.vue";
+
 
 
 
@@ -284,7 +286,14 @@ const routes = [
     path: "/CategoryList",
     name: "CategoryList",
     component:CategoryList,
-  }
+  },
+  {
+    path: "/Cours",
+    name: "Cours",
+    component: Cours,
+  },
+  
+  
 
 
 

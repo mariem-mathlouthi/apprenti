@@ -214,6 +214,7 @@ export default {
 
 <script>
 import SidebarMenu from "./SidebarMenu.vue";
+import NavbarOne from "./NavbarOne.vue";
 import axios from "axios";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";

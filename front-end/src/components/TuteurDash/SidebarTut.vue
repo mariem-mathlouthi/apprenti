@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
 
     <nav class="bg-blue-100 shadow-xl h-screen fixed top-0 left-0 min-w-[250px] py-6 font-[sans-serif] overflow-auto" style="margin-top:72px">
         <div class="relative flex flex-col h-full">
@@ -14,7 +14,7 @@
             <span>Tableau de bord</span>
           </router-link>
         </li>
-  
+        
   
   
   
@@ -31,7 +31,7 @@
                   d="M406.28 418.24c-2.42-.4-5.71-.78-10.2-.78s-7.78.38-10.2.78c-3.98.7-7.6 4.32-8.31 8.31-.4 2.42-.78 5.71-.78 10.2s.38 7.78.78 10.2c.7 3.98 4.32 7.6 8.31 8.31 2.42.4 5.71.78 10.2.78s7.78-.38 10.2-.78c3.98-.7 7.6-4.32 8.31-8.31.4-2.42.78-5.71.78-10.2s-.38-7.78-.78-10.2c-.7-3.98-4.32-7.6-8.31-8.31zm-10.21-12.61c10.49 0 19-8.51 19-19v-31.7c0-10.49-8.51-19-19-19s-19 8.51-19 19v31.7c0 10.49 8.51 19 19 19z"
                   data-original="#000000" />
           </svg>
-          <span> Liste des offres</span>
+          <span> Cours</span>
       </router-link>
   </li>
   
@@ -81,6 +81,8 @@
           <span> Compte</span>
       </router-link>
   </li>
+
+
   
   <li>
       <router-link to="/SignIn" class="text-[#333] text-sm flex items-center hover:text-[#007bff] hover:border-r-[5px] border-[#077bff] hover:bg-gray-100 px-8 py-4 transition-all">
@@ -90,6 +92,8 @@
           <span> Déconnexion </span>
       </router-link>
   </li>
+
+
   
   
   
@@ -127,4 +131,75 @@
      
   
    };
-   </script>
+   </script> --> 
+   <template>
+    <nav
+      class="bg-blue-100 shadow-xl h-screen fixed top-0 left-0 min-w-[250px] py-6 font-[sans-serif] overflow-auto"
+      style="margin-top:72px"
+    >
+      <div class="relative flex flex-col h-full">
+        <ul class="space-y-3 my-10 flex-1">
+          <!-- Tableau de bord -->
+          <li key="dashboard">
+            <router-link
+              to="/StudentDash"
+              class="text-[#333] text-sm flex items-center hover:text-[#007bff] hover:border-r-[5px] border-[#077bff] hover:bg-gray-100 px-8 py-4 transition-all"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                class="w-[18px] h-[18px] mr-4"
+                viewBox="0 0 512 512"
+              >
+                <path
+                  d="M197.332 170.668h-160C16.746 170.668 0 153.922 0 133.332v-96C0 16.746 16.746 0 37.332 0h160c20.59 0 37.336 16.746 37.336 37.332v96c0 20.59-16.746 37.336-37.336 37.336zM37.332 32A5.336 5.336 0 0 0 32 37.332v96a5.337 5.337 0 0 0 5.332 5.336h160a5.338 5.338 0 0 0 5.336-5.336v-96A5.337 5.337 0 0 0 197.332 32z"
+                  data-original="#000000"
+                />
+              </svg>
+              <span>Tableau de bord</span>
+            </router-link>
+          </li>
+  
+          <!-- Liste des offres -->
+          <li key="offers">
+            <router-link
+              to="/OffersListStd"
+              class="text-[#333] text-sm flex items-center hover:text-[#007bff] hover:border-r-[5px] border-[#077bff] hover:bg-gray-100 px-8 py-4 transition-all"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                class="w-[18px] h-[18px] mr-4"
+                viewBox="0 0 512 512"
+              >
+                <path
+                  d="M122.39 165.78h244.87c10.49 0 19-8.51 19-19s-8.51-19-19-19H122.39c-10.49 0-19 8.51-19 19s8.51 19 19 19zm164.33 99.44c0-10.49-8.51-19-19-19H122.39c-10.49 0-19 8.51-19 19s8.51 19 19 19h145.33c10.49 0 19-8.51 19-19z"
+                  data-original="#000000"
+                />
+              </svg>
+              <span>Liste des offres</span>
+            </router-link>
+          </li>
+  
+          <!-- Cours -->
+          <li key="cours">
+            <router-link
+              to="/Cours"
+              class="text-[#333] text-sm flex items-center hover:text-[#007bff] hover:border-r-[5px] border-[#077bff] hover:bg-gray-100 px-8 py-4 transition-all"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                class="w-[18px] h-[18px] mr-4"
+                viewBox="0 0 512 512"
+              >
+                <path d="M..." data-original="#000000" />
+              </svg>
+              <span>Cours</span>
+            </router-link>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </template>
+  

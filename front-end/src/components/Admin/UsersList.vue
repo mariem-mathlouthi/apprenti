@@ -7,30 +7,88 @@
     <section id="content">
       <!-- NAVBAR -->
       <NavbarOne></NavbarOne>
+
+      <!-- FORM CONTENT -->
       <div class="col-span-9 mt-24 mr-24 ml-24">
-        <h1 class="text-center font-weight-bold my-4">Liste des Entreprises</h1>
-        <table id="example" class="min-w-full divide-y divide-gray-200 font-[sans-serif]">
-          <thead class="bg-gray-100 whitespace-nowrap">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NomEntreprise</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Secteur</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Numero SIRET</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200 whitespace-nowrap">
-            <tr v-for="enterprise in enterprises" :key="enterprise.id">
-              <td class="px-6 py-4 text-sm text-[#333]">{{enterprise.name}}</td>
-              <td class="px-6 py-4 text-sm text-[#333]">{{enterprise.email}}</td>
-              <td class="px-6 py-4 text-sm text-[#333]">{{enterprise.secteur}}</td>
-              <td class="px-6 py-4 text-sm text-[#333]">{{enterprise.numeroSIRET}}</td>
-              <td class="px-6 py-4 text-sm text-[#333]">
-                <button class="text-red-500 hover:text-red-700" @click="deleteEnterprise(enterprise.id)">Supprimer</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <h2 class="text-2xl font-bold mb-4">Créer un Tuteur</h2>
+        <form @submit.prevent="createTuteur" class="space-y-4">
+          <div>
+            <label class="font-medium">Nom complet</label>
+            <input
+              type="text"
+              v-model="fullname"
+              required
+              class="w-full px-3 py-2 border rounded-lg"
+            />
+          </div>
+
+          <div>
+            <label class="font-medium">Email</label>
+            <input
+              type="email"
+              v-model="email"
+              required
+              class="w-full px-3 py-2 border rounded-lg"
+            />
+          </div>
+
+          <div>
+            <label class="font-medium">Domaine</label>
+            <input
+              type="text"
+              v-model="domaine"
+              required
+              class="w-full px-3 py-2 border rounded-lg"
+            />
+          </div>
+
+          <div>
+            <label class="font-medium">Spécialité</label>
+            <input
+              type="text"
+              v-model="specialite"
+              required
+              class="w-full px-3 py-2 border rounded-lg"
+            />
+          </div>
+
+          <div>
+            <label class="font-medium">Expérience (années)</label>
+            <input
+              type="number"
+              v-model="experience"
+              required
+              class="w-full px-3 py-2 border rounded-lg"
+            />
+          </div>
+
+          <div>
+            <label class="font-medium">Téléphone</label>
+            <input
+              type="text"
+              v-model="phone"
+              required
+              class="w-full px-3 py-2 border rounded-lg"
+            />
+          </div>
+
+          <div>
+            <label class="font-medium">Mot de passe</label>
+            <input
+              type="password"
+              v-model="password"
+              required
+              class="w-full px-3 py-2 border rounded-lg"
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-500"
+          >
+            Ajouter Tuteur
+          </button>
+        </form>
       </div>
     </section>
     <!-- CONTENT -->
@@ -40,47 +98,68 @@
 <script>
 import NavbarOne from "./NavbarOne.vue";
 import SidebarMenu from "./SidebarMenu.vue";
-import axios from 'axios';
+import axios from "axios";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 export default {
-  name: 'App',
+  name: 'CreateTuteur',
   components: {
     NavbarOne,
     SidebarMenu
   },
   data() {
     return {
-      enterprises: [] // to store fetched enterprises
+      fullname: "",
+      email: "",
+      domaine: "",
+      specialite: "",
+      experience: "",
+      phone: "",
+      password: "",
     };
   },
-  mounted() {
-    this.fetchEnterprises();
-  },
   methods: {
-    fetchEnterprises() {
-      axios.get('http://localhost:8000/api/enterprisesAdmin')
-        .then(response => {
-          this.enterprises = response.data.enterprises;
-          console.table(this.enterprises);
-        })
-        .catch(error => {
-          console.error('Error fetching enterprises:', error);
-        });
-    },
-    deleteEnterprise(id) {
-      if (window.confirm("Êtes-vous sûr de vouloir supprimer cette entreprise ?")) {
-        axios.delete(`http://localhost:8000/api/enterprisesAdmin/${id}`)
-          .then(response => {
-            console.log(response.data.message); // Afficher un message de confirmation
-            this.fetchEnterprises(); // Recharger la liste des entreprises après la suppression
-          })
-          .catch(error => {
-            console.error('Erreur lors de la suppression de l\'entreprise :', error);
-          });
+    async createTuteur() {
+      let newTuteur = {
+        fullname: this.fullname,
+        email: this.email,
+        domaine: this.domaine,
+        specialite: this.specialite,
+        experience: parseInt(this.experience), // Convertir en nombre
+        phone: this.phone,
+        password: this.password,
+      };
+
+      console.log("Données envoyées :", newTuteur); // Debugging
+
+      try {
+        const response = await axios.post(
+          "http://localhost:8000/api/admin/tuteur",
+          newTuteur,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        toast.success("Tuteur ajouté avec succès !");
+        this.$router.push("/Admin");
+      } catch (error) {
+        if (error.response) {
+          console.error("Erreur Laravel:", error.response.data);
+          toast.error(
+            `Erreur: ${
+              error.response.data.message || "Vérifiez les champs saisis"
+            }`
+          );
+        } else {
+          console.error("Erreur inconnue:", error);
+        }
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>
