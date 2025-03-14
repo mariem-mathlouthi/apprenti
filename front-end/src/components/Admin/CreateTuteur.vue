@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!-- <template>
   <div class="container mx-auto p-4">
     <h2 class="text-2xl font-bold mb-4">Créer un Tuteur</h2>
@@ -79,15 +80,92 @@
         Ajouter Tuteur
       </button>
     </form>
+=======
+<template>
+  <div id="app" class="flex flex-col h-screen">
+    <!-- SIDEBAR AND NAVBAR -->
+    <NavbarOne />
+    <SidebarMenu />
+
+    <!-- CONTENT -->
+    <section id="content" class="flex-1 flex justify-center items-center py-6">
+      <!-- MAIN CONTENT (Formulaire pour Créer un Tuteur) -->
+      <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold text-indigo-700 text-center mb-6">
+          Créer un Tuteur
+        </h1>
+        <div class="bg-white p-8 rounded-lg shadow-lg w-full sm:w-96 max-w-4xl mx-auto">
+          <form @submit.prevent="createTuteur" class="space-y-6">
+            <!-- Nom complet -->
+            <div class="form-group">
+              <label class="label">Nom complet</label>
+              <input type="text" v-model="fullname" required class="input" placeholder="Entrez le nom complet" />
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+              <label class="label">Email</label>
+              <input type="email" v-model="email" required class="input" placeholder="Entrez l'email" />
+            </div>
+
+            <!-- Domaine -->
+            <div class="form-group">
+              <label class="label">Domaine</label>
+              <input type="text" v-model="domaine" required class="input" placeholder="Entrez le domaine" />
+            </div>
+
+            <!-- Spécialité -->
+            <div class="form-group">
+              <label class="label">Spécialité</label>
+              <input type="text" v-model="specialite" required class="input" placeholder="Entrez la spécialité" />
+            </div>
+
+            <!-- Expérience -->
+            <div class="form-group">
+              <label class="label">Expérience (en années)</label>
+              <input type="number" v-model="experience" required class="input" placeholder="Expérience en années" />
+            </div>
+
+            <!-- Téléphone -->
+            <div class="form-group">
+              <label class="label">Téléphone</label>
+              <input type="text" v-model="phone" required class="input" placeholder="Entrez le téléphone" />
+            </div>
+
+            <!-- Mot de passe -->
+            <div class="form-group">
+              <label class="label">Mot de passe</label>
+              <input type="password" v-model="password" required class="input" placeholder="Entrez le mot de passe" />
+            </div>
+
+            <!-- Bouton d'ajout -->
+            <div class="mt-6 flex justify-center">
+              <button type="submit" class="btn-submit">
+                Ajouter Tuteur
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+    <!-- END CONTENT -->
+>>>>>>> sauvegarde-commits
   </div>
 </template>
 
 <script>
+import SidebarMenu from "./SidebarMenu.vue";
+import NavbarOne from "./NavbarOne.vue";
 import axios from "axios";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
 export default {
+  name: "CreateTuteur",
+  components: {
+    SidebarMenu,
+    NavbarOne
+  },
   data() {
     return {
       fullname: "",
@@ -96,7 +174,7 @@ export default {
       specialite: "",
       experience: "",
       phone: "",
-      password: "",
+      password: ""
     };
   },
   methods: {
@@ -108,10 +186,8 @@ export default {
         specialite: this.specialite,
         experience: parseInt(this.experience), // Convertir en nombre
         phone: this.phone,
-        password: this.password,
+        password: this.password
       };
-
-      console.log("Données envoyées :", newTuteur); // Debugging
 
       try {
         const response = await axios.post(
@@ -119,13 +195,19 @@ export default {
           newTuteur,
           {
             headers: {
+<<<<<<< HEAD
               "Content-Type": "application/json",
             },
+=======
+              "Content-Type": "application/json"
+            }
+>>>>>>> sauvegarde-commits
           }
         );
         toast.success("Tuteur ajouté avec succès !");
         this.$router.push("/Admin");
       } catch (error) {
+<<<<<<< HEAD
         if (error.response) {
           console.error("Erreur Laravel:", error.response.data);
           toast.error(
@@ -133,12 +215,16 @@ export default {
               error.response.data.message || "Vérifiez les champs saisis"
             }`
           );
+=======
+        if (error.response && error.response.data.message) {
+          toast.error(`Erreur: ${error.response.data.message}`);
+>>>>>>> sauvegarde-commits
         } else {
           console.error("Erreur inconnue:", error);
         }
       }
-    },
-  },
+    }
+  }
 };
 </script> -->
 <template>
