@@ -142,7 +142,7 @@
           <!-- Tableau de bord -->
           <li key="dashboard">
             <router-link
-              to="/StudentDash"
+              to="/TuteurDashboard"
               class="text-[#333] text-sm flex items-center hover:text-[#007bff] hover:border-r-[5px] border-[#077bff] hover:bg-gray-100 px-8 py-4 transition-all"
             >
               <svg
@@ -160,26 +160,7 @@
             </router-link>
           </li>
   
-          <!-- Liste des offres -->
-          <li key="offers">
-            <router-link
-              to="/OffersListStd"
-              class="text-[#333] text-sm flex items-center hover:text-[#007bff] hover:border-r-[5px] border-[#077bff] hover:bg-gray-100 px-8 py-4 transition-all"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                class="w-[18px] h-[18px] mr-4"
-                viewBox="0 0 512 512"
-              >
-                <path
-                  d="M122.39 165.78h244.87c10.49 0 19-8.51 19-19s-8.51-19-19-19H122.39c-10.49 0-19 8.51-19 19s8.51 19 19 19zm164.33 99.44c0-10.49-8.51-19-19-19H122.39c-10.49 0-19 8.51-19 19s8.51 19 19 19h145.33c10.49 0 19-8.51 19-19z"
-                  data-original="#000000"
-                />
-              </svg>
-              <span>Liste des offres</span>
-            </router-link>
-          </li>
+         
   
           <!-- Cours -->
           <li key="cours">

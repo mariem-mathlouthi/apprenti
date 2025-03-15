@@ -53,7 +53,6 @@
   
   <script>
   import Sidebar from "./SidebarTut.vue";
-  import Navbar from "./NavBarTut.vue";
   import { toast } from "vue3-toastify";
   import "vue3-toastify/dist/index.css";
   
