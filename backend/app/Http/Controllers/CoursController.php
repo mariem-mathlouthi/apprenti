@@ -24,34 +24,47 @@ class CoursController extends Controller
      * Ajouter un nouveau cours.
      */
     public function createCourse(Request $request)
-    {
-        $request->validate([
-            'titre' => 'required|string|max:255',
-            'description' => 'required',
-            'category_id' => 'required|exists:categories,id',
-            'prix' => 'required|numeric',
-            'idTuteur' => 'required|exists:tuteurs,id',
-            'idApprenant' => 'nullable|exists:etudiants,id',
-            'duration' => 'required|integer',
-            'file' => 'nullable|string',
-            'createdBy' => 'required|exists:tuteurs,id',
-        ]);
+{
+    try {
+        // Récupérer toutes les données envoyées
+        $requestData = $request->all();
 
-        try {
-            $cours = Cours::create($request->all());
-            return response()->json([
-                'success' => true,
-                'message' => 'Cours ajouté avec succès',
-                'cours' => $cours
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erreur lors de l\'ajout du cours',
-                'error' => $e->getMessage()
-            ], 500);
+        // Vérifier si un fichier est envoyé
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('storage/cours'), $filename);
+            $requestData['file'] = asset('storage/cours/' . $filename); // Stocker le chemin du fichier
         }
+
+        // Créer un nouveau cours sans validation obligatoire
+        $cours = new Cours();
+        $cours->titre = $requestData['titre'] ?? null;
+        $cours->description = $requestData['description'] ?? null;
+        $cours->category_id = $requestData['category_id'] ?? null;
+        $cours->prix = $requestData['prix'] ?? null;
+        $cours->idTuteur = $requestData['idTuteur'] ?? null; // Optionnel
+        $cours->idApprenant = $requestData['idApprenant'] ?? null; // Optionnel
+        $cours->duration = $requestData['duration'] ?? null;
+        $cours->file = $requestData['file'] ?? null;
+        $cours->createdBy = $requestData['createdBy'] ?? null; // Optionnel
+
+        // Sauvegarde dans la base de données
+        $cours->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cours ajouté avec succès',
+            'cours' => $cours
+        ], 201);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Erreur lors de l\'ajout du cours',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
 
     /**
      * Récupérer un cours par son ID.
