@@ -44,7 +44,7 @@
             <!-- Durée -->
             <div class="form-group">
               <label class="label">Durée (heures)</label>
-              <input type="number" v-model="duree" required class="input" placeholder="Durée du cours" />
+              <input type="number" v-model="duration" required class="input" placeholder="Durée du cours" />
             </div>
 
             <!-- Fichier (PDF ou autre) -->
@@ -68,7 +68,7 @@
 
 <script>
 import SidebarTuteur from "./SidebarTut.vue";
-import NavbarTuteur from "./NavbarTut.vue"; // Assurez-vous d'importer NavbarTuteur
+import NavbarTuteur from "./NavbarTut.vue";
 import axios from "axios";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -86,8 +86,8 @@ export default {
       selectedCategory: "", // Catégorie sélectionnée
       categories: [], // Liste des catégories
       prix: "",
-      duree: "",
-      file: null,
+      duration: "", // Durée du cours
+      file: null, // Fichier uploadé
     };
   },
   methods: {
@@ -103,35 +103,70 @@ export default {
     },
     // Gérer l'upload du fichier
     handleFileUpload(event) {
-      this.file = event.target.files[0];
+      this.file = event.target.files[0]; // Set the file in the component's data
     },
     // Créer un nouveau cours
     async createCours() {
+      // Create FormData object
       let formData = new FormData();
+
+      // Append required fields
       formData.append("titre", this.titre);
       formData.append("description", this.description);
-      formData.append("category_id", parseInt(this.selectedCategory)); // Convertir en entier
-      formData.append("prix", this.prix); // Renamed from "price" to "prix"
-      formData.append("duree", this.duree); // Renamed from "duration" to "duree"
-      formData.append("file", this.file);
-      formData.append("idTuteur", "1"); // Remplacez par l'ID du tuteur connecté
-      formData.append("createdBy", "1"); // Remplacez par l'ID de l'utilisateur connecté
+      formData.append("category_id", parseInt(this.selectedCategory)); // Ensure it's a number
+      formData.append("prix", parseFloat(this.prix)); // Ensure it's a number
+      formData.append("duration", parseInt(this.duration)); // Ensure it's a number
+      formData.append("file", this.file); // Append the file
+
+      // Get the tuteur's ID and createdBy ID
+      const idTuteur = this.getTuteurId(); // Ensure this returns a valid integer
+      const createdBy = this.getTuteurId(); // Ensure this returns a valid integer
+
+      // Append tuteur and createdBy fields
+      formData.append("idTuteur", idTuteur);
+      formData.append("createdBy", createdBy);
+
+      // Log FormData for debugging
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
 
       try {
-        await axios.post("http://localhost:8000/api/cours", formData, {
+        // Send the request to the backend
+        const response = await axios.post("http://localhost:8000/api/cours", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         });
+
+        // Handle success
         toast.success("Cours ajouté avec succès !");
-        this.$router.push("/tuteur/dashboard"); // Rediriger après l'ajout
+        this.$router.push("/tuteur/dashboard");
       } catch (error) {
-        if (error.response && error.response.data.message) {
-          toast.error(`Erreur: ${error.response.data.message}`);
+        if (error.response && error.response.data.errors) {
+          // Log validation errors
+          console.error("Validation errors:", error.response.data.errors);
+          toast.error("Erreur de validation. Vérifiez les champs.");
         } else {
           console.error("Erreur inconnue:", error);
+          toast.error("Une erreur s'est produite.");
         }
       }
+    },
+    // Get the tuteur's ID from your authentication system
+    getTuteurId() {
+      // Retrieve the tuteur's ID from localStorage
+      const tuteurId = localStorage.getItem("tuteurId");
+
+      // Check if the ID exists and is valid
+      if (!tuteurId || isNaN(tuteurId)) {
+        console.error("Tuteur ID not found or invalid.");
+        toast.error("Erreur: ID du tuteur non trouvé ou invalide.");
+        return null; // Return null to indicate an error
+      }
+
+      // Return the ID as an integer
+      return parseInt(tuteurId);
     },
   },
   mounted() {
