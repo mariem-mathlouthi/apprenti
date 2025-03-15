@@ -1,56 +1,33 @@
 <template>
   <div id="app" class="flex flex-col h-screen">
-<<<<<<< HEAD
-    <!-- SIDEBAR & NAVBAR -->
-    <NavbarTuteur />
-    <SidebarTuteur />
-
-    <!-- CONTENU -->
-=======
     <!-- Navbar & Sidebar -->
     <NavbarTuteur />
     <SidebarTuteur />
 
     <!-- Contenu principal -->
->>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
     <section id="content" class="flex-1 flex justify-center items-center py-6">
       <div class="container mx-auto p-6">
         <h1 class="text-3xl font-bold text-indigo-700 text-center mb-6">
           Ajouter un Cours
         </h1>
-<<<<<<< HEAD
-        <div class="bg-white p-8 rounded-lg shadow-lg w-full sm:w-96 max-w-4xl mx-auto">
-          <form @submit.prevent="createCours" class="space-y-6">
-            <!-- Titre -->
-            <div class="form-group">
-=======
 
         <div class="bg-white p-8 rounded-lg shadow-lg w-full sm:w-96 max-w-4xl mx-auto">
           <form @submit.prevent="createCours" class="space-y-6">
             
             <!-- Titre -->
             <div>
->>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
               <label class="label">Titre</label>
               <input type="text" v-model="titre" required class="input" placeholder="Entrez le titre" />
             </div>
 
             <!-- Description -->
-<<<<<<< HEAD
-            <div class="form-group">
-=======
             <div>
->>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
               <label class="label">Description</label>
               <textarea v-model="description" required class="input" placeholder="Entrez la description"></textarea>
             </div>
 
             <!-- Catégorie -->
-<<<<<<< HEAD
-            <div class="form-group">
-=======
             <div>
->>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
               <label class="label">Catégorie</label>
               <select v-model="selectedCategory" required class="input">
                 <option disabled value="">Sélectionnez une catégorie</option>
@@ -61,34 +38,17 @@
             </div>
 
             <!-- Prix -->
-<<<<<<< HEAD
-            <div class="form-group">
-=======
             <div>
->>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
               <label class="label">Prix (€)</label>
               <input type="number" v-model="prix" required class="input" placeholder="Entrez le prix" />
             </div>
 
             <!-- Durée -->
-<<<<<<< HEAD
-            <div class="form-group">
-=======
             <div>
->>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
               <label class="label">Durée (heures)</label>
               <input type="number" v-model="duration" required class="input" placeholder="Durée du cours" />
             </div>
 
-<<<<<<< HEAD
-            <!-- Fichier (PDF ou autre) -->
-            <div class="form-group">
-              <label class="label">Fichier</label>
-              <input type="file" @change="handleFileUpload" required class="input" />
-            </div>
-
-            <!-- Bouton d'ajout -->
-=======
             <!-- Fichier -->
             <div>
               <label class="label">Fichier</label>
@@ -96,16 +56,12 @@
             </div>
 
             <!-- Bouton -->
->>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
             <div class="mt-6 flex justify-center">
               <button type="submit" class="btn-submit">
                 Ajouter Cours
               </button>
             </div>
-<<<<<<< HEAD
-=======
 
->>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
           </form>
         </div>
       </div>
@@ -130,21 +86,6 @@ export default {
     return {
       titre: "",
       description: "",
-<<<<<<< HEAD
-      selectedCategory: "", // Catégorie sélectionnée
-      categories: [], // Liste des catégories
-      prix: "",
-      duration: "", // Durée du cours
-      file: null, // Fichier uploadé
-    };
-  },
-  methods: {
-    // Récupérer les catégories depuis l'API
-    async fetchCategories() {
-      try {
-        const response = await axios.get("http://localhost:8000/api/categories");
-        this.categories = response.data;
-=======
       selectedCategory: "",
       categories: [],
       prix: "",
@@ -159,84 +100,11 @@ export default {
       try {
         const response = await axios.get("http://localhost:8000/api/categories");
         this.categories = response.data || [];
->>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
       } catch (error) {
         console.error("Erreur lors de la récupération des catégories :", error);
         toast.error("Impossible de récupérer les catégories.");
       }
     },
-<<<<<<< HEAD
-    // Gérer l'upload du fichier
-    handleFileUpload(event) {
-      this.file = event.target.files[0]; // Set the file in the component's data
-    },
-    // Créer un nouveau cours
-    async createCours() {
-      // Create FormData object
-      let formData = new FormData();
-
-      // Append required fields
-      formData.append("titre", this.titre);
-      formData.append("description", this.description);
-      formData.append("category_id", parseInt(this.selectedCategory)); // Ensure it's a number
-      formData.append("prix", parseFloat(this.prix)); // Ensure it's a number
-      formData.append("duration", parseInt(this.duration)); // Ensure it's a number
-      formData.append("file", this.file); // Append the file
-
-      // Get the tuteur's ID and createdBy ID
-      const idTuteur = this.getTuteurId(); // Ensure this returns a valid integer
-      const createdBy = this.getTuteurId(); // Ensure this returns a valid integer
-
-      // Append tuteur and createdBy fields
-      formData.append("idTuteur", idTuteur);
-      formData.append("createdBy", createdBy);
-
-      // Log FormData for debugging
-      for (let [key, value] of formData.entries()) {
-        console.log(key, value);
-      }
-
-      try {
-        // Send the request to the backend
-        const response = await axios.post("http://localhost:8000/api/cours", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-
-        // Handle success
-        toast.success("Cours ajouté avec succès !");
-        this.$router.push("/tuteur/dashboard");
-      } catch (error) {
-        if (error.response && error.response.data.errors) {
-          // Log validation errors
-          console.error("Validation errors:", error.response.data.errors);
-          toast.error("Erreur de validation. Vérifiez les champs.");
-        } else {
-          console.error("Erreur inconnue:", error);
-          toast.error("Une erreur s'est produite.");
-        }
-      }
-    },
-    // Get the tuteur's ID from your authentication system
-    getTuteurId() {
-      // Retrieve the tuteur's ID from localStorage
-      const tuteurId = localStorage.getItem("tuteurId");
-
-      // Check if the ID exists and is valid
-      if (!tuteurId || isNaN(tuteurId)) {
-        console.error("Tuteur ID not found or invalid.");
-        toast.error("Erreur: ID du tuteur non trouvé ou invalide.");
-        return null; // Return null to indicate an error
-      }
-
-      // Return the ID as an integer
-      return parseInt(tuteurId);
-    },
-  },
-  mounted() {
-    this.fetchCategories(); // Charger les catégories au montage du composant
-=======
 
     handleFileUpload(event) {
       this.file = event.target.files[0];
@@ -303,7 +171,6 @@ export default {
   mounted() {
     this.loadTuteurData();
     this.fetchCategories();
->>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
   },
 };
 </script>
@@ -311,12 +178,6 @@ export default {
 <style scoped>
 .input {
   width: 100%;
-<<<<<<< HEAD
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-=======
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -327,19 +188,13 @@ export default {
   outline: none;
 }
 
->>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
 .btn-submit {
   background-color: #4f46e5;
   color: white;
   padding: 10px 15px;
-<<<<<<< HEAD
-  border-radius: 4px;
-  cursor: pointer;
-=======
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
->>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
 }
 .btn-submit:hover {
   background-color: #4338ca;
