@@ -1,31 +1,56 @@
 <template>
   <div id="app" class="flex flex-col h-screen">
+<<<<<<< HEAD
     <!-- SIDEBAR & NAVBAR -->
     <NavbarTuteur />
     <SidebarTuteur />
 
     <!-- CONTENU -->
+=======
+    <!-- Navbar & Sidebar -->
+    <NavbarTuteur />
+    <SidebarTuteur />
+
+    <!-- Contenu principal -->
+>>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
     <section id="content" class="flex-1 flex justify-center items-center py-6">
       <div class="container mx-auto p-6">
         <h1 class="text-3xl font-bold text-indigo-700 text-center mb-6">
           Ajouter un Cours
         </h1>
+<<<<<<< HEAD
         <div class="bg-white p-8 rounded-lg shadow-lg w-full sm:w-96 max-w-4xl mx-auto">
           <form @submit.prevent="createCours" class="space-y-6">
             <!-- Titre -->
             <div class="form-group">
+=======
+
+        <div class="bg-white p-8 rounded-lg shadow-lg w-full sm:w-96 max-w-4xl mx-auto">
+          <form @submit.prevent="createCours" class="space-y-6">
+            
+            <!-- Titre -->
+            <div>
+>>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
               <label class="label">Titre</label>
               <input type="text" v-model="titre" required class="input" placeholder="Entrez le titre" />
             </div>
 
             <!-- Description -->
+<<<<<<< HEAD
             <div class="form-group">
+=======
+            <div>
+>>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
               <label class="label">Description</label>
               <textarea v-model="description" required class="input" placeholder="Entrez la description"></textarea>
             </div>
 
             <!-- Catégorie -->
+<<<<<<< HEAD
             <div class="form-group">
+=======
+            <div>
+>>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
               <label class="label">Catégorie</label>
               <select v-model="selectedCategory" required class="input">
                 <option disabled value="">Sélectionnez une catégorie</option>
@@ -36,17 +61,26 @@
             </div>
 
             <!-- Prix -->
+<<<<<<< HEAD
             <div class="form-group">
+=======
+            <div>
+>>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
               <label class="label">Prix (€)</label>
               <input type="number" v-model="prix" required class="input" placeholder="Entrez le prix" />
             </div>
 
             <!-- Durée -->
+<<<<<<< HEAD
             <div class="form-group">
+=======
+            <div>
+>>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
               <label class="label">Durée (heures)</label>
               <input type="number" v-model="duration" required class="input" placeholder="Durée du cours" />
             </div>
 
+<<<<<<< HEAD
             <!-- Fichier (PDF ou autre) -->
             <div class="form-group">
               <label class="label">Fichier</label>
@@ -54,11 +88,24 @@
             </div>
 
             <!-- Bouton d'ajout -->
+=======
+            <!-- Fichier -->
+            <div>
+              <label class="label">Fichier</label>
+              <input type="file" @change="handleFileUpload" class="input" />
+            </div>
+
+            <!-- Bouton -->
+>>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
             <div class="mt-6 flex justify-center">
               <button type="submit" class="btn-submit">
                 Ajouter Cours
               </button>
             </div>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
           </form>
         </div>
       </div>
@@ -83,6 +130,7 @@ export default {
     return {
       titre: "",
       description: "",
+<<<<<<< HEAD
       selectedCategory: "", // Catégorie sélectionnée
       categories: [], // Liste des catégories
       prix: "",
@@ -96,11 +144,28 @@ export default {
       try {
         const response = await axios.get("http://localhost:8000/api/categories");
         this.categories = response.data;
+=======
+      selectedCategory: "",
+      categories: [],
+      prix: "",
+      duration: "",
+      file: null,
+      idTuteur: null, // Ne plus hardcoder
+      createdBy: null
+    };
+  },
+  methods: {
+    async fetchCategories() {
+      try {
+        const response = await axios.get("http://localhost:8000/api/categories");
+        this.categories = response.data || [];
+>>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
       } catch (error) {
         console.error("Erreur lors de la récupération des catégories :", error);
         toast.error("Impossible de récupérer les catégories.");
       }
     },
+<<<<<<< HEAD
     // Gérer l'upload du fichier
     handleFileUpload(event) {
       this.file = event.target.files[0]; // Set the file in the component's data
@@ -171,6 +236,74 @@ export default {
   },
   mounted() {
     this.fetchCategories(); // Charger les catégories au montage du composant
+=======
+
+    handleFileUpload(event) {
+      this.file = event.target.files[0];
+    },
+
+    loadTuteurData() {
+      const tuteurData = JSON.parse(localStorage.getItem('TuteurAccountInfo'));
+      if (tuteurData) {
+        this.idTuteur = tuteurData.id;
+        this.createdBy = tuteurData.id;
+      } else {
+        toast.error("Veuillez vous reconnecter");
+        this.$router.push('/login');
+      }
+    },
+
+    async createCours() {
+      if (!this.idTuteur) {
+        toast.error("Identifiant tuteur non trouvé");
+        return;
+      }
+
+      let formData = new FormData();
+      formData.append("titre", this.titre);
+      formData.append("description", this.description);
+      formData.append("category_id", Number(this.selectedCategory));
+      formData.append("prix", Number(this.prix));
+      formData.append("duration", Number(this.duration));
+      formData.append("idTuteur", this.idTuteur);
+      formData.append("createdBy", this.createdBy);
+
+      if (this.file) {
+        formData.append("file", this.file);
+      }
+
+      try {
+        const response = await axios.post("http://localhost:8000/api/cours", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${localStorage.getItem('token')}`
+          },
+        });
+
+        if (response.data.success) {
+          toast.success("Cours ajouté avec succès !");
+          this.resetForm();
+        }
+      } catch (error) {
+        console.error("Erreur complète :", error);
+        const errorMessage = error.response?.data?.error || "Erreur inconnue";
+        toast.error(`Échec de l'ajout : ${errorMessage}`);
+      }
+    },
+
+    resetForm() {
+      this.titre = "";
+      this.description = "";
+      this.selectedCategory = "";
+      this.prix = "";
+      this.duration = "";
+      this.file = null;
+    }
+  },
+  mounted() {
+    this.loadTuteurData();
+    this.fetchCategories();
+>>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
   },
 };
 </script>
@@ -178,16 +311,35 @@ export default {
 <style scoped>
 .input {
   width: 100%;
+<<<<<<< HEAD
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
+=======
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  transition: border-color 0.2s;
+}
+.input:focus {
+  border-color: #4f46e5;
+  outline: none;
+}
+
+>>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
 .btn-submit {
   background-color: #4f46e5;
   color: white;
   padding: 10px 15px;
+<<<<<<< HEAD
   border-radius: 4px;
   cursor: pointer;
+=======
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+>>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
 }
 .btn-submit:hover {
   background-color: #4338ca;
