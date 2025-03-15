@@ -131,69 +131,26 @@
      
   
    };
-   </script> --> 
+   </script>  -->
+
    <template>
-    <nav
-      class="bg-blue-100 shadow-xl h-screen fixed top-0 left-0 min-w-[250px] py-6 font-[sans-serif] overflow-auto"
-      style="margin-top:72px"
-    >
+    <nav class="bg-blue-100 shadow-xl h-screen fixed top-0 left-0 min-w-[250px] py-6 font-[sans-serif] overflow-auto" style="margin-top:72px">
       <div class="relative flex flex-col h-full">
         <ul class="space-y-3 my-10 flex-1">
-          <!-- Tableau de bord -->
-          <li key="dashboard">
-            <router-link
-              to="/StudentDash"
-              class="text-[#333] text-sm flex items-center hover:text-[#007bff] hover:border-r-[5px] border-[#077bff] hover:bg-gray-100 px-8 py-4 transition-all"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                class="w-[18px] h-[18px] mr-4"
-                viewBox="0 0 512 512"
-              >
-                <path
-                  d="M197.332 170.668h-160C16.746 170.668 0 153.922 0 133.332v-96C0 16.746 16.746 0 37.332 0h160c20.59 0 37.336 16.746 37.336 37.332v96c0 20.59-16.746 37.336-37.336 37.336zM37.332 32A5.336 5.336 0 0 0 32 37.332v96a5.337 5.337 0 0 0 5.332 5.336h160a5.338 5.338 0 0 0 5.336-5.336v-96A5.337 5.337 0 0 0 197.332 32z"
-                  data-original="#000000"
-                />
+          <li>
+            <router-link to="/TuteurDashboard" class="text-[#333] text-sm flex items-center hover:text-[#007bff] hover:border-r-[5px] border-[#077bff] hover:bg-gray-100 px-8 py-4 transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-[18px] h-[18px] mr-4" viewBox="0 0 512 512">
+                <path d="M197.332 170.668h-160C16.746 170.668 0 153.922 0 133.332v-96C0 16.746 16.746 0 37.332 0h160c20.59 0 37.336 16.746 37.336 37.332v96c0 20.59-16.746 37.336-37.336 37.336zM37.332 32A5.336 5.336 0 0 0 32 37.332v96a5.337 5.337 0 0 0 5.332 5.336h160a5.338 5.338 0 0 0 5.336-5.336v-96A5.337 5.337 0 0 0 197.332 32zm160 480h-160C16.746 512 0 495.254 0 474.668v-224c0-20.59 16.746-37.336 37.332-37.336h160c20.59 0 37.336 16.746 37.336 37.336v224c0 20.586-16.746 37.332-37.336 37.332zm-160-266.668A5.337 5.337 0 0 0 32 250.668v224A5.336 5.336 0 0 0 37.332 480h160a5.337 5.337 0 0 0 5.336-5.332v-224a5.338 5.338 0 0 0-5.336-5.336zM474.668 512h-160c-20.59 0-37.336-16.746-37.336-37.332v-96c0-20.59 16.746-37.336 37.336-37.336h160c20.586 0 37.332 16.746 37.332 37.336v96C512 495.254 495.254 512 474.668 512zm-160-138.668a5.338 5.338 0 0 0-5.336 5.336v96a5.337 5.337 0 0 0 5.336 5.332h160a5.336 5.336 0 0 0 5.332-5.332v-96a5.337 5.337 0 0 0-5.332-5.336zm160-74.664h-160c-20.59 0-37.336-16.746-37.336-37.336v-224C277.332 16.746 294.078 0 314.668 0h160C495.254 0 512 16.746 512 37.332v224c0 20.59-16.746 37.336-37.332 37.336zM314.668 32a5.337 5.337 0 0 0-5.336 5.332v224a5.338 5.338 0 0 0 5.336 5.336h160a5.337 5.337 0 0 0 5.332-5.336v-224A5.336 5.336 0 0 0 474.668 32zm0 0" data-original="#000000" />
               </svg>
               <span>Tableau de bord</span>
             </router-link>
           </li>
   
-          <!-- Liste des offres -->
-          <li key="offers">
-            <router-link
-              to="/OffersListStd"
-              class="text-[#333] text-sm flex items-center hover:text-[#007bff] hover:border-r-[5px] border-[#077bff] hover:bg-gray-100 px-8 py-4 transition-all"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                class="w-[18px] h-[18px] mr-4"
-                viewBox="0 0 512 512"
-              >
-                <path
-                  d="M122.39 165.78h244.87c10.49 0 19-8.51 19-19s-8.51-19-19-19H122.39c-10.49 0-19 8.51-19 19s8.51 19 19 19zm164.33 99.44c0-10.49-8.51-19-19-19H122.39c-10.49 0-19 8.51-19 19s8.51 19 19 19h145.33c10.49 0 19-8.51 19-19z"
-                  data-original="#000000"
-                />
-              </svg>
-              <span>Liste des offres</span>
-            </router-link>
-          </li>
-  
-          <!-- Cours -->
-          <li key="cours">
-            <router-link
-              to="/Cours"
-              class="text-[#333] text-sm flex items-center hover:text-[#007bff] hover:border-r-[5px] border-[#077bff] hover:bg-gray-100 px-8 py-4 transition-all"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                class="w-[18px] h-[18px] mr-4"
-                viewBox="0 0 512 512"
-              >
-                <path d="M..." data-original="#000000" />
+         
+          <li>
+            <router-link to="/Cours" class="text-[#333] text-sm flex items-center hover:text-[#007bff] hover:border-r-[5px] border-[#077bff] hover:bg-gray-100 px-8 py-4 transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-[18px] h-[18px] mr-4" viewBox="0 0 512 512">
+                <path d="M193.61 149.99c-10.56 0-21.12 3.13-30.03 9.31l-33.69 23.95c-15.39 10.71-29.48 24.46-42.65 40.54l-70.98 99.48C26.77 334.25 16.35 351.83 15.65 368.58c-.07 2.01-.11 4.02-.13 6.03l-.29 83.77c0 2.3 1.77 4.11 4.07 4.11s4.07-1.81 4.07-4.11c0-45.2 28.88-81.52 68.4-88.35 38.17-6.12 76.34 11.9 102.45 45.87 45.7 62.67 110.89 81.35 168.92 87.62 51.28 4.91 101.59-5.76 146.41-26.41 50.71-22.56 92.3-58.44 116.48-106.94 18.71-34.47 30.29-74.48 32.76-113.53 3.47-36.06-1.63-70.28-13.56-101.64l4.06-1.66 5.32 18.14c2.39 5.47-.99 11.82-7.28 13.22l-80.04 29.88c-5.02 1.87-9.88-1.2-11.09-6.22-4.2-14.16-11.28-23.85-22.93-27.97-3.35-2.2-7.04-3.34-10.97-3.34z" />
               </svg>
               <span>Cours</span>
             </router-link>
@@ -202,4 +159,14 @@
       </div>
     </nav>
   </template>
+  
+  <script>
+  export default {
+    name: 'SideBarTut',
+  };
+  </script>
+  
+  <style scoped>
+  /* Add custom styles if needed */
+  </style>
   
