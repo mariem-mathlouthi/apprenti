@@ -591,7 +591,7 @@ const routes = [
     component: CategoryList,
   },
   {
-    path: "/Cours",
+    path: "/cours",
     name: "Cours",
     component: Cours,
   },

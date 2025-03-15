@@ -11,6 +11,21 @@ return new class extends Migration
      */
     public function up()
     {
+<<<<<<< HEAD
+        Schema::create('cours', function (Blueprint $table) {
+            $table->id();
+            $table->string('titre');
+            $table->text('description');
+            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
+            $table->decimal('prix', 10, 2);
+            $table->foreignId('idTuteur')->constrained('tuteurs')->onDelete('cascade');
+            $table->foreignId('idApprenant')->nullable()->constrained('etudiants')->onDelete('set null');
+            $table->integer('duration'); // en minutes ou heures
+            $table->string('file')->nullable();
+            $table->foreignId('createdBy')->constrained('tuteurs')->onDelete('cascade');
+            $table->timestamps();
+        });
+=======
       Schema::create('cours', function (Blueprint $table) {
         $table->id();
         $table->string('titre');
@@ -25,6 +40,7 @@ return new class extends Migration
         $table->timestamps();
     });
     
+>>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
     }
 
     /**
@@ -34,4 +50,8 @@ return new class extends Migration
     {
         Schema::dropIfExists('cours');
     }
+<<<<<<< HEAD
 };
+=======
+};
+>>>>>>> 673f7af5d820339a7a5e76d843fda127b93ee883
