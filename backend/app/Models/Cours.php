@@ -37,5 +37,6 @@ class Cours extends Model
         return $this->belongsTo(Tuteur::class, 'createdBy');
     }
     
+    
 }
 

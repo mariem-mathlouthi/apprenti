@@ -144,6 +144,8 @@ export default {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Authorization": `Bearer ${localStorage.getItem('token')}`
+
           },
         });
 
@@ -155,6 +157,7 @@ export default {
         console.error("Erreur complète :", error);
         const errorMessage = error.response?.data?.error || "Erreur inconnue";
         toast.error(`Échec de l'ajout : ${errorMessage}`);
+
       }
     },
   },
