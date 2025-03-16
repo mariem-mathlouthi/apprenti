@@ -13,7 +13,6 @@
 
         <div class="bg-white p-8 rounded-lg shadow-lg w-full sm:w-96 max-w-4xl mx-auto">
           <form @submit.prevent="createCours" class="space-y-6">
-            
             <!-- Titre -->
             <div>
               <label class="label">Titre</label>
@@ -61,7 +60,6 @@
                 Ajouter Cours
               </button>
             </div>
-
           </form>
         </div>
       </div>
@@ -91,8 +89,8 @@ export default {
       prix: "",
       duration: "",
       file: null,
-      idTuteur: null, // Ne plus hardcoder
-      createdBy: null
+      idTuteur: null,
+      createdBy: null,
     };
   },
   methods: {
@@ -111,13 +109,14 @@ export default {
     },
 
     loadTuteurData() {
-      const tuteurData = JSON.parse(localStorage.getItem('TuteurAccountInfo'));
+      const tuteurData = localStorage.getItem("TuteurAccountInfo");
       if (tuteurData) {
-        this.idTuteur = tuteurData.id;
-        this.createdBy = tuteurData.id;
+        const parsedData = JSON.parse(tuteurData);
+        this.idTuteur = parsedData.id;
+        this.createdBy = parsedData.id;
       } else {
         toast.error("Veuillez vous reconnecter");
-        this.$router.push('/login');
+        this.$router.push("/login");
       }
     },
 
@@ -144,13 +143,13 @@ export default {
         const response = await axios.post("http://localhost:8000/api/cours", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
-            "Authorization": `Bearer ${localStorage.getItem('token')}`
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
 
         if (response.data.success) {
           toast.success("Cours ajouté avec succès !");
-          this.resetForm();
+          this.$router.push("/cours"); // Rediriger vers la liste des cours
         }
       } catch (error) {
         console.error("Erreur complète :", error);
@@ -158,15 +157,6 @@ export default {
         toast.error(`Échec de l'ajout : ${errorMessage}`);
       }
     },
-
-    resetForm() {
-      this.titre = "";
-      this.description = "";
-      this.selectedCategory = "";
-      this.prix = "";
-      this.duration = "";
-      this.file = null;
-    }
   },
   mounted() {
     this.loadTuteurData();

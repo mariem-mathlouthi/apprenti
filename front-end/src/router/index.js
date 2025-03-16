@@ -378,7 +378,10 @@ import AddOfferAdmin from "../components/Admin/AddOffer.vue";
 import CreateTuteur from "../components/Admin/CreateTuteur.vue";
 
 import TuteurDashboard from "../components/TuteurDash/TuteurDashboard.vue";
+import CoursListe from "../components/TuteurDash/CoursListe.vue";
 import Cours from "../components/TuteurDash/Cours.vue";
+import CoursEdit from "../components/TuteurDash/CoursEdit.vue";
+
 import AddCategory from "../components/Admin/AddCategory.vue";
 import DetailCategory from "../components/Admin/DetailCategory.vue";
 import UpdateCategory from "../components/Admin/UpdateCategory.vue";
@@ -591,10 +594,23 @@ const routes = [
     component: CategoryList,
   },
   {
-    path: "/cours",
-    name: "Cours",
-    component: Cours,
+    path: "/cours", // Route pour afficher la liste des cours
+    name: "CoursListe",
+    component: CoursListe,
   },
+  {
+    path: "/ajouter-cours", 
+    name: "AjouterCours",
+    component: Cours, 
+  },
+
+
+  {
+    path: "/modifier-cours/:id", 
+    name: "CoursEdit",
+    component: CoursEdit,
+  },
+
 ];
 
 const router = createRouter({
