@@ -12,5 +12,7 @@ class Tuteur extends Model
     use HasFactory;
 
     protected $fillable = ['fullname', 'email', 'password'];
+
+    
 }
 

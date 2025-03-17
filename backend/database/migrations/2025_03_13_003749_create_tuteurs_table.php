@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('specialite');
             $table->integer('experience'); 
             $table->string('phone')->unique();
+            $table->enum('status',['en attente','accepté','refusé']); // modif to apply later
             $table->string('image')->nullable();
             $table->timestamps();
         });

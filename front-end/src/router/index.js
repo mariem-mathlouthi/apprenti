@@ -4,6 +4,10 @@ import SignupEtudiant from "../components/Auth/SignUpEtudiant.vue";
 import SignupEtudiantPart2 from "../components/Auth/SignUpEtudiantPart2.vue";
 import SignupEntreprise from "../components/Auth/SignUpEntreprise.vue";
 import SignupEntreprisePart2 from "../components/Auth/SignUpEntreprisePart2.vue";
+
+import SignUpTuteur from "../components/Auth/SignUpTuteur.vue";
+import SignUpTuteurPart2 from "../components/Auth/SignUpTuteurPart2.vue";
+
 import Contact from "../components/Contact.vue";
 import LandingPage from "../components/LandingPage.vue";
 import Teams from "../components/Teams.vue";
@@ -49,6 +53,8 @@ import AddCategory from "../components/Admin/AddCategory.vue";
 import DetailCategory from "../components/Admin/DetailCategory.vue";
 import UpdateCategory from "../components/Admin/UpdateCategory.vue";
 import CategoryList from "../components/Admin/CategoryList.vue";
+import TuteursListAdmin from "../components/Admin/TuteursListAdmin.vue";
+import DetailTuteurAdmin from "../components/Admin/DetailTuteurAdmin.vue";
 //import CoursListe from "../components/TuteurDash/CoursListe.vue";
 //import CoursEdit from "../components/TuteurDash/CoursEdit.vue";
 
@@ -143,6 +149,17 @@ const routes = [
     name: "signupEntreprisePart2",
     component: SignupEntreprisePart2,
   },
+  {
+    path: "/SignUpTuteur",
+    name: "SignUpTuteur",
+    component:SignUpTuteur,
+  },
+  {
+    path: "/SignUpTuteurPart2",
+    name: "SignUpTuteurPart2",
+    component:SignUpTuteurPart2,
+  },
+
   {
     path: "/signin",
     name: "signin",
@@ -281,6 +298,19 @@ const routes = [
     component:ConsultListCours,
 
   },
+  {path:'/TuteursListAdmin',
+    name:'TuteursListAdmin',
+    component:TuteursListAdmin,
+
+  },
+  {path:'/DetailTuteurAdmin/:id',
+    name:'DetailTuteurAdmin',
+    component:DetailTuteurAdmin,
+
+  },
+
+
+
 
 
 
