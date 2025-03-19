@@ -190,6 +190,71 @@ class adminController extends Controller
         'tuteur' => $tuteur
     ], 201);
 }
+
+
+
+public function getAllTuteurs()
+{
+    // Récupérer tous les tuteurs
+    $tuteurs = Tuteur::all();
+
+    // Vérifier si des tuteurs existent
+    if ($tuteurs->isEmpty()) {
+        return response()->json([
+            'message' => 'Aucun tuteur trouvé',
+            'tuteurs' => [],
+        ], 404);
+    }
+
+    return response()->json([
+        'tuteurs' => $tuteurs,
+        'message' => 'Tuteurs récupérés avec succès',
+    ]);
+}
+
+public function updateTuteurStatus(Request $request, $id)
+{
+    $tuteur = Tuteur::find($id);
+
+    if (!$tuteur) {
+        return response()->json(['message' => 'Tuteur non trouvé'], 404);
+    }
+
+    $request->validate([
+        'status' => 'required|string|in:accepté,en attente,refusé' // Corriger les valeurs autorisées
+    ]);
+
+    $tuteur->status = $request->status;
+    $tuteur->save();
+
+    return response()->json([
+        'message' => 'Statut du tuteur mis à jour avec succès',
+        'tuteur' => $tuteur
+    ]);
+}
+
+public function deleteTuteur($id)
+{
+    $tuteur = Tuteur::find($id);
+
+    if (!$tuteur) {
+        return response()->json([
+            'message' => 'Tuteur non trouvé'
+        ], 404);
+    }
+
+    $tuteur->delete();
+
+    return response()->json([
+        'message' => 'Tuteur supprimé avec succès'
+    ]);
+}
+
+
+
+
+
+
     
 
 

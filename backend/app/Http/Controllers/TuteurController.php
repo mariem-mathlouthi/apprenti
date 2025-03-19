@@ -7,6 +7,29 @@ use Illuminate\Http\Request;
 
 class TuteurController extends Controller
 {
+
+
+    public function getTuteurDetail(Request $request, $id)
+{
+    // Récupérer les détails du tuteur par ID
+    $tuteur = Tuteur::where('id', $id)->first();
+
+    // Vérifier si le tuteur existe
+    if (!$tuteur) {
+        return response()->json([
+            'message' => 'Tuteur non trouvé',
+            'check' => false,
+        ], 404);
+    }
+
+    // Retourner les détails du tuteur
+    return response()->json([
+        'tuteur' => $tuteur,
+        'message' => 'Détails du tuteur récupérés avec succès',
+        'check' => true,
+    ]);
+}
+
     /**
      * Display a listing of the resource.
      */

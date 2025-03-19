@@ -80,6 +80,45 @@ class authController extends Controller
         ]);
     }
 
+    public function signUpTuteur(Request $request){
+        $requestData = $request->all();
+    
+        // Vérifier si l'email ou le téléphone existe déjà
+        $existingEmail = Tuteur::where('email', $requestData['email'])->first();
+        $existingPhone = Tuteur::where('phone', $requestData['phone'])->first();
+    
+        if ($existingEmail) {
+            return response()->json([
+                'message' => 'Email already exists',
+                'check' => false,
+            ]);
+        }
+    
+        if ($existingPhone) {
+            return response()->json([
+                'message' => 'Phone number already exists',
+                'check' => false,
+            ]);
+        }
+    
+        // Création du nouveau tuteur
+        $newTuteur = new Tuteur();
+        $newTuteur->fullname = $requestData['fullname'];
+        $newTuteur->email = $requestData['email'];
+        $newTuteur->password = Hash::make($requestData['password']);
+        $newTuteur->specialite = $requestData['specialite'];
+        $newTuteur->experience = $requestData['experience'];
+        $newTuteur->phone = $requestData['phone'];
+        $newTuteur->image = $requestData['image'] ?? null; // Optionnel si l'image est fournie
+        $newTuteur->save();
+    
+        return response()->json([
+            'message' => 'Account created successfully',
+            'check' => true,
+        ]);
+    }
+    
+
 
     public function LoginUser(Request $request)
     {

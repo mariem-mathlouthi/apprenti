@@ -13,6 +13,7 @@ use App\Http\Controllers\attestationController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CoursController;
 use App\Http\Controllers\RessourceController;
+use App\Http\Controllers\TuteurController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +33,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::group(['middleware' => 'cors'], function () {
     Route::post('/singupEtudiant', [authController::class, 'signUpEtudiant']);
     Route::post('/signupEntreprise', [authController::class, 'signUpEntreprise']);
+    Route::post('/signupTuteur', [authController::class, 'signUpTuteur']);
+
     Route::post('/admin', [adminController::class, 'signUpAdmin']);
     Route::post('/login', [authController::class, 'LoginUser']);
     Route::post('/modifyStudent', [studentController::class, 'ModifyEtudiantInfo']);
@@ -52,6 +55,14 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get('/offreDetail2/{id}', [offreController::class, 'OffreDetail']);
     Route::post('/updateOffre', [offreController::class, 'updateOffre']);
     Route::post('/deleteOffre', [offreController::class, 'deleteOffre']);
+
+
+    Route::get('/tuteurs', [AdminController::class, 'getAllTuteurs']);
+    Route::put('/tuteurs/{id}/status', [AdminController::class, 'updateTuteurStatus']);
+    Route::delete('/tuteurs/{id}', [AdminController::class, 'deleteTuteur']);
+    Route::post('/tuteurs', [AdminController::class, 'addTuteur']);
+    Route::get('/tuteurs/{id}', [TuteurController::class, 'getTuteurDetail']);
+
 
 });
 
