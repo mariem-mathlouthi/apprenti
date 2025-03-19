@@ -98,6 +98,7 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get('/ressources/{id}', [RessourceController::class, 'getRessourceById']);    
     Route::put('/ressources/{id}', [RessourceController::class, 'updateRessource']);     
     Route::delete('/ressources/{id}', [RessourceController::class, 'deleteRessource']);
+    //Route::post('/upload', [RessourceController::class, 'uploadFile']);
 
 
 

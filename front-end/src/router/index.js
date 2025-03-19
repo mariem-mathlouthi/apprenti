@@ -51,6 +51,9 @@ import UpdateCategory from "../components/Admin/UpdateCategory.vue";
 import CategoryList from "../components/Admin/CategoryList.vue";
 //import CoursListe from "../components/TuteurDash/CoursListe.vue";
 //import CoursEdit from "../components/TuteurDash/CoursEdit.vue";
+import CoursDetails from "../components/TuteurDash/CoursDetails.vue";
+import Ressource from "../components/TuteurDash/Ressource.vue";
+
 
 const routes = [
   {
@@ -281,6 +284,24 @@ const routes = [
     component:ConsultListCours,
 
   },
+
+  {
+    path: "/ajouter-ressource/:id",
+    name: "AjouterRessource",
+    component: Ressource,
+  },
+
+  {
+    path: "/cours/:id",
+    name: "CoursDetails",
+    component: CoursDetails,
+  }
+
+
+
+  
+
+  
 
 
 
