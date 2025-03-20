@@ -78,22 +78,6 @@ class RessourceController extends Controller
         }
     }
 
-    public function uploadFile(Request $request)
-{
-    // Valider le fichier
-    $request->validate([
-        'file' => 'required|file|mimes:pdf,doc,docx,txt,mp4,mov,avi|max:102400', // 100MB
-    ]);
-
-    // Stocker le fichier
-    $filePath = $request->file('file')->store('public/files');
-
-    // Retourner le chemin du fichier
-    return response()->json([
-        'success' => true,
-        'filePath' => $filePath,
-    ]);
-}
 
     /**
      * Supprimer une ressource
@@ -109,4 +93,8 @@ class RessourceController extends Controller
             return response()->json(['message' => 'Ressource non trouvée'], 404);
         }
     }
+
+    
+
+
 }

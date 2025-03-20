@@ -58,7 +58,8 @@ import DetailTuteurAdmin from "../components/Admin/DetailTuteurAdmin.vue";
 //import CoursListe from "../components/TuteurDash/CoursListe.vue";
 //import CoursEdit from "../components/TuteurDash/CoursEdit.vue";
 import CoursDetails from "../components/TuteurDash/CoursDetails.vue";
-import Ressource from "../components/TuteurDash/Ressource.vue";
+import RessourceList from "../components/TuteurDash/RessourceList.vue";
+import RessourceAdd from "../components/TuteurDash/RessourceAdd.vue";
 
 
 const routes = [
@@ -315,17 +316,33 @@ const routes = [
 
 
 
-  {
-    path: "/ajouter-ressource/:id",
-    name: "AjouterRessource",
-    component: Ressource,
-  },
+  // {
+  //   path: "/ajouter-ressource/:id",
+  //   name: "AjouterRessource",
+  //   component: RessourceList,
+  // },
+  // {
+  //   path: "/cours/:id/ajouter-ressource", 
+  //   name: "RessourceAdd",
+  //   component: RessourceAdd,
+  // },
 
   {
     path: "/cours/:id",
     name: "CoursDetails",
     component: CoursDetails,
-  }
+  },
+
+  {
+    path: "/ajouter-ressource/:id",
+    name: "RessourceList",
+    component: RessourceList, // Pas de .vue ici
+  },
+  {
+    path: "/cours/:id/ajouter-ressource",
+    name: "RessourceAdd",
+    component: RessourceAdd, // Pas de .vue ici
+  },
 
 
 
