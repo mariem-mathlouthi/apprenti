@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="flex flex-col h-screen bg-gray-100">
+  <div id="app" class="flex flex-col h-screen bg-gradient-to-br from-gray-50 to-gray-100">
     <!-- Navbar -->
     <NavbarTuteur />
 
@@ -8,17 +8,19 @@
       <SidebarTuteur class="w-64" />
 
       <!-- Main Content -->
-      <section class="flex-1 p-6 overflow-auto mt-20">
-        <div class="max-w-5xl mx-auto bg-white shadow-lg rounded-lg p-6">
+      <section class="flex-1 p-8 overflow-auto mt-16">
+        <div class="max-w-6xl mx-auto">
           <!-- Header -->
-          <div class="flex flex-col items-center mb-6">
-            <h1 class="text-3xl font-bold text-gray-800 text-center">📚 Ressources du Cours</h1>
-            <p class="text-gray-600 text-center max-w-2xl mt-2">
+          <div class="flex flex-col items-center mb-10">
+            <h1 class="text-4xl font-bold text-gray-800 text-center mb-4">
+              📚 Ressources du Cours
+            </h1>
+            <p class="text-gray-600 text-center max-w-2xl">
               Gérer et organiser les ressources pédagogiques pour ce cours. Ajoutez, modifiez ou supprimez des ressources en un clic.
             </p>
             <router-link 
               :to="`/cours/${idCours}/ajouter-ressource`"
-              class="btn-primary mt-4"
+              class="btn-primary mt-6"
             >
               ➕ Ajouter une Ressource
             </router-link>
@@ -32,7 +34,7 @@
               class="card transform transition-all hover:scale-105"
             >
               <div class="p-6">
-                <h3 class="font-bold text-lg text-gray-800 mb-2">{{ ressource.titre }}</h3>
+                <h3 class="font-bold text-xl text-gray-800 mb-2">{{ ressource.titre }}</h3>
                 <p class="text-gray-600 text-sm">{{ ressource.description }}</p>
 
                 <!-- Affichage de la vidéo ou du fichier -->
@@ -81,8 +83,8 @@
           </div>
 
           <!-- Message si aucune ressource -->
-          <div v-else class="text-center py-10">
-            <p class="text-gray-500">📭 Aucune ressource disponible pour ce cours.</p>
+          <div v-else class="text-center py-20">
+            <p class="text-gray-500 text-xl">📭 Aucune ressource disponible pour ce cours.</p>
           </div>
         </div>
       </section>
@@ -144,54 +146,57 @@ export default {
 </script>
 
 <style scoped>
-/* Espacement pour éviter que le contenu touche le navbar */
-.mt-20 {
-  margin-top: 80px;
+/* Fond dégradé */
+.bg-gradient-to-br {
+  background: linear-gradient(135deg, #f9fafb, #f3f4f6);
 }
 
-/* Ajustement global */
-.max-w-5xl {
-  max-width: 900px;
+/* Espacement pour éviter que le contenu touche le navbar */
+.mt-16 {
+  margin-top: 64px;
 }
 
 /* Bouton Ajouter */
 .btn-primary {
   background-color: #4f46e5;
   color: white;
-  padding: 12px 20px;
+  padding: 12px 24px;
   border-radius: 8px;
   font-weight: bold;
   text-decoration: none;
   transition: 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 .btn-primary:hover {
   background-color: #4338ca;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Lien Voir fichier */
 .btn-link {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   color: #4f46e5;
   font-weight: bold;
-  margin-top: 10px;
-  text-decoration: underline;
+  text-decoration: none;
+  transition: 0.3s;
 }
 .btn-link:hover {
   color: #4338ca;
+  text-decoration: underline;
 }
 
 /* Style des cartes */
 .card {
   background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s, box-shadow 0.3s;
-  text-align: center;
 }
 .card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 /* Boutons Modifier et Supprimer */
