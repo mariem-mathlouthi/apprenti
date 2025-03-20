@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Ressource;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Storage;
 
 class RessourceController extends Controller
 {
@@ -24,8 +25,7 @@ class RessourceController extends Controller
         $request->validate([
             'titre' => 'required|string|max:255',
             'description' => 'required|string',
-            'file' => 'nullable|string',
-            // 'file' => 'required|file|mimes:pdf,doc,docx,txt,mp4,mov,avi|max:102400', 
+            'file' => 'nullable|string', // Chemin du fichier après upload
             'idCours' => 'required|exists:cours,id',
         ]);
 
@@ -78,7 +78,6 @@ class RessourceController extends Controller
         }
     }
 
-
     /**
      * Supprimer une ressource
      */
@@ -94,7 +93,26 @@ class RessourceController extends Controller
         }
     }
 
-    
+    /**
+     * Uploader un fichier
+     */
+    public function uploadFile(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:pdf,doc,docx,txt,mp4,mov,avi|max:102400', // 100 MB max
+        ]);
 
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $fileName = time() . '_' . $file->getClientOriginalName(); // Nom unique pour le fichier
+            $filePath = $file->storeAs('uploads', $fileName, 'public'); // Stocker dans le dossier public/uploads
 
+            return response()->json([
+                'success' => true,
+                'filePath' => '/storage/' . $filePath, // Chemin d'accès public
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Aucun fichier trouvé.'], 400);
+    }
 }
