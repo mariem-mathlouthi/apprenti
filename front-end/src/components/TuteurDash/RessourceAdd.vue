@@ -89,11 +89,13 @@
         if (!this.fileToUpload) return null; // Si aucun fichier n'est sélectionné
   
         const formData = new FormData();
-        formData.append("file", this.fileToUpload);
+        formData.append("file", this.fileToUpload); // Ajouter le fichier à FormData
   
         try {
           const response = await axios.post("http://localhost:8000/api/upload", formData, {
-            headers: { "Content-Type": "multipart/form-data" },
+            headers: {
+              "Content-Type": "multipart/form-data", // Définir le bon type de contenu
+            },
           });
           return response.data.filePath; // Supposons que l'API renvoie le chemin du fichier
         } catch (error) {
