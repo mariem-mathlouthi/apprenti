@@ -90,22 +90,20 @@ export default {
     };
   },
   methods: {
-    // Récupérer la liste des cours du tuteur connecté
+    // Récupérer la liste des cours du tuteur
     async fetchCours() {
       try {
-        // Récupérer tous les cours
-        const response = await axios.get('http://localhost:8000/api/cours');
-
-        // Récupérer l'ID du tuteur connecté
+        // Récupérer l'ID du tuteur connecté depuis le localStorage
         const tuteurId = JSON.parse(localStorage.getItem("TuteurAccountInfo")).id;
 
-        // Filtrer les cours pour ne garder que ceux du tuteur connecté
-        this.coursListe = response.data.cours
-          .filter(cours => cours.idTuteur === tuteurId) // Filtrer par idTuteur
-          .map(cours => ({
-            ...cours,
-            file: cours.file || this.defaultImage, // Utiliser l'image par défaut si le fichier est manquant
-          }));
+        // Appeler l'API avec l'ID du tuteur
+        const response = await axios.get(`http://localhost:8000/api/cours?tuteurId=${tuteurId}`);
+
+        // Mapper les cours et utiliser une image par défaut si nécessaire
+        this.coursListe = response.data.cours.map(cours => ({
+          ...cours,
+          file: cours.file || this.defaultImage, // Utiliser l'image par défaut si le fichier est manquant
+        }));
       } catch (error) {
         console.error("Erreur lors de la récupération des cours :", error);
         toast.error("Impossible de récupérer les cours.");

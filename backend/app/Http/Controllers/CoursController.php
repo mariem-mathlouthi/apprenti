@@ -11,14 +11,39 @@ class CoursController extends Controller
     /**
      * Récupérer tous les cours.
      */
-    public function getAllCourses()
+    // public function getAllCourses()
+    // {
+    //     $cours = Cours::with(['category', 'tuteur', 'apprenant', 'createur'])->get();
+    //     return response()->json([
+    //         'success' => true,
+    //         'cours' => $cours
+    //     ], 200);
+    // }
+
+    public function getAllCourses(Request $request)
     {
-        $cours = Cours::with(['category', 'tuteur', 'apprenant', 'createur'])->get();
+        // Récupérer l'ID du tuteur depuis la requête
+        $tuteurId = $request->query('tuteurId');
+
+        // Vérifier si l'ID du tuteur est fourni
+        if (!$tuteurId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'ID du tuteur manquant'
+            ], 400);
+        }
+
+        // Filtrer les cours en fonction de l'ID du tuteur
+        $cours = Cours::with(['category', 'tuteur', 'apprenant', 'createur'])
+                      ->where('idTuteur', $tuteurId)
+                      ->get();
+
         return response()->json([
             'success' => true,
             'cours' => $cours
         ], 200);
     }
+
 
     /**
      * Ajouter un nouveau cours.

@@ -1,132 +1,69 @@
 <template>
-  <div id="app" class="flex flex-col h-screen bg-gray-50 overflow-hidden">
-    <!-- Navbar Fixe -->
-    <NavbarTuteur class="fixed top-0 w-full z-50 shadow-lg" />
+  <div id="app" class="flex flex-col h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <!-- Navbar & Sidebar -->
+    <NavbarTuteur />
+    <SidebarTuteur />
 
-    <!-- Contenu Principal -->
-    <main class="flex-1 overflow-y-auto pt-16">
-      <!-- Section Centrée -->
-      <section class="container mx-auto px-4 py-8 max-w-4xl">
-        <!-- Bouton Retour -->
-        <button
-          @click="goBack"
-          class="flex items-center text-indigo-600 hover:text-indigo-800 transition duration-300 mb-6"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6 mr-2"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-          Retour
-        </button>
+    <!-- Main Content -->
+    <section id="content" class="flex-1 flex flex-col items-center py-8">
+      <div class="container mx-auto p-6 w-full max-w-4xl">
+        <!-- Title -->
+        <h1 class="text-3xl font-bold text-gray-800 text-center mb-8">Ajouter une Ressource</h1>
 
-        <!-- Titre -->
-        <h1 class="text-4xl font-bold text-gray-800 mb-8 animate-fade-in">
-          Ajouter une Ressource
-        </h1>
-
-        <!-- Formulaire -->
-        <form
-          @submit.prevent="createRessource"
-          class="bg-white p-8 rounded-xl shadow-2xl transform transition-all duration-500 hover:shadow-3xl"
-        >
+        <!-- Formulaire d'ajout de ressource -->
+        <form @submit.prevent="createRessource" class="bg-white p-8 rounded-xl shadow-lg space-y-6">
           <!-- Champ Titre -->
-          <div class="mb-6">
-            <label for="titre" class="block text-sm font-medium text-gray-700 mb-2">
-              Titre
-            </label>
+          <div>
+            <label for="titre" class="block text-sm font-medium text-gray-700 mb-2">Titre</label>
             <input
               type="text"
               id="titre"
               v-model="form.titre"
               required
-              class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-300"
+              class="input"
               placeholder="Titre de la ressource"
             />
-            <span v-if="errors.titre" class="text-red-500 text-sm mt-2 block">
-              {{ errors.titre }}
-            </span>
+            <span v-if="errors.titre" class="text-red-500 text-sm mt-1">{{ errors.titre }}</span>
           </div>
 
           <!-- Champ Description -->
-          <div class="mb-6">
-            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
-              Description
-            </label>
+          <div>
+            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
             <textarea
               id="description"
               v-model="form.description"
               required
-              class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-300"
-              placeholder="Description de la ressource"
+              class="input"
               rows="4"
+              placeholder="Description de la ressource"
             ></textarea>
-            <span v-if="errors.description" class="text-red-500 text-sm mt-2 block">
-              {{ errors.description }}
-            </span>
+            <span v-if="errors.description" class="text-red-500 text-sm mt-1">{{ errors.description }}</span>
           </div>
 
           <!-- Champ Fichier -->
-          <div class="mb-8">
-            <label for="file" class="block text-sm font-medium text-gray-700 mb-2">
-              Fichier
-            </label>
-            <div
-              class="relative border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-indigo-500 transition duration-300"
-            >
+          <div>
+            <label for="file" class="block text-sm font-medium text-gray-700 mb-2">Fichier</label>
+            <div class="relative">
               <input
                 type="file"
                 id="file"
                 @change="handleFileUpload"
-                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                class="input"
+                accept=".pdf,.doc,.docx,.txt,.mp4,.mov,.avi"
                 required
               />
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-12 w-12 mx-auto text-gray-400 mb-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-                />
-              </svg>
-              <p class="text-gray-600">
-                Glissez-déposez un fichier ou
-                <span class="text-indigo-600 font-semibold">cliquez pour téléverser</span>
-              </p>
-              <p v-if="fileToUpload" class="text-sm text-gray-500 mt-2">
+              <span v-if="fileToUpload" class="text-sm text-gray-600 mt-2 block">
                 Fichier sélectionné : {{ fileToUpload.name }}
-              </p>
+              </span>
             </div>
-            <span v-if="errors.file" class="text-red-500 text-sm mt-2 block">
-              {{ errors.file }}
-            </span>
+            <span v-if="errors.file" class="text-red-500 text-sm mt-1">{{ errors.file }}</span>
           </div>
 
           <!-- Bouton Soumettre -->
-          <button
-            type="submit"
-            class="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 transition duration-300 transform hover:scale-105"
-          >
-            Ajouter la Ressource
-          </button>
+          <button type="submit" class="btn-submit">Ajouter la Ressource</button>
         </form>
-      </section>
-    </main>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -145,10 +82,10 @@ export default {
       form: {
         titre: "",
         description: "",
-        file: null,
-        idCours: this.$route.params.id,
+        file: null, // Ce sera le chemin du fichier après l'upload
+        idCours: this.$route.params.id, // ID du cours depuis l'URL
       },
-      fileToUpload: null,
+      fileToUpload: null, // Fichier sélectionné par l'utilisateur
       errors: {
         titre: "",
         description: "",
@@ -157,12 +94,16 @@ export default {
     };
   },
   methods: {
+    // Gérer l'upload du fichier
     handleFileUpload(event) {
-      this.fileToUpload = event.target.files[0];
-      this.errors.file = "";
+      this.fileToUpload = event.target.files[0]; // Stocker le fichier sélectionné
+      this.errors.file = ""; // Réinitialiser l'erreur du fichier
     },
+
+    // Valider les champs
     validateForm() {
-      this.errors = { titre: "", description: "", file: "" };
+      this.errors = { titre: "", description: "", file: "" }; // Réinitialiser les erreurs
+
       let isValid = true;
 
       if (!this.form.titre) {
@@ -182,70 +123,95 @@ export default {
 
       return isValid;
     },
+
+    // Uploader le fichier et obtenir son chemin
     async uploadFile() {
       const formData = new FormData();
-      formData.append("file", this.fileToUpload);
+      formData.append("file", this.fileToUpload); // Ajouter le fichier à FormData
 
       try {
         const response = await axios.post("http://localhost:8000/api/upload", formData, {
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "multipart/form-data", // Définir le bon type de contenu
           },
         });
-        return response.data.filePath;
+        return response.data.filePath; // Supposons que l'API renvoie le chemin du fichier
       } catch (error) {
         console.error("Erreur lors de l'upload du fichier :", error);
         toast.error("Échec de l'upload du fichier.");
         return null;
       }
     },
-    async createRessource() {
-      if (!this.validateForm()) return;
 
+    // Ajouter une ressource
+    async createRessource() {
+      // Valider le formulaire avant de soumettre
+      if (!this.validateForm()) {
+        return; // Arrêter la soumission si le formulaire n'est pas valide
+      }
+
+      // Uploader le fichier et obtenir son chemin
       const filePath = await this.uploadFile();
 
+      // Préparer les données pour l'ajout de la ressource
       const requestData = {
         titre: this.form.titre,
         description: this.form.description,
         idCours: this.form.idCours,
-        file: filePath,
+        file: filePath, // Utiliser le chemin du fichier uploadé
       };
 
       try {
         const response = await axios.post("http://localhost:8000/api/ressources", requestData);
         toast.success("Ressource ajoutée avec succès !");
+
+        // Rediriger vers la liste des ressources
         this.$router.push({ name: "RessourceList", params: { id: this.form.idCours } });
       } catch (error) {
         console.error("Erreur lors de l'ajout de la ressource :", error);
+        if (error.response && error.response.data) {
+          console.error("Détails de l'erreur :", error.response.data);
+        }
         toast.error("Échec de l'ajout de la ressource.");
       }
-    },
-    goBack() {
-      this.$router.push({ name: "RessourceList", params: { id: this.form.idCours } });
     },
   },
 };
 </script>
 
 <style scoped>
-/* Animation pour le titre */
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-top: 4px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.animate-fade-in {
-  animation: fade-in 0.5s ease-out;
+.input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  outline: none;
 }
 
-/* Effet de survol pour le formulaire */
-form:hover {
-  transform: translateY(-5px);
+.btn-submit {
+  background-color: #4f46e5;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  width: 100%;
+}
+
+.btn-submit:hover {
+  background-color: #4338ca;
+  transform: translateY(-2px);
+}
+
+.text-red-500 {
+  color: #ef4444;
 }
 </style>
