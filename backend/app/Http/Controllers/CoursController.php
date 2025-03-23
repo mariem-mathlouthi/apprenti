@@ -11,16 +11,16 @@ class CoursController extends Controller
     /**
      * Récupérer tous les cours.
      */
-    // public function getAllCourses()
-    // {
-    //     $cours = Cours::with(['category', 'tuteur', 'apprenant', 'createur'])->get();
-    //     return response()->json([
-    //         'success' => true,
-    //         'cours' => $cours
-    //     ], 200);
-    // }
+    public function getAllCourses()
+    {
+        $cours = Cours::with(['category', 'tuteur', 'apprenant', 'createur'])->get();
+        return response()->json([
+            'success' => true,
+            'cours' => $cours
+        ], 200);
+    }
 
-    public function getAllCourses(Request $request)
+    public function getAllCoursesByTuteur(Request $request)
     {
         // Récupérer l'ID du tuteur depuis la requête
         $tuteurId = $request->query('tuteurId');

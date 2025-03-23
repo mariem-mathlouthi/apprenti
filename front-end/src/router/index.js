@@ -21,6 +21,7 @@ import Consulternotif from "../components/StudentDash/Consulternotif.vue";
 import EtudiantAccount from "../components/StudentDash/EtudiantAccount.vue";
 import OffersListStd from "../components/StudentDash/OffersListStd.vue";
 import ConsultListCours from "../components/StudentDash/ConsultListCours.vue";
+import ConsultRessource from "../components/StudentDash/ConsultRessource.vue";
 
 import EntrepriseDash from "../components/EntrepriseDash/EntrepriseDashbord.vue";
 import OffersList from "../components/EntrepriseDash/OffersList.vue";
@@ -336,6 +337,12 @@ const routes = [
     name: "RessourceEdit",
     component: RessourceEdit,
   },
+
+  {
+    path: '/DetailsCours/:id',
+    name: 'ConsultRessource',
+    component:ConsultRessource,
+  }
   
 
 

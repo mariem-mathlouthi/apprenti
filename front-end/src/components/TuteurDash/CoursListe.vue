@@ -21,14 +21,27 @@
         <!-- Liste des Cours sous forme de cartes -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <!-- Carte pour chaque cours -->
-          <div v-for="cours in coursListe" :key="cours.id" class="bg-white rounded-lg shadow-md overflow-hidden relative transform transition-transform hover:scale-102">
+          <div
+            v-for="cours in coursListe"
+            :key="cours.id"
+            class="bg-white rounded-lg shadow-md overflow-hidden relative transform transition-transform hover:scale-102"
+          >
             <!-- Bouton Supprimer (icône "x") -->
             <button
               @click="deleteCours(cours.id)"
               class="absolute top-2 right-2 bg-red-100 text-red-600 rounded-full p-1 hover:bg-red-200 transition-colors z-20"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clip-rule="evenodd"
+                />
               </svg>
             </button>
 
@@ -44,7 +57,9 @@
 
             <!-- Titre du cours et boutons directement sous l'image -->
             <div class="p-2">
-              <h2 class="text-lg font-semibold text-gray-800 mb-2">{{ cours.titre }}</h2>
+              <h2 class="text-lg font-semibold text-gray-800 mb-2">
+                {{ cours.titre }}
+              </h2>
               <div class="flex justify-between">
                 <!-- Bouton Détails -->
                 <router-link
@@ -93,14 +108,11 @@ export default {
     // Récupérer la liste des cours du tuteur
     async fetchCours() {
       try {
-        // Récupérer l'ID du tuteur connecté depuis le localStorage
         const tuteurId = JSON.parse(localStorage.getItem("TuteurAccountInfo")).id;
-
-        // Appeler l'API avec l'ID du tuteur
-        const response = await axios.get(`http://localhost:8000/api/cours?tuteurId=${tuteurId}`);
-
-        // Mapper les cours et utiliser une image par défaut si nécessaire
-        this.coursListe = response.data.cours.map(cours => ({
+        const response = await axios.get(
+          `http://localhost:8000/api/cours-by-tuteur?tuteurId=${tuteurId}`
+        );
+        this.coursListe = response.data.cours.map((cours) => ({
           ...cours,
           file: cours.file || this.defaultImage, // Utiliser l'image par défaut si le fichier est manquant
         }));
