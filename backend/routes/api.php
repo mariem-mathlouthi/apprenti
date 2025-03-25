@@ -106,7 +106,7 @@ Route::group(['middleware' => 'cors'], function () {
     //Route::get('/cours', [CoursController::class, 'getCoursesByTuteur']);
     Route::get('/cours-by-tuteur', [CoursController::class, 'getAllCoursesByTuteur']);
 
-    
+    Route::get('ressources/cours/{idCours}', [RessourceController::class, 'getRessourcesByCours']);
     Route::get('/ressources', [RessourceController::class, 'getAllRessources']);         
     Route::post('/ressources', [RessourceController::class, 'createRessource']);         
     Route::get('/ressources/{id}', [RessourceController::class, 'getRessourceById']);    

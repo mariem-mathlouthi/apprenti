@@ -13,10 +13,32 @@ class RessourceController extends Controller
      * Récupérer toutes les ressources
      */
     public function getAllRessources()
-    {
-        return response()->json(Ressource::all(), 200);
-    }
+{
+    $ressources = Ressource::all()->map(function($item) {
+        if ($item->file) {
+            // Ensure the path is correct and prepend the base URL
+            $cleanPath = ltrim($item->file, '/'); // Remove leading slash if present
+            $item->file = url($cleanPath); // This will prepend http://localhost:8000/
+        }
+        return $item;
+    });
+    
+    return response()->json($ressources, 200);
+}
 
+public function getRessourcesByCours($idCours)
+{
+    $ressources = Ressource::where('idCours', $idCours)->get()->map(function($item) {
+        if ($item->file) {
+           
+            $cleanPath = ltrim($item->file, '/'); 
+            $item->file = url($cleanPath); 
+        }
+        return $item;
+    });
+
+    return response()->json($ressources);
+}
     /**
      * Ajouter une nouvelle ressource
      */
