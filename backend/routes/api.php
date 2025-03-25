@@ -103,7 +103,6 @@ Route::group(['middleware' => 'cors'], function () {
     Route::put('/cours/{id}', [CoursController::class, 'updateCourse']);     
     Route::delete('/cours/{id}', [CoursController::class, 'deleteCourse']); 
     Route::get('/cours', [CoursController::class, 'getAllCourses']);
-    //Route::get('/cours', [CoursController::class, 'getCoursesByTuteur']);
     Route::get('/cours-by-tuteur', [CoursController::class, 'getAllCoursesByTuteur']);
 
     
