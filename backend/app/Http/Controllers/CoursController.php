@@ -20,6 +20,31 @@ class CoursController extends Controller
         ], 200);
     }
 
+    public function getAllCoursesByTuteur(Request $request)
+    {
+        // Récupérer l'ID du tuteur depuis la requête
+        $tuteurId = $request->query('tuteurId');
+
+        // Vérifier si l'ID du tuteur est fourni
+        if (!$tuteurId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'ID du tuteur manquant'
+            ], 400);
+        }
+
+        // Filtrer les cours en fonction de l'ID du tuteur
+        $cours = Cours::with(['category', 'tuteur', 'apprenant', 'createur'])
+                      ->where('idTuteur', $tuteurId)
+                      ->get();
+
+        return response()->json([
+            'success' => true,
+            'cours' => $cours
+        ], 200);
+    }
+
+
     /**
      * Ajouter un nouveau cours.
      */

@@ -36,7 +36,10 @@ class Cours extends Model
     public function createur() {
         return $this->belongsTo(Tuteur::class, 'createdBy');
     }
-    
+    public function inscriptions()
+{
+    return $this->hasMany(Inscription::class, 'idCours');
+}
     
 }
 
