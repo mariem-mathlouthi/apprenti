@@ -181,6 +181,37 @@
               <span>Cours</span>
             </router-link>
           </li>
+          <li key="QuizzList">
+            <router-link
+              to="/QuizzList"
+              class="text-[#333] text-sm flex items-center hover:text-[#007bff] hover:border-r-[5px] border-[#077bff] hover:bg-gray-100 px-8 py-4 transition-all"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                class="w-[18px] h-[18px] mr-4"
+                viewBox="0 0 512 512"
+              >
+                <!-- Replace "M..." with a valid SVG path -->
+                <path
+                  d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256 256-114.6 256-256S397.4 0 256 0zm0 464c-114.7 0-208-93.3-208-208S141.3 48 256 48s208 93.3 208 208-93.3 208-208 208zm96-280h-64v-64c0-8.8-7.2-16-16-16s-16 7.2-16 16v64h-64c-8.8 0-16 7.2-16 16s7.2 16 16 16h64v64c0 8.8 7.2 16 16 16s16-7.2 16-16v-64h64c8.8 0 16-7.2 16-16s-7.2-16-16-16z"
+                  data-original="#000000"
+                />
+              </svg>
+              <span>Quizz</span>
+            </router-link>
+          </li>
+
+          <!-- Déconnexion -->
+        <li>
+          <router-link to="/SignIn"
+            class="text-[#333] text-sm flex items-center hover:text-[#007bff] hover:border-r-[5px] border-[#077bff] hover:bg-gray-100 px-8 py-4 transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>Déconnexion</span>
+          </router-link>
+        </li>
   
           <!-- Autres liens existants -->
           <!-- Ajoutez ici les autres liens de votre sidebar sans les supprimer -->

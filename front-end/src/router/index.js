@@ -63,6 +63,10 @@ import RessourceList from "../components/TuteurDash/RessourceList.vue";
 import RessourceAdd from "../components/TuteurDash/RessourceAdd.vue";
 import RessourceEdit from '../components/TuteurDash/RessourceEdit.vue';
 
+import QuizzList from "../components/TuteurDash/QuizzList.vue";
+import QuizzAdd from "../components/TuteurDash/QuizzAdd.vue";
+import QuizzEdit from "../components/TuteurDash/QuizzEdit.vue";
+
 
 
 const routes = [
@@ -342,7 +346,25 @@ const routes = [
     path: '/DetailsCours/:id',
     name: 'ConsultRessource',
     component:ConsultRessource,
-  }
+  },
+  {
+    path: '/QuizzList',
+    name: 'QuizzList',
+    component:QuizzList,
+  },
+  {
+    path: '/QuizzAdd',
+    name: 'QuizzAdd',
+    component:QuizzAdd,
+  },
+  {
+    path: '/QuizzEdit/:id',
+    name: 'QuizzEdit',
+    component:QuizzEdit,
+  },
+
+
+
   
 
 

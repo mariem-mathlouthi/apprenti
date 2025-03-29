@@ -1,36 +1,63 @@
 <template>
-  <nav class="bg-blue-100 shadow-xl h-screen fixed top-0 left-0 min-w-[250px] py-6 font-[sans-serif] overflow-auto" style="margin-top:72px">
-    <div class="relative flex flex-col h-full">
-      <ul class="space-y-3 my-10 flex-1">
-        <li>
-          <router-link to="/TuteurDashboard" class="text-[#333] text-sm flex items-center hover:text-[#007bff] hover:border-r-[5px] border-[#077bff] hover:bg-gray-100 px-8 py-4 transition-all">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-[18px] h-[18px] mr-4" viewBox="0 0 512 512">
-              <path d="M197.332 170.668h-160C16.746 170.668 0 153.922 0 133.332v-96C0 16.746 16.746 0 37.332 0h160c20.59 0 37.336 16.746 37.336 37.332v96c0 20.59-16.746 37.336-37.336 37.336zM37.332 32A5.336 5.336 0 0 0 32 37.332v96a5.337 5.337 0 0 0 5.332 5.336h160a5.338 5.338 0 0 0 5.336-5.336v-96A5.337 5.337 0 0 0 197.332 32zm160 480h-160C16.746 512 0 495.254 0 474.668v-224c0-20.59 16.746-37.336 37.332-37.336h160c20.59 0 37.336 16.746 37.336 37.336v224c0 20.586-16.746 37.332-37.336 37.332zm-160-266.668A5.337 5.337 0 0 0 32 250.668v224A5.336 5.336 0 0 0 37.332 480h160a5.337 5.337 0 0 0 5.336-5.332v-224a5.338 5.338 0 0 0-5.336-5.336zM474.668 512h-160c-20.59 0-37.336-16.746-37.336-37.332v-96c0-20.59 16.746-37.336 37.336-37.336h160c20.586 0 37.332 16.746 37.332 37.336v96C512 495.254 495.254 512 474.668 512zm-160-138.668a5.338 5.338 0 0 0-5.336 5.336v96a5.337 5.337 0 0 0 5.336 5.332h160a5.336 5.336 0 0 0 5.332-5.332v-96a5.337 5.337 0 0 0-5.332-5.336zm160-74.664h-160c-20.59 0-37.336-16.746-37.336-37.336v-224C277.332 16.746 294.078 0 314.668 0h160C495.254 0 512 16.746 512 37.332v224c0 20.59-16.746 37.336-37.332 37.336zM314.668 32a5.337 5.337 0 0 0-5.336 5.332v224a5.338 5.338 0 0 0 5.336 5.336h160a5.337 5.337 0 0 0 5.332-5.336v-224A5.336 5.336 0 0 0 474.668 32zm0 0" data-original="#000000" />
-            </svg>
-            <span>Tableau de bord</span>
-          </router-link>
-        </li>
+  <Navbar/>
+  <div class="grid grid-cols-12 gap-4">
+  <div class="col-span-3">
+    <Sidebar />
+  </div>
+  <div class="col-span-9 mt-24 mr-24">
+    <div class="font-sans text-[#333] max-w-6xl max-md:max-w-md mx-auto">
+    <div class="grid md:grid-cols-2 items-center md:gap-8 gap-6">
+      <div class="max-md:order-1 max-md:text-center">
+        <p class="mt-4 text-sm font-bold text-blue-600"><span class="rotate-90 inline-block mr-2 mb-2">|</span> Tuteur </p>
+        <h2 class="md:text-5xl text-3xl font-extrabold mb-4 md:!leading-[55px]">Bonjour et bienvenue sur votre tableau de bord</h2>
+<p class="mt-4 text-base text-gray-500 leading-relaxed">Nous sommes ravis de vous accueillir ici. Comment pouvons-nous vous aider aujourd'hui ?</p>
 
-       
-        <li>
-          <router-link to="/Cours" class="text-[#333] text-sm flex items-center hover:text-[#007bff] hover:border-r-[5px] border-[#077bff] hover:bg-gray-100 px-8 py-4 transition-all">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-[18px] h-[18px] mr-4" viewBox="0 0 512 512">
-              <path d="M193.61 149.99c-10.56 0-21.12 3.13-30.03 9.31l-33.69 23.95c-15.39 10.71-29.48 24.46-42.65 40.54l-70.98 99.48C26.77 334.25 16.35 351.83 15.65 368.58c-.07 2.01-.11 4.02-.13 6.03l-.29 83.77c0 2.3 1.77 4.11 4.07 4.11s4.07-1.81 4.07-4.11c0-45.2 28.88-81.52 68.4-88.35 38.17-6.12 76.34 11.9 102.45 45.87 45.7 62.67 110.89 81.35 168.92 87.62 51.28 4.91 101.59-5.76 146.41-26.41 50.71-22.56 92.3-58.44 116.48-106.94 18.71-34.47 30.29-74.48 32.76-113.53 3.47-36.06-1.63-70.28-13.56-101.64l4.06-1.66 5.32 18.14c2.39 5.47-.99 11.82-7.28 13.22l-80.04 29.88c-5.02 1.87-9.88-1.2-11.09-6.22-4.2-14.16-11.28-23.85-22.93-27.97-3.35-2.2-7.04-3.34-10.97-3.34z" />
+        <div class="flex items-center mt-10">
+          <input id="checkbox3" type="checkbox" class="hidden peer" checked />
+          <label for="checkbox3"
+            class="relative flex items-center justify-center p-1 peer-checked:before:hidden before:block before:absolute before:w-full before:h-full before:bg-white w-5 h-5 cursor-pointer bg-blue-500 border rounded-full overflow-hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-full fill-white" viewBox="0 0 520 520">
+              <path
+                d="M79.423 240.755a47.529 47.529 0 0 0-36.737 77.522l120.73 147.894a43.136 43.136 0 0 0 36.066 16.009c14.654-.787 27.884-8.626 36.319-21.515L486.588 56.773a6.13 6.13 0 0 1 .128-.2c2.353-3.613 1.59-10.773-3.267-15.271a13.321 13.321 0 0 0-19.362 1.343q-.135.166-.278.327L210.887 328.736a10.961 10.961 0 0 1-15.585.843l-83.94-76.386a47.319 47.319 0 0 0-31.939-12.438z"
+                data-name="7-Check" data-original="#000000" />
             </svg>
-            <span>Cours</span>
-          </router-link>
-        </li>
-      </ul>
+          </label>
+         
+        </div>
+      </div>
+      <div class="md:h-[450px] p-2">
+        <img src="https://readymadeui.com/image-1.webp" class="w-full h-full object-contain shadow-[0_2px_22px_-10px_rgba(93,96,127,0.2)]" alt="Dining Experience" />
+      </div>
     </div>
-  </nav>
+    <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
+      <img src="https://readymadeui.com/google-logo.svg" class="w-28 mx-auto" alt="google-logo" />
+      <img src="https://readymadeui.com/facebook-logo.svg" class="w-28 mx-auto" alt="facebook-logo" />
+      <img src="https://readymadeui.com/linkedin-logo.svg" class="w-28 mx-auto" alt="linkedin-logo" />
+      <img src="https://readymadeui.com/pinterest-logo.svg" class="w-28 mx-auto" alt="pinterest-logo" />
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+</div>
 </template>
 
 <script>
+import Navbar from './NavBarTut.vue';
+import Sidebar from './SidebarTut.vue';
 export default {
-  name: 'SideBarTut',
-};
+  name: 'EntrepriseDashboard',
+  components: {
+    Navbar,
+    Sidebar
+  }
+}
 </script>
 
-<style scoped>
-/* Add custom styles if needed */
+<style>
+/* Styles spécifiques à votre tableau de bord d'entreprise */
 </style>
