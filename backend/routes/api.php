@@ -14,6 +14,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CoursController;
 use App\Http\Controllers\RessourceController;
 use App\Http\Controllers\TuteurController;
+use App\Http\Controllers\QuizzController;
 
 /*
 |--------------------------------------------------------------------------
@@ -112,6 +113,18 @@ Route::group(['middleware' => 'cors'], function () {
     Route::put('/ressources/{id}', [RessourceController::class, 'updateRessource']);     
     Route::delete('/ressources/{id}', [RessourceController::class, 'deleteRessource']);
     Route::post('/upload', [RessourceController::class, 'uploadFile']);
+
+
+
+
+
+
+    Route::get('/quizz', [QuizzController::class, 'getAllQuizz']);
+    Route::post('/quizz', [QuizzController::class, 'addQuizz']);
+    Route::get('/quizz/{id}', [QuizzController::class, 'getQuizzById']);
+    Route::put('/quizz/{id}', [QuizzController::class, 'updateQuizz']);
+    Route::delete('/quizz/{id}', [QuizzController::class, 'deleteQuizz']);
+    Route::get('/quizz-by-tuteur', [QuizzController::class, 'getQuizzByTuteur']);
 
 
 
