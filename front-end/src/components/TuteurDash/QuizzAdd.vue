@@ -1,13 +1,10 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <!-- Navbar fixe -->
     <NavbarTuteur class="fixed top-0 w-full z-50 bg-white shadow-md" />
 
     <div class="flex pt-16 h-screen">
-      <!-- Sidebar fixe -->
       <SidebarTuteur class="fixed left-0 h-full w-64 z-40 border-r bg-white" />
 
-      <!-- Contenu principal scrollable -->
       <main class="flex-1 ml-64 p-8 overflow-y-auto">
         <div class="max-w-4xl mx-auto">
           <h1 class="text-3xl font-bold text-indigo-700 text-center mb-8">
@@ -80,15 +77,66 @@
                     />
                   </div>
 
-                  <!-- Réponse correcte -->
+                  <!-- Réponses correctes multiples -->
                   <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-3">Réponse correcte</label>
-                    <input 
-                      v-model="question.correctAnswer" 
-                      required 
-                      placeholder="Réponse attendue"
-                      class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-                    />
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Réponses correctes</label>
+                    <div 
+                      v-for="(answer, aIndex) in question.correctAnswers" 
+                      :key="`correct-${aIndex}`" 
+                      class="flex gap-2 mb-2"
+                    >
+                      <input
+                        v-model="question.correctAnswers[aIndex]"
+                        required
+                        placeholder="Réponse correcte"
+                        class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                      />
+                      <button
+                        v-if="question.correctAnswers.length > 1"
+                        @click="removeCorrectAnswer(qIndex, aIndex)"
+                        type="button"
+                        class="px-3 text-red-500 hover:text-red-700"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <button
+                      @click="addCorrectAnswer(qIndex)"
+                      type="button"
+                      class="text-sm text-indigo-600 hover:text-indigo-800 mt-2"
+                    >
+                      + Ajouter une réponse correcte
+                    </button>
+                  </div>
+
+                  <!-- Réponses fausses multiples -->
+                  <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Réponses incorrectes</label>
+                    <div 
+                      v-for="(answer, aIndex) in question.incorrectAnswers" 
+                      :key="`incorrect-${aIndex}`" 
+                      class="flex gap-2 mb-2"
+                    >
+                      <input
+                        v-model="question.incorrectAnswers[aIndex]"
+                        placeholder="Réponse incorrecte"
+                        class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                      />
+                      <button
+                        @click="removeIncorrectAnswer(qIndex, aIndex)"
+                        type="button"
+                        class="px-3 text-red-500 hover:text-red-700"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <button
+                      @click="addIncorrectAnswer(qIndex)"
+                      type="button"
+                      class="text-sm text-indigo-600 hover:text-indigo-800 mt-2"
+                    >
+                      + Ajouter une réponse incorrecte
+                    </button>
                   </div>
 
                   <!-- Score -->
@@ -149,7 +197,8 @@ export default {
       questions: [
         {
           questionText: "",
-          correctAnswer: "",
+          correctAnswers: [""],
+          incorrectAnswers: [""],
           score: 1,
         },
       ],
@@ -172,7 +221,8 @@ export default {
     addQuestion() {
       this.questions.push({
         questionText: "",
-        correctAnswer: "",
+        correctAnswers: [""],
+        incorrectAnswers: [""],
         score: 1,
       });
     },
@@ -183,16 +233,45 @@ export default {
       }
     },
 
+    addCorrectAnswer(qIndex) {
+      this.questions[qIndex].correctAnswers.push("");
+    },
+
+    removeCorrectAnswer(qIndex, aIndex) {
+      this.questions[qIndex].correctAnswers.splice(aIndex, 1);
+    },
+
+    addIncorrectAnswer(qIndex) {
+      this.questions[qIndex].incorrectAnswers.push("");
+    },
+
+    removeIncorrectAnswer(qIndex, aIndex) {
+      this.questions[qIndex].incorrectAnswers.splice(aIndex, 1);
+    },
+
     async submitQuizz() {
       try {
         const requests = this.questions.map(question => {
+          // Nettoyage des réponses
+          const cleanCorrect = question.correctAnswers
+            .map(a => a.trim())
+            .filter(a => a.length > 0);
+
+          const cleanIncorrect = question.incorrectAnswers
+            .map(a => a.trim())
+            .filter(a => a.length > 0);
+
+          if (cleanCorrect.length === 0) {
+            throw new Error("Au moins une réponse correcte est requise");
+          }
+
           const payload = {
             idCours: this.idCours,
             idTuteur: this.tuteurId,
             titre: this.titre,
             question: question.questionText.trim(),
-            reponseCorrecte: question.correctAnswer.trim(),
-            reponsesFausses: [],
+            reponseCorrecte: cleanCorrect,
+            reponsesFausses: cleanIncorrect,
             score: question.score,
           };
 
@@ -204,7 +283,7 @@ export default {
         this.$router.push("/QuizzList");
       } catch (error) {
         console.error("Erreur :", error.response?.data || error.message);
-        toast.error(`Échec : ${error.response?.data?.message || "Erreur serveur"}`);
+        toast.error(`Échec : ${error.response?.data?.message || error.message}`);
       }
     },
 
@@ -226,12 +305,10 @@ export default {
 </script>
 
 <style scoped>
-/* Animation personnalisée pour le scroll */
 .overflow-y-auto {
   scroll-behavior: smooth;
 }
 
-/* Style personnalisé pour la scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -248,5 +325,13 @@ export default {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #a5b4fc;
+}
+
+/* Animation pour les nouveaux champs */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }
 </style>

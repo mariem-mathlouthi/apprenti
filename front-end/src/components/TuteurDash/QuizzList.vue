@@ -32,15 +32,6 @@
               <div class="text">
                 <h2 class="title">{{ quizz.titre }}</h2>
                 <p class="subtitle">{{ quizz.question }}</p>
-                <div class="mt-2 text-sm">
-                  <p class="text-blue-600">Réponse correcte: {{ quizz.reponseCorrecte }}</p>
-                  <p 
-                    v-if="quizz.reponsesFausses.length" 
-                    class="text-red-500 mt-1"
-                  >
-                    Réponses incorrectes: {{ quizz.reponsesFausses.join(', ') }}
-                  </p>
-                </div>
               </div>
 
               <div class="icons">
@@ -68,7 +59,6 @@
           <!-- Aucun résultat -->
           <div v-else class="text-center py-8 bg-gray-50 rounded-lg">
             <p class="text-gray-500 mb-4">Aucun quizz trouvé</p>
-            
           </div>
         </div>
       </div>
@@ -100,47 +90,22 @@ export default {
       try {
         this.loading = true;
         
-        // Vérification session
         const tuteurData = localStorage.getItem("TuteurAccountInfo");
-        if (!tuteurData) {
-          throw new Error("Session expirée");
-        }
+        if (!tuteurData) throw new Error("Session expirée");
 
         const tuteurId = JSON.parse(tuteurData).id;
         
-        // Appel API
         const response = await axios.get(
           "http://localhost:8000/api/quizz-by-tuteur",
-          {
-            params: { tuteurId },
-            headers: {
-              "Content-Type": "application/json",
-            }
-          }
+          { params: { tuteurId } }
         );
 
-        // Transformation des données
-        this.quizzListe = response.data.map(q => ({
-          ...q,
-          reponsesFausses: q.reponsesFausses ? JSON.parse(q.reponsesFausses) : []
-        }));
+        this.quizzListe = response.data;
 
       } catch (error) {
-        console.error("Erreur détaillée :", error);
-        
-        // Gestion des erreurs
-        const errorMessage = error.response?.data?.message || 
-          error.message || 
-          "Erreur inconnue lors du chargement";
-        
-        toast.error(errorMessage.includes("Session") ? 
-          "Session expirée, veuillez vous reconnecter" : 
-          errorMessage);
-
-        if (error.message.includes("Session")) {
-          this.$router.push("/login-tuteur");
-        }
-
+        console.error("Erreur :", error);
+        toast.error(error.response?.data?.message || error.message);
+        if (error.message.includes("Session")) this.$router.push("/login-tuteur");
       } finally {
         this.loading = false;
       }
@@ -154,9 +119,7 @@ export default {
         this.quizzListe = this.quizzListe.filter(q => q.id !== id);
         toast.success("Quizz supprimé avec succès !");
       } catch (error) {
-        console.error("Erreur suppression :", error);
-        toast.error(error.response?.data?.message || 
-          "Impossible de supprimer le quizz");
+        toast.error("Impossible de supprimer le quizz");
       }
     },
   },
@@ -169,26 +132,20 @@ export default {
 <style scoped>
 .card {
   width: 250px;
-  height: 300px;
+  height: 200px; /* Hauteur réduite */
   border-radius: 15px;
   background: rgba(105, 13, 197, 0.103);
   display: flex;
   flex-direction: column;
-  position: relative;
-  overflow: hidden;
+  justify-content: space-between; /* Meilleure répartition de l'espace */
   padding: 20px;
   transition: transform 0.3s ease;
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
 .title {
-  color: #1f2937;
-  font-weight: 700;
   font-size: 1.2rem;
+  font-weight: 700;
+  color: #1f2937;
   margin-bottom: 0.5rem;
 }
 
@@ -196,14 +153,17 @@ export default {
   color: #4b5563;
   font-size: 0.9rem;
   line-height: 1.4;
-  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Limite à 3 lignes */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .icons {
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
-  padding: 0.5rem;
+  padding-top: 1rem;
 }
 
 .btn-submit {
@@ -223,23 +183,7 @@ export default {
   height: 1.25rem;
 }
 
-.btn {
-  padding: 0.25rem;
-  border-radius: 9999px;
-  transition: background-color 0.2s;
-}
-
-.btn:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
+  to { transform: rotate(360deg); }
 }
 </style>

@@ -25,20 +25,21 @@ class QuizzController extends Controller
             'idTuteur' => 'nullable|exists:tuteurs,id',
             'titre' => 'required|string|max:255',
             'question' => 'required|string',
-            'reponseCorrecte' => 'required|string',
+            'reponseCorrecte' => 'required|array', // Maintenant un tableau JSON
+            'reponsesFausses' => 'required|array', // Assure que c'est bien un tableau
             'score' => 'required|integer|min:1',
         ]);
-    
+
         $quizz = Quizz::create([
             'idCours' => $request->idCours,
             'idTuteur' => $request->idTuteur,
             'titre' => $request->titre,
             'question' => $request->question,
-            'reponseCorrecte' => $request->reponseCorrecte,
-            'reponsesFausses' => json_encode([]), // Initialiser avec un tableau JSON vide
+            'reponseCorrecte' => json_encode($request->reponseCorrecte), // Convertir en JSON
+            'reponsesFausses' => json_encode($request->reponsesFausses), // Convertir en JSON
             'score' => $request->score
         ]);
-    
+
         return response()->json($quizz, 201);
     }
 
@@ -53,12 +54,16 @@ class QuizzController extends Controller
                     $query->select('id', 'titre');
                 }])
                 ->firstOrFail();
-    
+
+            // Décoder les colonnes JSON pour les renvoyer sous forme de tableau
+            $quizz->reponseCorrecte = json_decode($quizz->reponseCorrecte, true);
+            $quizz->reponsesFausses = json_decode($quizz->reponsesFausses, true);
+
             return response()->json([
                 'success' => true,
                 'data' => $quizz
             ], 200);
-    
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -73,27 +78,27 @@ class QuizzController extends Controller
     public function updateQuizz(Request $request, $id)
     {
         $quizz = Quizz::findOrFail($id);
-    
+
         $request->validate([
             'idCours' => 'required|exists:cours,id',
             'titre' => 'required|string|max:255',
             'question' => 'required|string',
-            'reponseCorrecte' => 'required|string',
-            'reponsesFausses' => 'sometimes|array', // Changé à 'sometimes' pour optionnel
+            'reponseCorrecte' => 'required|array', // Maintenant un tableau JSON
+            'reponsesFausses' => 'sometimes|array', // Optionnel, mais doit être un tableau
             'score' => 'required|integer|min:1',
         ]);
-    
+
         $quizz->update([
             'idCours' => $request->idCours,
             'titre' => $request->titre,
             'question' => $request->question,
-            'reponseCorrecte' => $request->reponseCorrecte,
-            'reponsesFausses' => $request->has('reponsesFausses') 
+            'reponseCorrecte' => json_encode($request->reponseCorrecte), // Convertir en JSON
+            'reponsesFausses' => $request->has('reponsesFausses')
                 ? json_encode($request->reponsesFausses)
                 : $quizz->reponsesFausses,
             'score' => $request->score
         ]);
-    
+
         return response()->json($quizz, 200);
     }
 
@@ -115,14 +120,19 @@ class QuizzController extends Controller
         $request->validate([
             'tuteurId' => 'required|exists:tuteurs,id'
         ]);
-    
-        // Modification clé : requête directe sur la table quizz
+
         $quizz = Quizz::where('idTuteur', $request->tuteurId)
             ->with(['cours' => function($query) {
                 $query->select('id', 'titre');
             }])
             ->get();
-    
+
+        // Décoder JSON avant d'envoyer la réponse
+        foreach ($quizz as $q) {
+            $q->reponseCorrecte = json_decode($q->reponseCorrecte, true);
+            $q->reponsesFausses = json_decode($q->reponsesFausses, true);
+        }
+
         return response()->json($quizz, 200);
     }
 }
