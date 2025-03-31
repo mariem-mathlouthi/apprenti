@@ -3,7 +3,7 @@
     <NavbarTuteur class="fixed top-0 w-full z-50 bg-white shadow-md" />
 
     <div class="flex pt-16 h-screen">
-      <SidebarTuteur class="fixed left-0 h-full w-64 z-40 border-r bg-white" />
+      <SidebarTuteur  />
 
       <main class="flex-1 ml-64 p-8 overflow-y-auto">
         <div class="max-w-4xl mx-auto">

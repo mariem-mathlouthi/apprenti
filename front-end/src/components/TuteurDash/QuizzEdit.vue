@@ -5,7 +5,7 @@
 
     <div class="flex pt-16 h-screen">
       <!-- Sidebar fixe -->
-      <SidebarTuteur class="fixed left-0 h-full w-64 z-40 border-r bg-white" />
+      <SidebarTuteur  />
 
       <!-- Contenu principal scrollable -->
       <main class="flex-1 ml-64 p-8 overflow-y-auto" style="height: calc(100vh - 4rem);">
