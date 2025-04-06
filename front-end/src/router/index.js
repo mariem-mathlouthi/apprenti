@@ -61,13 +61,13 @@ import DetailTuteurAdmin from "../components/Admin/DetailTuteurAdmin.vue";
 import CoursDetails from "../components/TuteurDash/CoursDetails.vue";
 import RessourceList from "../components/TuteurDash/RessourceList.vue";
 import RessourceAdd from "../components/TuteurDash/RessourceAdd.vue";
-import RessourceEdit from '../components/TuteurDash/RessourceEdit.vue';
+import RessourceEdit from "../components/TuteurDash/RessourceEdit.vue";
 
 import QuizzList from "../components/TuteurDash/QuizzList.vue";
 import QuizzAdd from "../components/TuteurDash/QuizzAdd.vue";
 import QuizzEdit from "../components/TuteurDash/QuizzEdit.vue";
-
-
+import ListeQuizz from "../components/StudentDash/ListeQuizz.vue";
+import PasserQuizz from "../components/StudentDash/PasserQuizz.vue";
 
 const routes = [
   {
@@ -163,12 +163,12 @@ const routes = [
   {
     path: "/SignUpTuteur",
     name: "SignUpTuteur",
-    component:SignUpTuteur,
+    component: SignUpTuteur,
   },
   {
     path: "/SignUpTuteurPart2",
     name: "SignUpTuteurPart2",
-    component:SignUpTuteurPart2,
+    component: SignUpTuteurPart2,
   },
 
   {
@@ -292,32 +292,31 @@ const routes = [
     component: CoursListe,
   },
   {
-    path: "/ajouter-cours", 
+    path: "/ajouter-cours",
     name: "AjouterCours",
-    component: Cours, 
+    component: Cours,
   },
 
-
   {
-    path: "/modifier-cours/:id", 
+    path: "/modifier-cours/:id",
     name: "CoursEdit",
     component: CoursEdit,
   },
-    
-  {path:'/ConsultListCours',
-    name:'ConsultListCours',
-    component:ConsultListCours,
 
+  {
+    path: "/ConsultListCours",
+    name: "ConsultListCours",
+    component: ConsultListCours,
   },
-  {path:'/TuteursListAdmin',
-    name:'TuteursListAdmin',
-    component:TuteursListAdmin,
-
+  {
+    path: "/TuteursListAdmin",
+    name: "TuteursListAdmin",
+    component: TuteursListAdmin,
   },
-  {path:'/DetailTuteurAdmin/:id',
-    name:'DetailTuteurAdmin',
-    component:DetailTuteurAdmin,
-
+  {
+    path: "/DetailTuteurAdmin/:id",
+    name: "DetailTuteurAdmin",
+    component: DetailTuteurAdmin,
   },
 
   {
@@ -329,12 +328,12 @@ const routes = [
   {
     path: "/ajouter-ressource/:id",
     name: "RessourceList",
-    component: RessourceList, 
+    component: RessourceList,
   },
   {
     path: "/cours/:id/ajouter-ressource",
     name: "RessourceAdd",
-    component: RessourceAdd, 
+    component: RessourceAdd,
   },
   {
     path: "/modifier-ressource/:id",
@@ -343,38 +342,38 @@ const routes = [
   },
 
   {
-    path: '/DetailsCours/:id',
-    name: 'ConsultRessource',
-    component:ConsultRessource,
+    path: "/DetailsCours/:id",
+    name: "ConsultRessource",
+    component: ConsultRessource,
   },
   {
-    path: '/QuizzList',
-    name: 'QuizzList',
-    component:QuizzList,
+    path: "/QuizzList",
+    name: "QuizzList",
+    component: QuizzList,
   },
   {
-    path: '/QuizzAdd',
-    name: 'QuizzAdd',
-    component:QuizzAdd,
+    path: "/QuizzAdd",
+    name: "QuizzAdd",
+    component: QuizzAdd,
   },
   {
-    path: '/QuizzEdit/:id',
-    name: 'QuizzEdit',
-    component:QuizzEdit,
+    path: "/QuizzEdit/:id",
+    name: "QuizzEdit",
+    component: QuizzEdit,
   },
 
-
-
-  
-
-
-
-  
-
-  
-
-
-
+  {
+    path: "/DetailsCours/:idCours/quizz",
+    name: "ListeQuizz",
+    component: ListeQuizz,
+    props: true,
+  },
+  {
+    path: "/passer-quizz/:idQuizz",
+    name: "PasserQuizz",
+    component: PasserQuizz,
+    props: true,
+  },
 ];
 
 const router = createRouter({

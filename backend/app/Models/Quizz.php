@@ -36,4 +36,5 @@ public function quizz()
 {
     return $this->hasMany(Quizz::class, 'idCours');
 }
+
 }

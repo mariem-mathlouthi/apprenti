@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -13,12 +14,13 @@ return new class extends Migration {
         Schema::create('quizz', function (Blueprint $table) {
             $table->id();
             $table->foreignId('idCours')->constrained('cours')->onDelete('cascade');
+            $table->foreignId('idTuteur')->nullable()->constrained('tuteurs')->nullOnDelete();
             $table->string('titre');
             $table->text('question');
-            $table->string('reponseCorrecte');
-            $table->json('reponsesFausses');
-            $table->integer('score')->default(1);
-            $table->timestamps();
+            $table->json('reponseCorrecte')->nullable();  // Correct answer(s) (JSON array)
+            $table->json('reponsesFausses')->nullable();  // Incorrect answers (JSON array)
+            $table->integer('score')->default(1);         // Default score per question
+            $table->timestamps();                         // Adds created_at and updated_at
         });
     }
 

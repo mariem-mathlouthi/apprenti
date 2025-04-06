@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Quizz;
 use Illuminate\Http\Request;
+use App\Models\ReponseEtudiant;
+use Illuminate\Support\Facades\Auth;
 
 class QuizzController extends Controller
 {
@@ -135,4 +137,38 @@ class QuizzController extends Controller
 
         return response()->json($quizz, 200);
     }
+
+    public function submitReponses(Request $request, $quizzId)
+{
+    if (!Auth::check()) {
+        return response()->json(['message' => 'Unauthenticated.'], 401);
+    }
+
+    $request->validate([
+        'reponses' => 'required|array',
+        'reponses.*' => 'required|string'
+    ]);
+
+    $quizz = Quizz::findOrFail($quizzId);
+    $user = Auth::user();
+
+    $correctAnswers = $this->parseAnswers($quizz->reponseCorrecte);
+    $isCorrect = empty(array_diff($request->reponses, $correctAnswers)) 
+              && empty(array_diff($correctAnswers, $request->reponses));
+
+    $reponse = ReponseEtudiant::create([
+        'etudiant_id' => $user->id,
+        'quizz_id' => $quizzId,
+        'reponses' => json_encode($request->reponses),
+        'est_correcte' => $isCorrect,
+        'score_obtenu' => $isCorrect ? $quizz->score : 0
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'score' => $reponse->score_obtenu,
+        'is_correct' => $isCorrect,
+        'correct_answers' => $correctAnswers
+    ]);
+}
 }
