@@ -369,7 +369,7 @@ const routes = [
     props: true,
   },
   {
-    path: "/passer-quizz/:idQuizz",
+    path: "/quizz/:idCours/:titreQuizz",
     name: "PasserQuizz",
     component: PasserQuizz,
     props: true,
