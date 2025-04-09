@@ -125,8 +125,7 @@ Route::group(['middleware' => 'cors'], function () {
     Route::put('/quizz/{id}', [QuizzController::class, 'updateQuizz']);
     Route::delete('/quizz/{id}', [QuizzController::class, 'deleteQuizz']);
     Route::get('/quizz-by-tuteur', [QuizzController::class, 'getQuizzByTuteur']);
-    // routes/api.php
-Route::get('/quizz/{idCours}/{titre}', [QuizzController::class, 'getByCourseAndTitle']);
+    Route::get('/quizz/{idCours}/{titre}', [QuizzController::class, 'getByCourseAndTitle']);
     
     
 });
