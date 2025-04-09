@@ -68,6 +68,7 @@ import QuizzAdd from "../components/TuteurDash/QuizzAdd.vue";
 import QuizzEdit from "../components/TuteurDash/QuizzEdit.vue";
 import ListeQuizz from "../components/StudentDash/ListeQuizz.vue";
 import PasserQuizz from "../components/StudentDash/PasserQuizz.vue";
+import QuestionList from "../components/TuteurDash/QuestionList.vue";
 
 const routes = [
   {
@@ -374,6 +375,14 @@ const routes = [
     component: PasserQuizz,
     props: true,
   },
+
+
+  {
+    path: '/question-list/:idCours/:titre',
+    name: 'QuestionList',
+    component: QuestionList,
+    props: true
+  }
 ];
 
 const router = createRouter({
