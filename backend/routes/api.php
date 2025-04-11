@@ -129,6 +129,8 @@ Route::group(['middleware' => 'cors'], function () {
 
     Route::post('/cours/{course}/feedbacks', [FeedbackController::class, 'createFeedback']);
     Route::get('/feedbacks/{id}', [FeedbackController::class, 'getFeedback']);
+    Route::get('/quizz/{idCours}/{titre}', [QuizzController::class, 'getByCourseAndTitle']);
+    
     
 });
 

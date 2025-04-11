@@ -1,168 +1,161 @@
 <template>
-  <div id="app" class="flex flex-col h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-    <!-- Navbar -->
+  <div class="min-h-screen bg-gray-50">
     <NavBarStd />
-    
-    <!-- Sidebar -->
-    <Sidebar class="w-64" />
 
-    <!-- Main Content -->
-    <main class="flex-1 overflow-auto mt-16 ml-64 p-8">
-      <div class="max-w-6xl mx-auto">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-8">
-          <h1 class="text-2xl font-bold text-gray-800">
-            Quizz du Cours: {{ coursTitre }}
-          </h1>
-          <router-link 
-            :to="{ name: 'ConsultRessource', params: { id: idCours } }" 
-            class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-          >
-            Retour aux ressources
-          </router-link>
-        </div>
+    <div class="flex pt-16">
+      <!-- Sidebar -->
+      <Sidebar />
 
-        <!-- Loading State -->
-        <div v-if="loading" class="text-center py-12">
-          <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-          <p class="text-gray-600">Chargement des quizz...</p>
-        </div>
-
-        <!-- Empty State -->
-        <div v-else-if="quizzList.length === 0" class="text-center py-12 bg-white rounded-lg shadow">
-          <div class="mx-auto w-24 h-24 text-gray-400 mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+      <!-- Main Content -->
+      <main class="flex-1 ml-64 p-8">
+        <div class="max-w-4xl mx-auto">
+          <!-- Header Section -->
+          <div class="flex items-center justify-between mb-8">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-800">
+                Quizz pour le cours : {{ coursTitre }}
+              </h1>
+              <p class="text-gray-500 mt-1">Testez vos connaissances</p>
+            </div>
+            <router-link 
+              :to="{ name: 'ConsultRessource', params: { id: idCours } }" 
+              class="flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              <span class="mr-2">←</span>
+              Retour aux ressources
+            </router-link>
           </div>
-          <h3 class="text-lg font-medium text-gray-900 mb-1">Aucun quizz disponible</h3>
-          <p class="text-gray-500">Le tuteur n'a pas encore ajouté de quizz pour ce cours.</p>
-        </div>
 
-        <!-- Quizz List -->
-        <div v-else class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <div 
-            v-for="quizz in quizzList" 
-            :key="quizz.id" 
-            class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-          >
-            <div class="p-6">
-              <div class="flex justify-between items-start mb-2">
-                <h2 class="text-xl font-semibold text-gray-800">{{ quizz.titre }}</h2>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                  {{ quizz.score }} pts
-                </span>
-              </div>
-              
-              <p class="text-gray-600 mb-4">{{ quizz.description }}</p>
-              
-              <div class="mt-4">
-                <router-link 
-                  :to="{ name: 'PasserQuizz', params: { idQuizz: quizz.id } }" 
-                  class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  Commencer le quizz
-                </router-link>
-              </div>
-              
-              <div class="mt-3 text-xs text-gray-500">
-                <div class="flex items-center">
-                  <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold mr-2">
-                    {{ getInitial(quizz.tuteurNom) }}
-                  </div>
-                  <span>Créé par: {{ quizz.tuteurNom || 'Tuteur inconnu' }}</span>
+          <!-- Loading State -->
+          <div v-if="loading" class="text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+          </div>
+
+          <!-- Empty State -->
+          <div v-else-if="!groupedQuizz.length" class="text-center p-8 bg-white rounded-xl shadow-sm">
+            <div class="inline-block p-4 mb-4 bg-gray-100 rounded-full">
+              <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Aucun quizz disponible</h3>
+            <p class="text-gray-500">Le tuteur n'a pas encore créé de quizz pour ce cours</p>
+          </div>
+
+          <!-- Quizz Cards -->
+          <div v-else class="grid gap-6 md:grid-cols-2">
+            <div 
+              v-for="(quizz, index) in groupedQuizz" 
+              :key="index"
+              class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300"
+            >
+              <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="text-xl font-semibold text-gray-800">{{ quizz.titre }}</h2>
+                  <span class="px-3 py-1 text-sm font-medium text-green-800 bg-green-100 rounded-full">
+                    {{ quizz.questionCount }} question{{ quizz.questionCount > 1 ? 's' : '' }}
+                  </span>
                 </div>
+
+                <div class="flex items-center text-sm text-gray-600 mb-4">
+                  <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  Durée : {{ quizz.dureeEstimee }}
+                </div>
+
+                <router-link
+                  :to="{ 
+                    name: 'PasserQuizz',
+                    params: { 
+                      idCours: quizz.idCours,
+                      titreQuizz: quizz.titre 
+                    }
+                  }"
+                  class="block w-full px-4 py-2 text-sm font-medium text-center text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+                >
+                  Commencer le quizz →
+                </router-link>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
-import NavBarStd from './NavBarStd.vue';
-import Sidebar from './Sidebar.vue';
-import { toast } from "vue3-toastify";
-import "vue3-toastify/dist/index.css";
+import axios from 'axios'
+import NavBarStd from './NavBarStd.vue'
+import Sidebar from './Sidebar.vue'
+import { toast } from "vue3-toastify"
+import "vue3-toastify/dist/index.css"
 
 export default {
   name: "ListeQuizz",
   components: { NavBarStd, Sidebar },
   data() {
-      return {
-          quizzList: [],
-          coursTitre: '',
-          loading: true,
-          idCours: this.$route.params.idCours
-      };
+    return {
+      groupedQuizz: [],
+      coursTitre: '',
+      loading: true,
+      idCours: Number(this.$route.params.idCours),
+    }
   },
   methods: {
-      getInitial(name) {
-          return name ? name.charAt(0).toUpperCase() : 'T';
-      },
+    async fetchQuizz() {
+      try {
+        const [quizzResponse, coursResponse] = await Promise.all([
+          axios.get(`http://localhost:8000/api/quizz`),
+          axios.get(`http://localhost:8000/api/cours/${this.idCours}`)
+        ])
 
-      async fetchQuizz() {
-          try {
-              this.loading = true;
-              
-              // 1. Récupérer les quizz
-              const quizzResponse = await axios.get(`http://localhost:8000/api/quizz`);
-              let quizzData = quizzResponse.data?.data || quizzResponse.data || [];
-              
-              if (!Array.isArray(quizzData)) {
-                  quizzData = [];
-              }
-              
-              // 2. Récupérer les tuteurs
-              const tuteursResponse = await axios.get('http://localhost:8000/api/tuteurs');
-              let tuteursData = tuteursResponse.data?.data || tuteursResponse.data || [];
-              
-              if (!Array.isArray(tuteursData)) {
-                  tuteursData = [];
-              }
-              
-              // Créer un mapping des tuteurs
-              const tuteursMap = {};
-              tuteursData.forEach(tuteur => {
-                  if (tuteur.id) {
-                      tuteursMap[tuteur.id] = tuteur.fullname || 
-                                            `${tuteur.prenom || ''} ${tuteur.nom || ''}`.trim() || 
-                                            'Tuteur inconnu';
-                  }
-              });
-              
-              // 3. Filtrer et mapper les quizz
-              this.quizzList = quizzData
-                  .filter(q => q.idCours == this.idCours)
-                  .map(quizz => ({
-                      ...quizz,
-                      tuteurNom: tuteursMap[quizz.idTuteur] || 'Tuteur inconnu'
-                  }));
-              
-              // 4. Récupérer le titre du cours
-              const coursResponse = await axios.get(`http://localhost:8000/api/cours/${this.idCours}`);
-              const coursData = coursResponse.data?.data || coursResponse.data || {};
-              this.coursTitre = coursData.titre || 'Cours sans titre';
+        this.coursTitre = coursResponse.data.titre
 
-          } catch (error) {
-              console.error("Erreur:", error);
-              toast.error("Erreur lors du chargement des données");
-              
-              // En cas d'erreur, initialiser avec des valeurs par défaut
-              this.quizzList = [];
-              this.coursTitre = 'Cours sans titre';
-          } finally {
-              this.loading = false;
-          }
+        const filtered = quizzResponse.data.filter(q => q.idCours === this.idCours)
+        
+        this.groupedQuizz = Object.values(
+          filtered.reduce((acc, quiz) => {
+            const key = quiz.titre
+            if (!acc[key]) {
+              acc[key] = {
+                titre: quiz.titre,
+                idCours: quiz.idCours,
+                questionCount: 0,
+                dureeEstimee: '0s'
+              }
+            }
+            acc[key].questionCount++
+            acc[key].dureeEstimee = this.calculateDuration(acc[key].questionCount)
+            return acc
+          }, {})
+        )
+
+      } catch (error) {
+        toast.error("Erreur de chargement des données")
+        console.error(error)
+      } finally {
+        this.loading = false
       }
+    },
+
+    calculateDuration(questionCount) {
+      const totalSeconds = questionCount * 15
+      const minutes = Math.floor(totalSeconds / 60)
+      const seconds = totalSeconds % 60
+      
+      let duration = []
+      if (minutes > 0) duration.push(`${minutes}min`)
+      if (seconds > 0) duration.push(`${seconds}s`)
+      
+      return duration.join(' ') || '0s'
+    }
   },
   mounted() {
-      this.fetchQuizz();
+    this.fetchQuizz()
   }
-};
+}
 </script>
 
 <style scoped>
@@ -177,5 +170,15 @@ export default {
 
 .transition-shadow {
   transition: box-shadow 0.3s ease;
+}
+
+.sidebar-enter-active,
+.sidebar-leave-active {
+  transition: transform 0.3s ease;
+}
+
+.sidebar-enter-from,
+.sidebar-leave-to {
+  transform: translateX(-100%);
 }
 </style>

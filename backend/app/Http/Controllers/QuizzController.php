@@ -171,4 +171,39 @@ class QuizzController extends Controller
         'correct_answers' => $correctAnswers
     ]);
 }
+
+
+public function getByCourseAndTitle($idCours, $titre)
+{
+    $quizzes = Quizz::where('idCours', $idCours)
+                   ->where('titre', $titre)
+                   ->get();
+
+    return response()->json($quizzes->map(function($quiz) {
+        $cleanText = fn($text) => str_replace(['[', ']', '"', "'"], '', $text) ?: 'Réponse manquante';
+        
+        // Nettoyer les réponses correctes
+        $correctAnswers = collect($quiz->reponseCorrecte)
+            ->map(fn($r) => $cleanText($r))
+            ->filter()
+            ->values();
+
+        return [
+            'question' => $cleanText($quiz->question),
+            'answers' => collect()
+                ->merge($quiz->reponseCorrecte)
+                ->merge($quiz->reponsesFausses)
+                ->map(function($answer) use ($cleanText, $correctAnswers) {
+                    return [
+                        'text' => $cleanText($answer),
+                        'isCorrect' => $correctAnswers->contains($cleanText($answer))
+                    ];
+                })
+                ->filter(fn($a) => !empty($a['text']))
+                ->shuffle()
+                ->toArray(),
+            'score' => $quiz->score
+        ];
+    }));
+}
 }
