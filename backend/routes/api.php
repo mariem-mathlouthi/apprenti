@@ -15,7 +15,7 @@ use App\Http\Controllers\CoursController;
 use App\Http\Controllers\RessourceController;
 use App\Http\Controllers\TuteurController;
 use App\Http\Controllers\QuizzController;
-
+use App\Http\Controllers\FeedbackController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -125,7 +125,10 @@ Route::group(['middleware' => 'cors'], function () {
     Route::put('/quizz/{id}', [QuizzController::class, 'updateQuizz']);
     Route::delete('/quizz/{id}', [QuizzController::class, 'deleteQuizz']);
     Route::get('/quizz-by-tuteur', [QuizzController::class, 'getQuizzByTuteur']);
-    
+
+
+    Route::post('/cours/{course}/feedbacks', [FeedbackController::class, 'createFeedback']);
+    Route::get('/feedbacks/{id}', [FeedbackController::class, 'getFeedback']);
     
 });
 

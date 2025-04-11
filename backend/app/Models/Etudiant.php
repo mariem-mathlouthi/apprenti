@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Etudiant extends Model
 {
     use HasFactory;
+
+    public function feedbacks()
+    {
+        return $this->hasMany(Feedback::class);
+    }
 }

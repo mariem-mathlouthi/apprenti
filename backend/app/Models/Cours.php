@@ -21,7 +21,6 @@ class Cours extends Model
         'createdBy'
     ];
     
-
     public function category() {
         return $this->belongsTo(Category::class, 'category_id');
     }
@@ -33,13 +32,15 @@ class Cours extends Model
     public function apprenant() {
         return $this->belongsTo(Etudiant::class, 'idApprenant');
     }
+    
     public function createur() {
         return $this->belongsTo(Tuteur::class, 'createdBy');
     }
-    public function inscriptions()
-{
-    return $this->hasMany(Inscription::class, 'idCours');
-}
     
+    public function feedbacks()
+{
+    return $this->hasMany(Feedback::class);
 }
 
+    
+}

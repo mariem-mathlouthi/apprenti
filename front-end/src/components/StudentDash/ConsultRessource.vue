@@ -1,8 +1,5 @@
 <template>
-  <div
-    id="app"
-    class="flex flex-col h-screen bg-gradient-to-br from-gray-50 to-gray-100"
-  >
+  <div id="app" class="flex flex-col h-screen bg-gray-100">
     <!-- Navbar -->
     <NavBarStd />
 
@@ -16,16 +13,14 @@
         <div class="max-w-6xl mx-auto">
           <!-- Header -->
           <div class="flex justify-between items-center mb-6">
-            <!-- Titre centré -->
             <div class="flex-1 text-center">
               <h1 class="text-2xl font-bold text-gray-800">
                 Ressources du Cours
               </h1>
             </div>
-            <!-- Nouveau bouton Quizz -->
             <router-link
               :to="{ name: 'ListeQuizz', params: { idCours: idCours } }"
-              class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md shadow-sm text-sm font-medium transition-colors"
+              class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow-md text-sm font-medium transition-all duration-200 hover:shadow-lg"
             >
               Voir les Quizz
             </router-link>
@@ -42,15 +37,12 @@
               class="card transform transition-all hover:scale-105"
             >
               <div class="p-4">
-                <!-- Contenu de la carte -->
                 <h3 class="font-semibold text-base text-gray-800 mb-1">
                   {{ ressource.titre }}
                 </h3>
                 <p class="text-gray-600 text-xs">{{ ressource.description }}</p>
 
-                <!-- Affichage de la vidéo ou du fichier -->
                 <div v-if="ressource.file" class="mt-2">
-                  <!-- Si c'est une vidéo -->
                   <video
                     v-if="isVideo(ressource.file)"
                     controls
@@ -60,7 +52,6 @@
                     Votre navigateur ne supporte pas la lecture de vidéos.
                   </video>
 
-                  <!-- Si c'est un fichier (PDF, DOC, etc.) -->
                   <a
                     v-else
                     :href="ressource.file"
@@ -74,11 +65,144 @@
             </div>
           </div>
 
-          <!-- Message si aucune ressource -->
           <div v-else class="text-center py-10">
             <p class="text-gray-500 text-sm">
               Aucune ressource disponible pour ce cours.
             </p>
+          </div>
+
+          <!-- Boutons Avis + Feedback - Nouveau Design -->
+          <div class="mt-8 flex justify-start space-x-4">
+            <button
+              @click="toggleAvis"
+              class="feedback-btn"
+              :class="{ 'feedback-btn-primary': !showAvis, 'feedback-btn-secondary': showAvis }"
+            >
+              <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              </svg>
+              {{ showAvis ? 'Masquer les Avis' : 'Afficher les Avis' }}
+            </button>
+            
+            <router-link
+              :to="{ name: 'FeedbackForm', params: { idCours: idCours } }"
+              class="feedback-btn feedback-btn-accent"
+            >
+              <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Donner votre avis
+            </router-link>
+          </div>
+
+          <!-- Section Avis -->
+          <div v-if="showAvis" class="mt-6 bg-gray-100 rounded-lg p-6 -mx-8">
+            <div class="max-w-6xl mx-auto">
+              <h1 class="text-2xl font-bold text-gray-800 mb-6">Avis</h1>
+
+              <!-- Barre de recherche et filtre -->
+              <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                <div class="flex-1 relative">
+                  <input
+                    type="text"
+                    v-model="searchQuery"
+                    placeholder="Rechercher des avis..."
+                    class="w-full pl-10 pr-10 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <svg
+                    class="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    ></path>
+                  </svg>
+                  <button
+                    v-if="searchQuery"
+                    @click="clearSearch"
+                    class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="w-full sm:w-64">
+                  <select
+                    v-model="selectedRating"
+                    class="w-full pl-3 pr-10 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="0">Toutes les notes</option>
+                    <option value="1">1 étoile</option>
+                    <option value="2">2 étoiles</option>
+                    <option value="3">3 étoiles</option>
+                    <option value="4">4 étoiles</option>
+                    <option value="5">5 étoiles</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Liste des avis -->
+              <div class="space-y-6 bg-white rounded-lg p-6 shadow-sm">
+                <div v-for="avis in filteredAvis" :key="avis.id" class="border-b pb-6 last:border-b-0">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <h2 class="font-bold text-lg text-gray-800">{{ avis.nom }}</h2>
+                      <h3 class="text-sm text-gray-600">{{ avis.prenom }}</h3>
+                    </div>
+                    <div class="flex items-center">
+                      <div class="flex mr-2">
+                        <span v-for="i in 5" :key="i" class="text-yellow-400 text-xl">
+                          <span v-if="i <= avis.note">★</span>
+                          <span v-else>☆</span>
+                        </span>
+                      </div>
+                      <span class="text-gray-500 text-sm">il y a {{ avis.date }}</span>
+                    </div>
+                  </div>
+                  
+                  <p class="mt-4 text-gray-700">{{ avis.commentaire }}</p>
+                  
+                  <div class="mt-4 flex justify-between items-center">
+                    <div class="text-sm text-gray-500">
+                      Cet avis vous a-t-il aidé ?
+                      <button class="ml-2 text-gray-400 hover:text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
+                        </svg>
+                      </button>
+                    </div>
+                    <button class="text-sm text-gray-500 hover:text-gray-700">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div v-if="filteredAvis.length === 0" class="text-center py-10">
+                  <p class="text-gray-500">Aucun avis ne correspond à votre recherche.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -98,20 +222,40 @@ export default {
   components: { NavBarStd, Sidebar },
   data() {
     return {
-      ressources: [], // Liste des ressources
-      idCours: this.$route.params.id, // ID du cours récupéré depuis l'URL
+      ressources: [],
+      idCours: this.$route.params.id,
+      showAvis: false,
+      listeAvis: [],
+      selectedRating: 0,
+      searchQuery: ""
     };
   },
+  computed: {
+    filteredAvis() {
+      let filtered = this.listeAvis;
+      
+      if (this.selectedRating > 0) {
+        filtered = filtered.filter(avis => avis.note == this.selectedRating);
+      }
+      
+      if (this.searchQuery) {
+        const query = this.searchQuery.toLowerCase();
+        filtered = filtered.filter(avis => 
+          avis.nom.toLowerCase().includes(query) || 
+          avis.prenom.toLowerCase().includes(query) ||
+          avis.commentaire.toLowerCase().includes(query)
+        );
+      }
+      
+      return filtered;
+    }
+  },
   methods: {
-    // Récupérer les ressources du cours
     async fetchRessources() {
       try {
-        const response = await axios.get(
-          "http://localhost:8000/api/ressources"
-        );
-        // Filtrer les ressources pour ce cours
+        const response = await axios.get("http://localhost:8000/api/ressources");
         this.ressources = response.data.filter(
-          (ressource) => ressource.idCours === parseInt(this.idCours)
+          ressource => ressource.idCours === parseInt(this.idCours)
         );
       } catch (error) {
         console.error("Erreur lors du chargement des ressources :", error);
@@ -119,30 +263,140 @@ export default {
       }
     },
 
-    // Vérifie si le fichier est une vidéo
     isVideo(file) {
       const videoExtensions = [".mp4", ".webm", ".ogg"];
-      return videoExtensions.some((ext) => file.toLowerCase().endsWith(ext));
+      return videoExtensions.some(ext => file.toLowerCase().endsWith(ext));
     },
+
+    toggleAvis() {
+      this.showAvis = !this.showAvis;
+      if (this.showAvis && this.listeAvis.length === 0) {
+        this.fetchAvis();
+      }
+    },
+
+    async fetchAvis() {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/cours/${this.idCours}/avis`
+        );
+        this.listeAvis = response.data.map(avis => ({
+          ...avis,
+          date: this.formatDate(avis.created_at)
+        }));
+      } catch (error) {
+        console.error("Erreur lors du chargement des avis :", error);
+        toast.error("Erreur lors du chargement des avis");
+      }
+    },
+
+    formatDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diff = now - date;
+      
+      const seconds = Math.floor(diff / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+      const months = Math.floor(days / 30);
+      const years = Math.floor(months / 12);
+      
+      if (years > 0) return `${years} an${years > 1 ? 's' : ''}`;
+      if (months > 0) return `${months} mois`;
+      if (days > 0) return `${days} jour${days > 1 ? 's' : ''}`;
+      if (hours > 0) return `${hours} heure${hours > 1 ? 's' : ''}`;
+      if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''}`;
+      return `${seconds} seconde${seconds > 1 ? 's' : ''}`;
+    },
+
+    clearSearch() {
+      this.searchQuery = "";
+    }
   },
   mounted() {
-    this.fetchRessources(); // Charger les ressources au montage du composant
-  },
+    this.fetchRessources();
+  }
 };
 </script>
 
 <style scoped>
-/* Fond dégradé */
-.bg-gradient-to-br {
-  background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+/* Nouveaux styles pour les boutons */
+.feedback-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
 }
 
-/* Espacement pour éviter que le contenu touche le navbar */
-.mt-16 {
-  margin-top: 64px;
+.feedback-btn:hover {
+  transform: translateY(-0.125rem);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-/* Lien Voir fichier */
+.feedback-btn-primary {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.feedback-btn-primary:hover {
+  background-color: #4338ca;
+}
+
+.feedback-btn-secondary {
+  background-color: #6b7280;
+  color: white;
+}
+
+.feedback-btn-secondary:hover {
+  background-color: #4b5563;
+}
+
+.feedback-btn-accent {
+  background-color: #059669;
+  color: white;
+}
+
+.feedback-btn-accent:hover {
+  background-color: #047857;
+}
+
+.btn-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Styles existants */
+.bg-gray-100 {
+  background-color: #f3f4f6;
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.-mx-8 {
+  margin-left: -2rem;
+  margin-right: -2rem;
+}
+
 .btn-link {
   display: inline-flex;
   align-items: center;
@@ -151,20 +405,23 @@ export default {
   text-decoration: none;
   transition: 0.3s;
 }
+
 .btn-link:hover {
   color: #4338ca;
   text-decoration: underline;
 }
 
-/* Style des cartes */
-.card {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
+.mt-16 {
+  margin-top: 64px;
 }
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+
+@media (min-width: 640px) {
+  .sm\:flex-row {
+    flex-direction: row;
+  }
+  
+  .sm\:w-64 {
+    width: 16rem;
+  }
 }
 </style>

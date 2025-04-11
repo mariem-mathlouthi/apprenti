@@ -69,6 +69,10 @@ import QuizzEdit from "../components/TuteurDash/QuizzEdit.vue";
 import ListeQuizz from "../components/StudentDash/ListeQuizz.vue";
 import PasserQuizz from "../components/StudentDash/PasserQuizz.vue";
 
+
+import FeedbackForm from "../components/StudentDash/FeedbackForm.vue";
+import AdminFeedbacks from "../components/Admin/AdminFeedbacks.vue";
+
 const routes = [
   {
     path: "/",
@@ -374,6 +378,43 @@ const routes = [
     component: PasserQuizz,
     props: true,
   },
+
+  // {
+  //   path: '/course-feedback',
+  //   name: 'CourseFeedback',
+  //   component: CourseEvaluations,
+  //   meta: { requiresAuth: true, role: 'student' }
+  // },
+
+  // {
+  //   path: '/course-feedback',
+  //   name: 'CourseFeedback',
+  //   component: CourseEvaluations,
+  //   meta: { requiresAuth: true }
+  // },
+  // {
+  //   path: '/submit-feedback/:courseId',
+  //   name: 'SubmitFeedback',
+  //   component: FeedbackForm,
+  //   meta: { requiresAuth: true },
+  //   props: true
+  // } 
+
+  {
+    path: '/cours/:idCours/feedback',
+    name: 'FeedbackForm',
+    component:FeedbackForm,
+    props: true
+  },
+
+  {
+    path: '/AdminFeedbacks',
+    name: 'AdminFeedbacks',
+    component: AdminFeedbacks,
+    meta: { requiresAuth: true, role: 'admin' }
+  },
+
+
 ];
 
 const router = createRouter({
