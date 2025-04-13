@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class FeedbackController extends Controller
 {
@@ -37,7 +38,7 @@ class FeedbackController extends Controller
     /**
      * Ajouter un nouveau feedback
      */
-    public function createFeedback(Request $request, $courseId)
+   /* public function createFeedback(Request $request, $courseId)
     {
         try {
             // Vérification de l'authentification
@@ -111,8 +112,42 @@ class FeedbackController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
-    }
+    }*/
+    public function createFeedback(Request $request)
+{
+    try {
+        $validated = $request->validate([
+            'etudiant_id' => [
+                'required',
+                'exists:etudiants,id',
+                Rule::unique('feedbacks')->where(function ($query) use ($request) {
+                    return $query->where('cours_id', $request->cours_id);
+                })
+            ],
+            'cours_id' => 'required|exists:cours,id',
+            'note' => 'required|integer|between:1,5',
+            'commentaire' => 'required|string|max:500'
+        ]);
 
+        $feedback = Feedback::create($validated);
+
+        return response()->json([
+            'message' => 'Feedback enregistré',
+            'data' => $feedback
+        ], 201);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'message' => 'Validation error',
+            'errors' => $e->errors()
+        ], 422);
+    } catch (\Exception $e) {
+        \Log::error('Feedback error: '.$e->getMessage());
+        return response()->json([
+            'message' => 'Server error'
+        ], 500);
+    }
+}
     /**
      * Récupérer un feedback spécifique
      */

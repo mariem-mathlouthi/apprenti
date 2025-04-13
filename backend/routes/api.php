@@ -127,9 +127,10 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get('/quizz-by-tuteur', [QuizzController::class, 'getQuizzByTuteur']);
 
 
-    Route::post('/cours/{course}/feedbacks', [FeedbackController::class, 'createFeedback']);
+  //  Route::post('/cours/{course}/feedbacks', [FeedbackController::class, 'createFeedback']);
     Route::get('/feedbacks/{id}', [FeedbackController::class, 'getFeedback']);
     Route::get('/quizz/{idCours}/{titre}', [QuizzController::class, 'getByCourseAndTitle']);
+    Route::post('/feedbacks', [FeedbackController::class, 'createFeedback']);
     
     
 });

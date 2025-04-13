@@ -12,11 +12,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('etudiant_id')->constrained('etudiants')->onDelete('cascade');
             $table->foreignId('cours_id')->constrained('cours')->onDelete('cascade');
-            $table->integer('note')->unsigned()->between(1, 5);
+            $table->tinyInteger('note')->unsigned(); 
             $table->text('commentaire');
             $table->timestamps();
             
-            $table->unique(['etudiant_id', 'cours_id']); // Un étudiant ne peut donner qu'un feedback par cours
+            $table->unique(['etudiant_id', 'cours_id']);
         });
     }
 
