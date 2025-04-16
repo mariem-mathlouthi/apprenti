@@ -133,6 +133,7 @@ Route::group(['middleware' => 'cors'], function () {
 
     Route::post('/feedbacks', [FeedbackController::class, 'createFeedback']);
     Route::delete('/feedbacks/{id}', [FeedbackController::class, 'deleteFeedback']);
+    Route::put('/feedbacks/{id}', [FeedbackController::class, 'updateFeedback']);
     
 });
 

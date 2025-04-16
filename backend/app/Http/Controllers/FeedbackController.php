@@ -94,4 +94,70 @@ class FeedbackController extends Controller
             ], 404);
         }
     }
+
+
+
+
+    
+public function updateFeedback(Request $request, $id)
+{
+    try {
+        $feedback = Feedback::findOrFail($id);
+
+        
+        if ($feedback->etudiant_id !== $request->etudiant_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Action non autorisée'
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'note' => 'required|integer|between:1,5',
+            'commentaire' => 'required|string|max:500'
+        ]);
+
+        $feedback->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Feedback mis à jour',
+            'data' => $feedback
+        ], 200);
+
+    } catch (ModelNotFoundException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Feedback non trouvé'
+        ], 404);
+    } catch (\Exception $e) {
+        Log::error('Update error: '.$e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Erreur serveur'
+        ], 500);
+    }
+}
+
+
+
+
+public function deleteFeedback($id)
+{
+    try {
+        $feedback = Feedback::findOrFail($id);
+        $feedback->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Avis supprimé avec succès'
+        ], 200);
+
+    } catch (ModelNotFoundException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Avis introuvable'
+        ], 404);
+    }
+}
 }
