@@ -7,7 +7,7 @@
 
         <div class="col-span-3">
         <Sidebar />
-      </div>
+      </div> 
   
         <!-- Contenu principal -->
         <div class="col-span-9 h-full">

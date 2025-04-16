@@ -71,7 +71,7 @@
             </p>
           </div>
 
-          <!-- Boutons Avis + Feedback - Nouveau Design -->
+          <!-- Boutons Avis + Feedback -->
           <div class="mt-8 flex justify-start space-x-4">
             <button
               @click="toggleAvis"
@@ -98,7 +98,7 @@
           <!-- Section Avis -->
           <div v-if="showAvis" class="mt-6 bg-gray-100 rounded-lg p-6 -mx-8">
             <div class="max-w-6xl mx-auto">
-              <h1 class="text-2xl font-bold text-gray-800 mb-6">Avis</h1>
+              <h1 class="text-2xl font-bold text-gray-800 mb-6">Avis des Étudiants</h1>
 
               <!-- Barre de recherche et filtre -->
               <div class="flex flex-col sm:flex-row gap-4 mb-6">
@@ -160,46 +160,57 @@
                 </div>
               </div>
 
+              <!-- État de chargement -->
+              <div v-if="isLoadingFeedbacks" class="text-center py-10">
+                <i class="fas fa-spinner fa-spin text-blue-500 text-2xl"></i>
+                <p class="mt-2 text-gray-600">Chargement des avis...</p>
+              </div>
+
+              <!-- Message d'erreur -->
+              <div v-else-if="feedbackError" class="text-center py-10 text-red-500">
+                {{ feedbackError }}
+              </div>
+
               <!-- Liste des avis -->
-              <div class="space-y-6 bg-white rounded-lg p-6 shadow-sm">
-                <div v-for="avis in filteredAvis" :key="avis.id" class="border-b pb-6 last:border-b-0">
+              <div v-else class="space-y-6 bg-white rounded-lg p-6 shadow-sm">
+                <div v-for="feedback in filteredAvis" :key="feedback.id" class="border-b pb-6 last:border-b-0">
                   <div class="flex justify-between items-start">
                     <div>
-                      <h2 class="font-bold text-lg text-gray-800">{{ avis.nom }}</h2>
-                      <h3 class="text-sm text-gray-600">{{ avis.prenom }}</h3>
+                      <h2 class="font-bold text-lg text-gray-800">
+                        {{ feedback.etudiant.fullname }}
+                      </h2>
+                      <p class="text-sm text-gray-500">
+                        {{ feedback.etudiant.specialite }} - {{ feedback.etudiant.niveau }}
+                      </p>
                     </div>
                     <div class="flex items-center">
                       <div class="flex mr-2">
                         <span v-for="i in 5" :key="i" class="text-yellow-400 text-xl">
-                          <span v-if="i <= avis.note">★</span>
+                          <span v-if="i <= feedback.note">★</span>
                           <span v-else>☆</span>
                         </span>
                       </div>
-                      <span class="text-gray-500 text-sm">il y a {{ avis.date }}</span>
+                      <span class="text-gray-500 text-sm">{{ formatDate(feedback.created_at) }}</span>
                     </div>
                   </div>
                   
-                  <p class="mt-4 text-gray-700">{{ avis.commentaire }}</p>
+                  <p class="mt-4 text-gray-700">{{ feedback.commentaire }}</p>
                   
-                  <div class="mt-4 flex justify-between items-center">
-                    <div class="text-sm text-gray-500">
-                      Cet avis vous a-t-il aidé ?
-                      <button class="ml-2 text-gray-400 hover:text-gray-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
-                        </svg>
-                      </button>
-                    </div>
-                    <button class="text-sm text-gray-500 hover:text-gray-700">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
-                      </svg>
-                    </button>
+                  <div class="mt-2 flex items-center">
+                    <img 
+                      v-if="feedback.etudiant.image" 
+                      :src="'/storage/' + feedback.etudiant.image" 
+                      class="w-8 h-8 rounded-full mr-2"
+                      alt="Photo de profil"
+                    >
+                    <span class="text-sm text-gray-500">
+                      Posté le {{ new Date(feedback.created_at).toLocaleDateString() }}
+                    </span>
                   </div>
                 </div>
 
-                <div v-if="filteredAvis.length === 0" class="text-center py-10">
-                  <p class="text-gray-500">Aucun avis ne correspond à votre recherche.</p>
+                <div v-if="!isLoadingFeedbacks && filteredAvis.length === 0" class="text-center py-10">
+                  <p class="text-gray-500">Aucun avis disponible pour ce cours.</p>
                 </div>
               </div>
             </div>
@@ -227,7 +238,9 @@ export default {
       showAvis: false,
       listeAvis: [],
       selectedRating: 0,
-      searchQuery: ""
+      searchQuery: "",
+      isLoadingFeedbacks: false,
+      feedbackError: null
     };
   },
   computed: {
@@ -241,9 +254,8 @@ export default {
       if (this.searchQuery) {
         const query = this.searchQuery.toLowerCase();
         filtered = filtered.filter(avis => 
-          avis.nom.toLowerCase().includes(query) || 
-          avis.prenom.toLowerCase().includes(query) ||
-          avis.commentaire.toLowerCase().includes(query)
+          (avis.etudiant.fullname && avis.etudiant.fullname.toLowerCase().includes(query)) ||
+          (avis.commentaire && avis.commentaire.toLowerCase().includes(query))
         );
       }
       
@@ -263,30 +275,48 @@ export default {
       }
     },
 
-    isVideo(file) {
-      const videoExtensions = [".mp4", ".webm", ".ogg"];
-      return videoExtensions.some(ext => file.toLowerCase().endsWith(ext));
+    async fetchAvis() {
+      this.isLoadingFeedbacks = true;
+      this.feedbackError = null;
+      
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(
+          `http://localhost:8000/api/feedbacks/course/${this.idCours}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        );
+        
+        if (response.data.success) {
+          this.listeAvis = response.data.feedbacks.map(feedback => {
+            // Formatage des données étudiant
+            return {
+              ...feedback,
+              etudiant: {
+                ...feedback.etudiant,
+                fullname: feedback.etudiant.fullname || 'Étudiant'
+              }
+            };
+          }).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        } else {
+          throw new Error(response.data.message || 'Erreur inconnue');
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement des avis :", error);
+        this.feedbackError = error.response?.data?.message || "Impossible de charger les avis";
+        toast.error(this.feedbackError);
+      } finally {
+        this.isLoadingFeedbacks = false;
+      }
     },
 
     toggleAvis() {
       this.showAvis = !this.showAvis;
       if (this.showAvis && this.listeAvis.length === 0) {
         this.fetchAvis();
-      }
-    },
-
-    async fetchAvis() {
-      try {
-        const response = await axios.get(
-          `http://localhost:8000/api/cours/${this.idCours}/avis`
-        );
-        this.listeAvis = response.data.map(avis => ({
-          ...avis,
-          date: this.formatDate(avis.created_at)
-        }));
-      } catch (error) {
-        console.error("Erreur lors du chargement des avis :", error);
-        toast.error("Erreur lors du chargement des avis");
       }
     },
 
@@ -312,6 +342,12 @@ export default {
 
     clearSearch() {
       this.searchQuery = "";
+    },
+
+    isVideo(file) {
+      if (!file) return false;
+      const videoExtensions = [".mp4", ".webm", ".ogg"];
+      return videoExtensions.some(ext => file.toLowerCase().endsWith(ext));
     }
   },
   mounted() {
@@ -321,7 +357,6 @@ export default {
 </script>
 
 <style scoped>
-/* Nouveaux styles pour les boutons */
 .feedback-btn {
   display: flex;
   align-items: center;
@@ -371,11 +406,6 @@ export default {
   height: 1.25rem;
 }
 
-/* Styles existants */
-.bg-gray-100 {
-  background-color: #f3f4f6;
-}
-
 .card {
   background: white;
   border-radius: 8px;
@@ -386,15 +416,6 @@ export default {
 .card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-.shadow-sm {
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-}
-
-.-mx-8 {
-  margin-left: -2rem;
-  margin-right: -2rem;
 }
 
 .btn-link {
@@ -409,10 +430,6 @@ export default {
 .btn-link:hover {
   color: #4338ca;
   text-decoration: underline;
-}
-
-.mt-16 {
-  margin-top: 64px;
 }
 
 @media (min-width: 640px) {
