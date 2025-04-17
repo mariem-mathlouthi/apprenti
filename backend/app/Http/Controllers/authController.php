@@ -7,6 +7,7 @@ use App\Models\Etudiant;
 use App\Models\Admin;
 use App\Models\Tuteur;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class authController extends Controller
 {
@@ -80,44 +81,53 @@ class authController extends Controller
         ]);
     }
 
-    public function signUpTuteur(Request $request){
-        $requestData = $request->all();
-    
-        // Vérifier si l'email ou le téléphone existe déjà
-        $existingEmail = Tuteur::where('email', $requestData['email'])->first();
-        $existingPhone = Tuteur::where('phone', $requestData['phone'])->first();
-    
-        if ($existingEmail) {
-            return response()->json([
-                'message' => 'Email already exists',
-                'check' => false,
-            ]);
-        }
-    
-        if ($existingPhone) {
-            return response()->json([
-                'message' => 'Phone number already exists',
-                'check' => false,
-            ]);
-        }
-    
-        // Création du nouveau tuteur
-        $newTuteur = new Tuteur();
-        $newTuteur->fullname = $requestData['fullname'];
-        $newTuteur->email = $requestData['email'];
-        $newTuteur->password = Hash::make($requestData['password']);
-        $newTuteur->specialite = $requestData['specialite'];
-        $newTuteur->experience = $requestData['experience'];
-        $newTuteur->phone = $requestData['phone'];
-        $newTuteur->image = $requestData['image'] ?? null; // Optionnel si l'image est fournie
-        $newTuteur->save();
-    
+    public function signUpTuteur(Request $request)
+{
+    $requestData = $request->all();
+
+    // Validation avec règles Laravel
+    $validator = Validator::make($requestData, [
+        'fullname' => 'required|string|max:255',
+        'email' => 'required|email|unique:tuteurs,email',
+        'password' => 'required|min:6',
+        'specialite_id' => 'required|integer|exists:specialites,id',
+        'experience' => 'required|integer|min:0',
+        'phone' => 'required|unique:tuteurs,phone',
+        'image' => 'sometimes|nullable|string'
+    ]);
+
+    if ($validator->fails()) {
         return response()->json([
-            'message' => 'Account created successfully',
-            'check' => true,
-        ]);
+            'message' => $validator->errors()->first(),
+            'check' => false
+        ], 422);
     }
-    
+
+    try {
+        $newTuteur = Tuteur::create([
+            'fullname' => $requestData['fullname'],
+            'email' => $requestData['email'],
+            'password' => Hash::make($requestData['password']),
+            'specialite_id' => $requestData['specialite_id'],
+            'experience' => $requestData['experience'],
+            'phone' => $requestData['phone'],
+            'image' => $requestData['image'] ?? null,
+            'status' => 'en attente' // Valeur par défaut
+        ]);
+
+        return response()->json([
+            'message' => 'Compte créé avec succès',
+            'check' => true,
+            'tuteur' => $newTuteur
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Erreur de création : ' . $e->getMessage(),
+            'check' => false
+        ], 500);
+    }
+}
 
 
     public function LoginUser(Request $request)

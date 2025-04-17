@@ -16,14 +16,13 @@ return new class extends Migration
             $table->string('fullname');
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('specialite');
-            $table->integer('experience'); 
+            $table->foreignId('specialite_id')->constrained()->onDelete('cascade');
+            $table->integer('experience');
             $table->string('phone')->unique();
-            $table->enum('status',['en attente','accepté','refusé']); // modif to apply later
+            $table->enum('status', ['en attente', 'accepté', 'refusé'])->default('en attente');
             $table->string('image')->nullable();
             $table->timestamps();
         });
-        
     }
 
     /**

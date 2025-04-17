@@ -16,6 +16,7 @@ use App\Http\Controllers\RessourceController;
 use App\Http\Controllers\TuteurController;
 use App\Http\Controllers\QuizzController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\SpecialiteController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -134,6 +135,12 @@ Route::group(['middleware' => 'cors'], function () {
     Route::post('/feedbacks', [FeedbackController::class, 'createFeedback']);
     Route::delete('/feedbacks/{id}', [FeedbackController::class, 'deleteFeedback']);
     Route::put('/feedbacks/{id}', [FeedbackController::class, 'updateFeedback']);
+
+    Route::get('/specialites', [SpecialiteController::class, 'getAllSpecialites']);
+    Route::post('/specialites', [SpecialiteController::class, 'createSpecialite']);
+    Route::get('/specialites/{id}', [SpecialiteController::class, 'getSpecialiteById']);
+    Route::put('/specialites/{id}', [SpecialiteController::class, 'updateSpecialite']);
+    Route::delete('/specialites/{id}', [SpecialiteController::class, 'deleteSpecialite']);
     
 });
 
