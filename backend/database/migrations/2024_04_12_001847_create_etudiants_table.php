@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('domaine');
             $table->string('typeStage');
-            $table->string('specialite');
+            $table->foreignId('specialite_id')->constrained()->onDelete('cascade');
             $table->string('etablissement');
             $table->string('image');
             $table->timestamps();

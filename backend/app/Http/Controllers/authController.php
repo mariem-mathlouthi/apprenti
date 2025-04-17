@@ -13,41 +13,57 @@ class authController extends Controller
 {
     //
 
-    public function signUpEtudiant(Request $request){
+    public function signUpEtudiant(Request $request)
+    {
         $requestData = $request->all();
-        // Check if email already exists
-        $existingUser = Etudiant::where('email', $requestData['email'])->first();
-        $existingUser2 = Etudiant::where('cin', $requestData['cin'])->first();
-        if ($existingUser) {
-            return response()->json([
-                'message' => 'Email already exists',
-                'check' => false,
-            ]);
-        }
-        if ($existingUser2) {
-            return response()->json([
-                'message' => 'cin already exists',
-                'check' => false,
-            ]);
-        }
-        // Create a new user
-        $newUser = new Etudiant();
-        $newUser->fullname = $requestData['fullname'];
-        $newUser->niveau = $requestData['niveau'];
-        $newUser->cin = $requestData['cin'];
-        $newUser->email = $requestData['email'];
-        $newUser->password = Hash::make($requestData['password']);
-        $newUser->domaine = $requestData['domaine'];
-        $newUser->typeStage = $requestData['typeStage'];
-        $newUser->specialite = $requestData['specialite']; // Corrected typo from 'specailite' to 'specialite'
-        $newUser->etablissement = $requestData['etablissement'];
-        $newUser->image = $requestData['image'];
-        $newUser->save();
-
-        return response()->json([
-            'message' => 'Account created successfully',
-            'check' => true,
+    
+        // Validation renforcée
+        $validator = Validator::make($requestData, [
+            'fullname' => 'required|string|max:255',
+            'niveau' => 'required|string|max:50',
+            'cin' => 'required|string|unique:etudiants,cin',
+            'email' => 'required|email|unique:etudiants,email',
+            'password' => 'required|min:6',
+            'domaine' => 'required|string|max:100',
+            'typeStage' => 'required|string|max:100',
+            'specialite_id' => 'required|integer|exists:specialites,id',
+            'etablissement' => 'required|string|max:255',
+            'image' => 'sometimes|nullable|string'
         ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors()->first(),
+                'check' => false
+            ], 422);
+        }
+    
+        try {
+            $newUser = Etudiant::create([
+                'fullname' => $requestData['fullname'],
+                'niveau' => $requestData['niveau'],
+                'cin' => $requestData['cin'],
+                'email' => $requestData['email'],
+                'password' => Hash::make($requestData['password']),
+                'domaine' => $requestData['domaine'],
+                'typeStage' => $requestData['typeStage'],
+                'specialite_id' => $requestData['specialite_id'],
+                'etablissement' => $requestData['etablissement'],
+                'image' => $requestData['image'] ?? null
+            ]);
+    
+            return response()->json([
+                'message' => 'Compte créé avec succès',
+                'check' => true,
+                'etudiant' => $newUser
+            ]);
+    
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erreur serveur : ' . $e->getMessage(),
+                'check' => false
+            ], 500);
+        }
     }
 
 
