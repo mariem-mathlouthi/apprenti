@@ -29,6 +29,14 @@
 			  <li>
 				  <a href="#">
 					  <i class='bx bxs-shopping-bag-alt'></i>
+					  <router-link to="/SpecialiteList"><span class="text">specialite</span></router-link>
+				  </a>
+			  </li>
+
+			  
+			  <li>
+				  <a href="#">
+					  <i class='bx bxs-shopping-bag-alt'></i>
 					  <router-link to="/OffresListAdmin"><span class="text">Les offres</span></router-link>
 				  </a>
 			  </li>

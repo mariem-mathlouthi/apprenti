@@ -74,6 +74,12 @@ import QuestionList from "../components/TuteurDash/QuestionList.vue";
 import FeedbackForm from "../components/StudentDash/FeedbackForm.vue";
 import AdminFeedbacks from "../components/Admin/AdminFeedbacks.vue";
 
+
+import SpecialiteList from "../components/Admin/SpecialiteList.vue";
+import AddSpecialite from "../components/Admin/AddSpecialite.vue";
+import UpdateSpecialite from "../components/Admin/UpdateSpecialite.vue";
+import DetailSpecialite from "../components/Admin/DetailSpecialite.vue";
+
 const routes = [
   {
     path: "/",
@@ -401,6 +407,27 @@ const routes = [
     name: 'QuestionList',
     component: QuestionList,
     props: true
+  },
+
+  {
+    path: '/SpecialiteList',
+    name: 'SpecialiteList',
+    component: SpecialiteList
+  },
+  {
+    path: '/AddSpecialite',
+    name: 'AddSpecialite',
+    component: AddSpecialite
+  },
+  {
+    path: '/UpdateSpecialite/:id',
+    name: 'UpdateSpecialite',
+    component: UpdateSpecialite
+  },
+  {
+    path: '/DetailSpecialite/:id',
+    name: 'DetailSpecialite',
+    component: DetailSpecialite
   }
 ];
 
