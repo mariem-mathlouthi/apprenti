@@ -17,6 +17,7 @@ use App\Http\Controllers\TuteurController;
 use App\Http\Controllers\QuizzController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\SpecialiteController;
+use App\Http\Controllers\DomaineController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -141,6 +142,16 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get('/specialites/{id}', [SpecialiteController::class, 'getSpecialiteById']);
     Route::put('/specialites/{id}', [SpecialiteController::class, 'updateSpecialite']);
     Route::delete('/specialites/{id}', [SpecialiteController::class, 'deleteSpecialite']);
+
+
+
+
+
+    Route::get('/domaines', [DomaineController::class, 'getAllDomaines']);
+    Route::post('/domaines', [DomaineController::class, 'createDomaine']);
+    Route::get('/domaines/{id}', [DomaineController::class, 'getDomaineById']);
+    Route::put('/domaines/{id}', [DomaineController::class, 'updateDomaine']);
+    Route::delete('/domaines/{id}', [DomaineController::class, 'deleteDomaine']);
     
 });
 

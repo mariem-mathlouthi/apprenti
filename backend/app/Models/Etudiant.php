@@ -14,7 +14,7 @@ class Etudiant extends Model
         'cin',
         'email',
         'password',
-        'domaine',
+        'domaine_id',
         'typeStage',
         'specialite_id',
         'etablissement',
@@ -29,5 +29,9 @@ class Etudiant extends Model
     public function feedbacks()
     {
         return $this->hasMany(Feedback::class);
+    }
+    public function domaine()
+    {
+        return $this->belongsTo(Domaine::class);
     }
 }

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('cin')->unique();
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('domaine');
+            $table->foreignId('domaine_id')->constrained()->onDelete('cascade');
             $table->string('typeStage');
             $table->foreignId('specialite_id')->constrained()->onDelete('cascade');
             $table->string('etablissement');
