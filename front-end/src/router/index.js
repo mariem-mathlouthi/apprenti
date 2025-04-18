@@ -80,6 +80,12 @@ import AddSpecialite from "../components/Admin/AddSpecialite.vue";
 import UpdateSpecialite from "../components/Admin/UpdateSpecialite.vue";
 import DetailSpecialite from "../components/Admin/DetailSpecialite.vue";
 
+
+import DomaineList from "../components/Admin/DomaineList.vue";
+import AddDomaine from "../components/Admin/AddDomaine.vue";
+import UpdateDomaine from "../components/Admin/UpdateDomaine.vue";
+import DetailDomaine from "../components/Admin/DetailDomaine.vue";
+
 const routes = [
   {
     path: "/",
@@ -428,6 +434,28 @@ const routes = [
     path: '/DetailSpecialite/:id',
     name: 'DetailSpecialite',
     component: DetailSpecialite
+  },
+  {
+    path: '/DomaineList',
+    name: 'DomaineList',
+    component: DomaineList
+  },
+  {
+    path: '/AddDomaine',
+    name: 'AddDomaine',
+    component: AddDomaine
+  },
+  {
+    path: '/UpdateDomaine/:id',
+    name: 'UpdateDomaine',
+    component: UpdateDomaine,
+    props: true
+  },
+  {
+    path: '/DetailDomaine/:id',
+    name: 'DetailDomaine',
+    component: DetailDomaine,
+    props: true
   }
 ];
 

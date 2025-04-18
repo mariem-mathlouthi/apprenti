@@ -32,6 +32,12 @@
 					  <router-link to="/SpecialiteList"><span class="text">specialite</span></router-link>
 				  </a>
 			  </li>
+			  <li>
+				  <a href="#">
+					  <i class='bx bxs-shopping-bag-alt'></i>
+					  <router-link to="/DomaineList"><span class="text">Domaine</span></router-link>
+				  </a>
+			  </li>
 
 			  
 			  <li>
