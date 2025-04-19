@@ -145,7 +145,7 @@ export default {
       
       const payload = {
         fullname: storedData.fullname,
-        niveau: storedData.niveau,
+        niveau_id: storedData.niveau_id,
         cin: storedData.cin,
         email: storedData.email,
         password: storedData.password,
