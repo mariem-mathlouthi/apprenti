@@ -10,7 +10,7 @@ class Etudiant extends Model
     use HasFactory;
     protected $fillable = [
         'fullname',
-        'niveau',
+        'niveau_id',
         'cin',
         'email',
         'password',
@@ -34,4 +34,9 @@ class Etudiant extends Model
     {
         return $this->belongsTo(Domaine::class);
     }
+
+    public function niveau()
+{
+    return $this->belongsTo(Niveau::class);
+}
 }

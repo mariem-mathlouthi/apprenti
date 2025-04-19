@@ -18,6 +18,8 @@ use App\Http\Controllers\QuizzController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\SpecialiteController;
 use App\Http\Controllers\DomaineController;
+use App\Http\Controllers\NiveauController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -152,6 +154,16 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get('/domaines/{id}', [DomaineController::class, 'getDomaineById']);
     Route::put('/domaines/{id}', [DomaineController::class, 'updateDomaine']);
     Route::delete('/domaines/{id}', [DomaineController::class, 'deleteDomaine']);
+
+
+
+    Route::get('/niveaux', [NiveauController::class, 'getAllNiveaux']);
+    Route::post('/niveaux', [NiveauController::class, 'createNiveau']);
+    Route::get('/niveaux/{id}', [NiveauController::class, 'getNiveauById']);
+    Route::put('/niveaux/{id}', [NiveauController::class, 'updateNiveau']);
+    Route::delete('/niveaux/{id}', [NiveauController::class, 'deleteNiveau']);
+
+
     
 });
 

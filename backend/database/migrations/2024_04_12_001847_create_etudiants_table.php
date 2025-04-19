@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('etudiants', function (Blueprint $table) {
             $table->id();
             $table->string('fullname');
-            $table->string('niveau');
+            $table->foreignId('niveau_id')->constrained('niveaux')->onDelete('cascade');
             $table->string('cin')->unique();
             $table->string('email')->unique();
             $table->string('password');

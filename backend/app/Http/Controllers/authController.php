@@ -20,7 +20,7 @@ class authController extends Controller
         // Validation renforcée
         $validator = Validator::make($requestData, [
             'fullname' => 'required|string|max:255',
-            'niveau' => 'required|string|max:50',
+            'niveau_id' => 'required|integer|exists:niveaux,id', 
             'cin' => 'required|string|unique:etudiants,cin',
             'email' => 'required|email|unique:etudiants,email',
             'password' => 'required|min:6',
@@ -41,7 +41,7 @@ class authController extends Controller
         try {
             $newUser = Etudiant::create([
                 'fullname' => $requestData['fullname'],
-                'niveau' => $requestData['niveau'],
+                'niveau_id' => $requestData['niveau_id'],
                 'cin' => $requestData['cin'],
                 'email' => $requestData['email'],
                 'password' => Hash::make($requestData['password']),
