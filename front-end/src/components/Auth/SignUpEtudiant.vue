@@ -30,13 +30,13 @@
               />
             </div>
             <div>
-              <label class="font-medium">niveau</label>
+              <label class="font-medium">Niveau</label>
               <select
-                v-model="selectedSpecialiteId"
+                v-model="selectedNiveauId"
                 required
                 class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
               >
-                <option disabled value="">Sélectionnez un niveau</option>
+                <option disabled value="">Select a level</option>
                 <option 
                   v-for="niveau in niveaux" 
                   :key="niveau.id"
@@ -89,7 +89,6 @@
             </div>
           </div>
 
-          <!-- Progress steps -->
           <div class="max-w-lg mx-auto px-4 sm:px-0">
             <ul aria-label="Steps" class="flex items-center">
               <li 
@@ -127,7 +126,7 @@
           <button
             class="w-full px-4 py-2 text-white font-medium bg-gray-800 hover:bg-gray-700 active:bg-gray-700 rounded-lg duration-150"
           >
-            Suivant
+            Next
           </button>
         </form>
       </div>
