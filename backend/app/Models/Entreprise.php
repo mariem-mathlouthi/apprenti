@@ -9,4 +9,20 @@ class Entreprise extends Model
 {
     use HasFactory;
     protected $primaryKey = 'id';
+
+    protected $fillable = [
+        'numeroSIRET', 
+        'email', 
+        'password', 
+        'name', 
+        'secteur_id', 
+        'logo', 
+        'description', 
+        'link'
+    ];
+
+    public function secteur()
+    {
+        return $this->belongsTo(Secteur::class);
+    }
 }

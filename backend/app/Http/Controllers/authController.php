@@ -69,33 +69,53 @@ class authController extends Controller
 
 
 
-    public function signUpEntreprise(Request $request){
-        $requestData = $request->all();
-        // Check if email already exist
-        $existingUser = Entreprise::where('email', $requestData['email'])->first();
-        if ($existingUser) {
-            return response()->json([
-                'message' => 'Email already exists',
-                'check' => false,
-            ]);
-        }
-        // Create a new user
-        $newUser = new Entreprise();
-        $newUser->numeroSIRET = $requestData['numeroSIRET'];
-        $newUser->email = $requestData['email'];
-        $newUser->password = Hash::make($requestData['password']);
-        $newUser->name = $requestData['name'];
-        $newUser->secteur = $requestData['secteur'];
-        $newUser->logo = $requestData['logo'];
-        $newUser->description = $requestData['description'];
-        $newUser->link = $requestData['link'];
-        $newUser->save();
+    public function signUpEntreprise(Request $request)
+{
+    $requestData = $request->all();
+
+    $validator = Validator::make($requestData, [
+        'numeroSIRET' => 'required|string|unique:entreprises,numeroSIRET',
+        'email' => 'required|email|unique:entreprises,email',
+        'password' => 'required|min:6',
+        'name' => 'required|string|max:255',
+        'secteur_id' => 'required|integer|exists:secteurs,id', 
+        'logo' => 'sometimes|nullable|string',
+        'description' => 'required|string',
+        'link' => 'required|string'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => $validator->errors()->first(),
+            'check' => false
+        ], 422);
+    }
+
+    try {
+        $newUser = Entreprise::create([
+            'numeroSIRET' => $requestData['numeroSIRET'],
+            'email' => $requestData['email'],
+            'password' => Hash::make($requestData['password']),
+            'name' => $requestData['name'],
+            'secteur_id' => $requestData['secteur_id'], 
+            'logo' => $requestData['logo'] ?? null,
+            'description' => $requestData['description'],
+            'link' => $requestData['link']
+        ]);
 
         return response()->json([
             'message' => 'Account created successfully',
             'check' => true,
+            'entreprise' => $newUser
         ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Server error: ' . $e->getMessage(),
+            'check' => false
+        ], 500);
     }
+}
 
     public function signUpTuteur(Request $request)
 {

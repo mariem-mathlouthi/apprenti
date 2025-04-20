@@ -19,6 +19,7 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\SpecialiteController;
 use App\Http\Controllers\DomaineController;
 use App\Http\Controllers\NiveauController;
+use App\Http\Controllers\SecteurController;
 
 /*
 |--------------------------------------------------------------------------
@@ -162,6 +163,15 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get('/niveaux/{id}', [NiveauController::class, 'getNiveauById']);
     Route::put('/niveaux/{id}', [NiveauController::class, 'updateNiveau']);
     Route::delete('/niveaux/{id}', [NiveauController::class, 'deleteNiveau']);
+
+
+
+
+    Route::get('/secteurs', [SecteurController::class, 'getAllSecteurs']);
+    Route::post('/secteurs', [SecteurController::class, 'createSecteur']);
+    Route::get('/secteurs/{id}', [SecteurController::class, 'getSecteurById']);
+    Route::put('/secteurs/{id}', [SecteurController::class, 'updateSecteur']);
+    Route::delete('/secteurs/{id}', [SecteurController::class, 'deleteSecteur']);
 
 
     
