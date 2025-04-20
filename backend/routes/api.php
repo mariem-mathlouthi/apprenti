@@ -20,6 +20,7 @@ use App\Http\Controllers\SpecialiteController;
 use App\Http\Controllers\DomaineController;
 use App\Http\Controllers\NiveauController;
 use App\Http\Controllers\SecteurController;
+use App\Http\Controllers\TypeStageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -173,6 +174,14 @@ Route::group(['middleware' => 'cors'], function () {
     Route::put('/secteurs/{id}', [SecteurController::class, 'updateSecteur']);
     Route::delete('/secteurs/{id}', [SecteurController::class, 'deleteSecteur']);
 
+
+
+
+    Route::get('/type-stages', [TypeStageController::class, 'getAllTypeStages']);
+    Route::post('/type-stages', [TypeStageController::class, 'createTypeStage']);
+    Route::get('/type-stages/{id}', [TypeStageController::class, 'getTypeStageById']);
+    Route::put('/type-stages/{id}', [TypeStageController::class, 'updateTypeStage']);
+    Route::delete('/type-stages/{id}', [TypeStageController::class, 'deleteTypeStage']);
 
     
 });
