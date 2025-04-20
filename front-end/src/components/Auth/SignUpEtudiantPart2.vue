@@ -21,33 +21,61 @@
         </div>
 
         <form @submit.prevent="signUp" class="space-y-5">
-          <div>
-            <label class="font-medium">Domaine d'études</label>
-            <select
-              v-model="domaine_id"
-              required
-              class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
-            >
-              <option disabled value="">Sélectionnez un domaine</option>
-              <option 
-                v-for="domaine in domaines" 
-                :key="domaine.id"
-                :value="domaine.id"
+          <div class="grid grid-cols-2 gap-x-3">
+            <div>
+              <label class="font-medium">Niveau d'études</label>
+              <select
+                v-model="selectedNiveauId"
+                required
+                class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
               >
-                {{ domaine.description }}
-              </option>
-            </select>
+                <option disabled value="">Sélectionnez un niveau</option>
+                <option 
+                  v-for="niveau in niveaux" 
+                  :key="niveau.id"
+                  :value="niveau.id"
+                >
+                  {{ niveau.description }}
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label class="font-medium">Domaine d'études</label>
+              <select
+                v-model="selectedDomaineId"
+                required
+                class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+              >
+                <option disabled value="">Sélectionnez un domaine</option>
+                <option 
+                  v-for="domaine in domaines" 
+                  :key="domaine.id"
+                  :value="domaine.id"
+                >
+                  {{ domaine.description }}
+                </option>
+              </select>
+            </div>
           </div>
 
           <div class="grid grid-cols-2 gap-x-3">
             <div>
-              <label class="font-medium">Type de stage recherché</label>
-              <input
-                v-model="typeStage"
-                type="text"
+              <label class="font-medium">Type de stage</label>
+              <select
+                v-model="selectedTypeStageId"
                 required
                 class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
-              />
+              >
+                <option disabled value="">Sélectionnez un type</option>
+                <option 
+                  v-for="typeStage in typeStages" 
+                  :key="typeStage.id"
+                  :value="typeStage.id"
+                >
+                  {{ typeStage.description }}
+                </option>
+              </select>
             </div>
             
             <div>
@@ -79,8 +107,6 @@
             />
           </div>
 
-          <!-- Progress steps (identique) -->
-
           <button
             :disabled="loading"
             class="w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-400 rounded-lg duration-150"
@@ -101,24 +127,40 @@ import axios from "axios";
 export default {
   data() {
     return {
-      stepsCount: [1, 2],
-      currentStep: 2,
       etablissement: "",
-      domaine_id: null,
-      typeStage: "",
+      selectedNiveauId: null,
+      selectedDomaineId: null,
+      selectedTypeStageId: null,
       selectedSpecialiteId: null,
       image: "default.jpg",
+      niveaux: [],
       domaines: [],
       specialites: [],
+      typeStages: [],
       loading: false
     };
   },
 
   async mounted() {
-    await Promise.all([this.fetchDomaines(), this.fetchSpecialites()]);
+    await Promise.all([
+      this.fetchNiveaux(),
+      this.fetchDomaines(),
+      this.fetchSpecialites(),
+      this.fetchTypeStages()
+    ]);
   },
 
   methods: {
+    async fetchNiveaux() {
+      try {
+        const response = await axios.get("http://localhost:8000/api/niveaux");
+        this.niveaux = response.data;
+      } catch (error) {
+        toast.error("Erreur de chargement des niveaux", { autoClose: 2000 });
+        console.error("Erreur:", error);
+      }
+    },
+
     async fetchDomaines() {
       try {
         const response = await axios.get("http://localhost:8000/api/domaines");
@@ -139,18 +181,28 @@ export default {
       }
     },
 
+    async fetchTypeStages() {
+      try {
+        const response = await axios.get("http://localhost:8000/api/type-stages");
+        this.typeStages = response.data;
+      } catch (error) {
+        toast.error("Erreur de chargement des types de stage", { autoClose: 2000 });
+        console.error("Erreur:", error);
+      }
+    },
+
     async signUp() {
       this.loading = true;
       const storedData = JSON.parse(localStorage.getItem("Etudiant"));
       
       const payload = {
         fullname: storedData.fullname,
-        niveau_id: storedData.niveau_id,
+        niveau_id: this.selectedNiveauId,
         cin: storedData.cin,
         email: storedData.email,
         password: storedData.password,
-        domaine_id: this.domaine_id,
-        typeStage: this.typeStage,
+        domaine_id: this.selectedDomaineId,
+        type_stage_id: this.selectedTypeStageId,
         specialite_id: this.selectedSpecialiteId,
         etablissement: this.etablissement,
         image: this.image
@@ -180,12 +232,6 @@ export default {
       } finally {
         this.loading = false;
       }
-    }
-  },
-
-  watch: {
-    etablissement(val) {
-      this.currentStep = val ? 2 : 1;
     }
   }
 };

@@ -98,6 +98,12 @@ import SecteurList from "../components/Admin/SecteurList.vue";
 import AddSecteur from "../components/Admin/AddSecteur.vue";
 import UpdateSecteur from "../components/Admin/UpdateSecteur.vue";
 
+
+
+import TypeStageList from "../components/EntrepriseDash/TypeStageList.vue";
+import AddTypeStage from "../components/EntrepriseDash/AddTypeStage.vue";
+import UpdateTypeStage from "../components/EntrepriseDash/UpdateTypeStage.vue";
+
 const routes = [
   {
     path: "/",
@@ -506,6 +512,23 @@ const routes = [
     path: '/UpdateSecteur/:id',
     name: 'UpdateSecteur',
     component: UpdateSecteur
+  },
+
+  {
+    path: '/TypeStageList',
+    name: 'TypeStageList',
+    component: TypeStageList
+  },
+  {
+    path: '/AddTypeStage',
+    name: 'AddTypeStage',
+    component: AddTypeStage
+  },
+  {
+    path: '/UpdateTypeStage/:id',
+    name: 'UpdateTypeStage',
+    component:UpdateTypeStage,
+    props: true
   }
 ];
 
