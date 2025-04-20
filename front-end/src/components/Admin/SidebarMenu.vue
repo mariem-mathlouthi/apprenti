@@ -44,6 +44,12 @@
 					  <router-link to="/NiveauList"><span class="text">Niveau</span></router-link>
 				  </a>
 			  </li>
+			  <li>
+				  <a href="#">
+					  <i class='bx bxs-shopping-bag-alt'></i>
+					  <router-link to="/SecteurList"><span class="text">Secteur</span></router-link>
+				  </a>
+			  </li>
 
 			  
 			  <li>

@@ -92,6 +92,12 @@ import AddNiveau from "../components/Admin/AddNiveau.vue";
 import UpdateNiveau from "../components/Admin/UpdateNiveau.vue";
 import DetailNiveau from "../components/Admin/DetailNiveau.vue";
 
+
+
+import SecteurList from "../components/Admin/SecteurList.vue";
+import AddSecteur from "../components/Admin/AddSecteur.vue";
+import UpdateSecteur from "../components/Admin/UpdateSecteur.vue";
+
 const routes = [
   {
     path: "/",
@@ -485,6 +491,22 @@ const routes = [
     component: DetailNiveau,
     props: true
   },
+
+  {
+    path: '/SecteurList',
+    name: 'SecteurList',
+    component: SecteurList
+  },
+  {
+    path: '/AddSecteur',
+    name: 'AddSecteur',
+    component: AddSecteur
+  },
+  {
+    path: '/UpdateSecteur/:id',
+    name: 'UpdateSecteur',
+    component: UpdateSecteur
+  }
 ];
 
 const router = createRouter({
