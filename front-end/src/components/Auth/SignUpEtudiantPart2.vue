@@ -23,13 +23,13 @@
         <form @submit.prevent="signUp" class="space-y-5">
           <div class="grid grid-cols-2 gap-x-3">
             <div>
-              <label class="font-medium">Field of study</label>
+              <label class="font-medium">Domaine</label>
               <select
                 v-model="selectedDomaineId"
                 required
                 class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
               >
-                <option disabled value="">Select a field</option>
+                <option disabled value="">sélectionner votre domaine</option>
                 <option 
                   v-for="domaine in domaines" 
                   :key="domaine.id"
@@ -41,13 +41,13 @@
             </div>
             
             <div>
-              <label class="font-medium">Internship type</label>
+              <label class="font-medium">Type stage cherché</label>
               <select
                 v-model="selectedTypeStageId"
                 required
                 class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
               >
-                <option disabled value="">Select a type</option>
+                <option disabled value="">Selectionner un type</option>
                 <option 
                   v-for="typeStage in typeStages" 
                   :key="typeStage.id"
@@ -61,13 +61,13 @@
 
           <div class="grid grid-cols-2 gap-x-3">
             <div>
-              <label class="font-medium">Specialty</label>
+              <label class="font-medium">Specialité</label>
               <select
                 v-model="selectedSpecialiteId"
                 required
                 class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
               >
-                <option disabled value="">Select a specialty</option>
+                <option disabled value="">Selectionner une specialité</option>
                 <option 
                   v-for="specialite in specialites" 
                   :key="specialite.id"
@@ -80,7 +80,7 @@
           </div>
 
           <div>
-            <label class="font-medium">Institution</label>
+            <label class="font-medium">établissement</label>
             <input
               v-model="etablissement"
               type="text"
