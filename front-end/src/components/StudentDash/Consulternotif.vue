@@ -1,145 +1,212 @@
 <template>
-    <div>
-      <Navbar/>
-      <div class="grid grid-cols-12 gap-4">
-        <div class="col-span-3">
-          <Sidebar />
-        </div>
-        <div class="col-span-9 mt-24 mr-24">
-          <header class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-800" style="color:purple">Notifications</h1>
-          </header>
-          <div class="bg-purple-100 rounded-lg shadow-md p-6"> <!-- Changement de la classe bg-purple-100 à bg-purple-50 -->
-            <div v-if="notifications.length === 0" class="text-center text-gray-500">Aucune notification pour le moment.</div>
-            <div v-else>
-              <div v-for="(notification, index) in notifications" :key="index" class="mb-4">
-                <h2 class="text-lg font-semibold">{{ notification.title }} </h2>
-                <p class="text-gray-600">{{ notification.message }}  <span class="text-blue-500">{{ notification.date }}</span> <router-link v-if="notification.type=='offre'" to="/OffersListStd" class="text-blue-600">consulter la</router-link> 
-                  <button v-if="notification.type=='attestation'" class="text-orange-500 ml-2" @click="voirAttestation(notification.attestation)"> voir votre attestation</button>
+  <div>
+    <Navbar/>
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-3">
+        <Sidebar />
+      </div>
+      <div class="col-span-9 mt-24 mr-24">
+        <header class="text-center mb-8">
+          <h1 class="text-3xl font-bold text-gray-800" style="color:purple">Notifications</h1>
+        </header>
+        <div class="bg-purple-100 rounded-lg shadow-md p-6">
+          <div v-if="notifications.length === 0" class="text-center text-gray-500">
+            Aucune notification pour le moment.
+          </div>
+          <div v-else>
+            <div 
+              v-for="(notification, index) in notifications" 
+              :key="index" 
+              class="mb-4 p-4 bg-white rounded-lg shadow-sm"
+            >
+              <!-- Notification de demande -->
+              <div v-if="notification.type === 'demande'" class="border-l-4 border-green-500 pl-3">
+                <h2 class="text-lg font-semibold text-green-600">
+                  📩 {{ notification.title }}
+                </h2>
+                <p class="text-gray-600 mt-2">
+                  {{ notification.message }}
+                  <span class="block text-sm text-gray-400 mt-1">
+                    {{ formatDate(notification.date) }}
+                  </span>
                 </p>
-                <hr class="my-2 border-gray-200">
+              </div>
+
+              <!-- Notification d'offre -->
+              <div v-if="notification.type === 'offre'" class="border-l-4 border-blue-500 pl-3">
+                <h2 class="text-lg font-semibold text-blue-600">
+                  💼 {{ notification.title }}
+                </h2>
+                <p class="text-gray-600 mt-2">
+                  {{ notification.message }}
+                  <router-link 
+                    to="/OffersListStd" 
+                    class="inline-block mt-2 text-blue-600 hover:text-blue-800"
+                  >
+                    Voir l'offre →
+                  </router-link>
+                  <span class="block text-sm text-gray-400 mt-1">
+                    {{ formatDate(notification.date) }}
+                  </span>
+                </p>
+              </div>
+
+              <!-- Notification de cours -->
+              <div v-if="notification.type === 'cours'" class="border-l-4 border-purple-500 pl-3">
+                <h2 class="text-lg font-semibold text-purple-600">
+                  📚 {{ notification.title }}
+                </h2>
+                <p class="text-gray-600 mt-2">
+                  {{ notification.message }}
+                  <router-link 
+                    to="/ConsultListCours" 
+                    class="inline-block mt-2 text-purple-600 hover:text-purple-800"
+                  >
+                    Accéder au cours →
+                  </router-link>
+                  <span class="block text-sm text-gray-400 mt-1">
+                    {{ formatDate(notification.date) }}
+                  </span>
+                </p>
+              </div>
+
+              <!-- Notification d'attestation -->
+              <div v-if="notification.type === 'attestation'" class="border-l-4 border-orange-500 pl-3">
+                <h2 class="text-lg font-semibold text-orange-600">
+                  📄 {{ notification.title }}
+                </h2>
+                <p class="text-gray-600 mt-2">
+                  {{ notification.message }}
+                  <button 
+                    @click="voirAttestation(notification.attestation)"
+                    class="ml-2 text-orange-600 hover:text-orange-800"
+                  >
+                    Télécharger ↓
+                  </button>
+                  <span class="block text-sm text-gray-400 mt-1">
+                    {{ formatDate(notification.date) }}
+                  </span>
+                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </template>
-  
-  <script>
- 
-  import Navbar from './NavBarStd.vue'
-  import Sidebar from './Sidebar.vue'
-  import { toast } from "vue3-toastify";
-  import "vue3-toastify/dist/index.css";
-  import axios from "axios";
-  export default {
-    data() {
-      return {
-        notifications: [],
-        idEtudiant:"",
-        
+  </div>
+</template>
 
-      };
+<script>
+import Navbar from './NavBarStd.vue'
+import Sidebar from './Sidebar.vue'
+import axios from "axios";
+
+export default {
+  data() {
+    return {
+      notifications: [],
+      idEtudiant: null
+    };
+  },
+  components: {
+    Sidebar,
+    Navbar
+  },
+  methods: {
+    getAccountData() {
+      const storedData = localStorage.getItem("StudentAccountInfo");
+      if (storedData) {
+        const parsedData = JSON.parse(storedData);
+        this.idEtudiant = parsedData.id;
+      }
     },
-    components: {
-      Sidebar,
-      Navbar
+    
+    async getNotifications() {
+      try {
+        const [notifResponse, attestResponse] = await Promise.all([
+          axios.get("http://localhost:8000/api/getAllNotifications"),
+          axios.get(`http://localhost:8000/api/getAttestation/${this.idEtudiant}`)
+        ]);
+
+        this.notifications = [];
+
+        // Traitement des notifications principales
+        notifResponse.data.notifications.forEach(notif => {
+          // Demandes spécifiques
+          if (notif.type === 'demande' && notif.idEtudiant == this.idEtudiant) {
+            this.notifications.push({
+              title: "Mise à jour de demande",
+              message: notif.message,
+              date: notif.date,
+              type: "demande"
+            });
+          }
+
+          // Offres globales ou spécifiques
+          if (notif.type === 'offre' && (notif.idEtudiant == 0 || notif.idEtudiant == this.idEtudiant)) {
+            this.notifications.push({
+              title: "Nouvelle offre disponible",
+              message: notif.message,
+              date: notif.date,
+              type: "offre"
+            });
+          }
+
+          // Cours globaux
+          if (notif.type === 'cours' && notif.idEtudiant == 0) {
+            this.notifications.push({
+              title: "Nouveau cours publié",
+              message: notif.message,
+              date: notif.date,
+              type: "cours"
+            });
+          }
+        });
+
+        // Ajout des attestations
+        if (attestResponse.data?.check) {
+          attestResponse.data.attestation.forEach(att => {
+            this.notifications.push({
+              title: "Attestation de stage",
+              message: att.message,
+              date: att.date,
+              type: "attestation",
+              attestation: att.attestation
+            });
+          });
+        }
+
+        // Tri par date décroissante
+        this.notifications.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      } catch (error) {
+        console.error("Erreur:", error);
+      }
     },
-    methods:{
-      getAccountData(){
-        let storedData = localStorage.getItem("StudentAccountInfo"); 
-          this.idEtudiant = JSON.parse(storedData).id;
-          this.fullname= JSON.parse(storedData).fullname;
-          this.email= JSON.parse(storedData).email;
-      },
-      async getNotifications(){
-        try {
-            const response = await axios.get(
-                "http://localhost:8000/api/getAllNotifications"
-            );
-            console.log(response.data.notifications);
-            if (response.data.check === true) {
-                for(let i=0;i<response.data.notifications.length;i++){
-                 if(response.data.notifications[i].idEtudiant==this.idEtudiant){
-                  if(response.data.notifications[i].type=="demande"){
-                    let myObj={
-                    title:"Notification de votre demande stage",
-                    message:response.data.notifications[i].message,
-                    date:response.data.notifications[i].date,
-                    type:"demande"
-                  }
-                  this.notifications.push(myObj);
-                  }
-                 }
-                 else{
-                  if(response.data.notifications[i].type=="offre"){
-                    let myObj={
-                    title:"Nouvelle Offre de stage",
-                    message:response.data.notifications[i].message,
-                    date:response.data.notifications[i].date,
-                    type:"offre"
-                  }
-                  console.log(myObj);
-                  this.notifications.push(myObj);
-                  console.log(this.notifications);
 
-                  } 
-                 }
-                }
-                
-              } else {
-                  toast.error("Something went wrong !", {
-                      autoClose: 2000,
-                  });
-              }
+    formatDate(dateString) {
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString('fr-FR', options);
+    },
 
-              const response2 = await axios.get(
-                `http://localhost:8000/api/getAttestation/${this.idEtudiant}`
-              );
-              if(response2.data.check==true) {
-                for(let i=0;i<response2.data.attestation.length;i++){
-                  let myObj={
-                    title:"Notification d'attestation de  stage",
-                    message:response2.data.attestation[i].message,
-                    date:response2.data.attestation[i].date,
-                    attestation:response2.data.attestation[i].attestation,
-                    type:"attestation"
-                  }
-                  this.notifications.push(myObj);
-                }
-                
-              }
-              console.log(this.notifications);
-                this.notifications.reverse();
-                console.table(this.notifications);
-                let myJson ={
-                  notifications:this.notifications,
-                }
-                localStorage.setItem("notifications",JSON.stringify(myJson));
-
-              } catch (error) {
-                  console.error("Error:", error);
-              }
-              
-      },
-      voirAttestation(filename) {
-       console.log(filename);
-      // Construct the full URL of the file
+    voirAttestation(filename) {
       const fileURL = `http://localhost:8000${filename}`;
-
-      // Open the file URL in a new tab to initiate the download
       window.open(fileURL, '_blank');
-},
-    },
-    mounted(){
-      this.getNotifications();
-      this.getAccountData();
-      
     }
+  },
+  mounted() {
+    this.getAccountData();
+    this.getNotifications();
   }
-  </script>
-  
-  <style>
-  /* Ajoutez des styles CSS personnalisés au besoin */
-  </style>
+}
+</script>
+
+<style scoped>
+.notification-card {
+  transition: transform 0.2s ease;
+}
+
+.notification-card:hover {
+  transform: translateX(5px);
+}
+</style>

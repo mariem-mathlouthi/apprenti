@@ -129,6 +129,7 @@ Cancel
               let myObj={
               idEtudiant:response3.data.student.id,
               idEntreprise:this.idEntreprise,
+              idTuteur: 0,
               message:this.entrepriseName+" a accepté votre demande de stage en "+response4.data.offre.titre,
               destination:"Etudiant",
               type:"demande",
@@ -144,6 +145,7 @@ Cancel
               let myObj={
               idEtudiant:response3.data.student.id,
               idEntreprise:this.idEntreprise,
+              idTuteur: 0,
               message:this.entrepriseName+" a rejeté votre demande de stage en "+response4.data.offre.titre,
               destination:"Etudiant",
               type:"demande",
@@ -158,6 +160,7 @@ Cancel
               let myObj={
               idEtudiant:response3.data.student.id,
               idEntreprise:this.idEntreprise,
+              idTuteur: 0,
               message:this.entrepriseName+" votre demande de stage en "+response4.data.offre.titre+" en execution",
               destination:"Etudiant",
               type:"demande",
