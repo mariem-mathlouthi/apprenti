@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->string('name');
-            $table->string('secteur');
+            $table->foreignId('secteur_id')->constrained()->onDelete('cascade');
             $table->string('logo');
             $table->text('description');
             $table->string('link');

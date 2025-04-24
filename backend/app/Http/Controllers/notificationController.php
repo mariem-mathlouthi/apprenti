@@ -12,6 +12,7 @@ class notificationController extends Controller
         $new = new Notification();
         $new->idEtudiant =$requestData['idEtudiant'];
         $new->idEntreprise = $requestData['idEntreprise'];
+        $new->idTuteur = $requestData['idTuteur'];
         $new->message= $requestData['message'];
         $new->destination= $requestData['destination'];
         $new->type= $requestData['type'];

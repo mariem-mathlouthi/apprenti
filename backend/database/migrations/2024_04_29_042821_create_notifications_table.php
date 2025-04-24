@@ -15,9 +15,10 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('idEtudiant');
             $table->unsignedBigInteger('idEntreprise');
+            $table->unsignedBigInteger('idTuteur');
             $table->String('message');
-            $table->enum('destination',['Etudiant','Entreprise']);
-            $table->enum('type',['offre','demande']);
+            $table->enum('destination',['Etudiant','Entreprise','Tuteur']);
+            $table->enum('type',['offre','demande','cours']);
             $table->enum('visibility',['shown','hidden']);
             $table->date('date');
             $table->timestamps();

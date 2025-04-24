@@ -7,117 +7,163 @@ use App\Models\Etudiant;
 use App\Models\Admin;
 use App\Models\Tuteur;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class authController extends Controller
 {
     //
 
-    public function signUpEtudiant(Request $request){
+    public function signUpEtudiant(Request $request)
+    {
         $requestData = $request->all();
-        // Check if email already exists
-        $existingUser = Etudiant::where('email', $requestData['email'])->first();
-        $existingUser2 = Etudiant::where('cin', $requestData['cin'])->first();
-        if ($existingUser) {
-            return response()->json([
-                'message' => 'Email already exists',
-                'check' => false,
-            ]);
-        }
-        if ($existingUser2) {
-            return response()->json([
-                'message' => 'cin already exists',
-                'check' => false,
-            ]);
-        }
-        // Create a new user
-        $newUser = new Etudiant();
-        $newUser->fullname = $requestData['fullname'];
-        $newUser->niveau = $requestData['niveau'];
-        $newUser->cin = $requestData['cin'];
-        $newUser->email = $requestData['email'];
-        $newUser->password = Hash::make($requestData['password']);
-        $newUser->domaine = $requestData['domaine'];
-        $newUser->typeStage = $requestData['typeStage'];
-        $newUser->specialite = $requestData['specialite']; // Corrected typo from 'specailite' to 'specialite'
-        $newUser->etablissement = $requestData['etablissement'];
-        $newUser->image = $requestData['image'];
-        $newUser->save();
-
-        return response()->json([
-            'message' => 'Account created successfully',
-            'check' => true,
+    
+        // Validation renforcée
+        $validator = Validator::make($requestData, [
+            'fullname' => 'required|string|max:255',
+            'niveau_id' => 'required|integer|exists:niveaux,id', 
+            'cin' => 'required|string|unique:etudiants,cin',
+            'email' => 'required|email|unique:etudiants,email',
+            'password' => 'required|min:6',
+            'domaine_id' => 'required|integer|exists:domaines,id',
+            'type_stage_id' => 'required|integer|exists:type_stages,id', 
+            'specialite_id' => 'required|integer|exists:specialites,id',
+            'etablissement' => 'required|string|max:255',
+            'image' => 'sometimes|nullable|string'
         ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors()->first(),
+                'check' => false
+            ], 422);
+        }
+    
+        try {
+            $newUser = Etudiant::create([
+                'fullname' => $requestData['fullname'],
+                'niveau_id' => $requestData['niveau_id'],
+                'cin' => $requestData['cin'],
+                'email' => $requestData['email'],
+                'password' => Hash::make($requestData['password']),
+                'domaine_id' => $requestData['domaine_id'],
+                'type_stage_id' => $requestData['type_stage_id'],
+                'specialite_id' => $requestData['specialite_id'],
+                'etablissement' => $requestData['etablissement'],
+                'image' => $requestData['image'] ?? null
+            ]);
+    
+            return response()->json([
+                'message' => 'Compte créé avec succès',
+                'check' => true,
+                'etudiant' => $newUser
+            ]);
+    
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erreur serveur : ' . $e->getMessage(),
+                'check' => false
+            ], 500);
+        }
     }
 
 
 
 
-    public function signUpEntreprise(Request $request){
-        $requestData = $request->all();
-        // Check if email already exist
-        $existingUser = Entreprise::where('email', $requestData['email'])->first();
-        if ($existingUser) {
-            return response()->json([
-                'message' => 'Email already exists',
-                'check' => false,
-            ]);
-        }
-        // Create a new user
-        $newUser = new Entreprise();
-        $newUser->numeroSIRET = $requestData['numeroSIRET'];
-        $newUser->email = $requestData['email'];
-        $newUser->password = Hash::make($requestData['password']);
-        $newUser->name = $requestData['name'];
-        $newUser->secteur = $requestData['secteur'];
-        $newUser->logo = $requestData['logo'];
-        $newUser->description = $requestData['description'];
-        $newUser->link = $requestData['link'];
-        $newUser->save();
+    public function signUpEntreprise(Request $request)
+{
+    $requestData = $request->all();
+
+    $validator = Validator::make($requestData, [
+        'numeroSIRET' => 'required|string|unique:entreprises,numeroSIRET',
+        'email' => 'required|email|unique:entreprises,email',
+        'password' => 'required|min:6',
+        'name' => 'required|string|max:255',
+        'secteur_id' => 'required|integer|exists:secteurs,id', 
+        'logo' => 'sometimes|nullable|string',
+        'description' => 'required|string',
+        'link' => 'required|string'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => $validator->errors()->first(),
+            'check' => false
+        ], 422);
+    }
+
+    try {
+        $newUser = Entreprise::create([
+            'numeroSIRET' => $requestData['numeroSIRET'],
+            'email' => $requestData['email'],
+            'password' => Hash::make($requestData['password']),
+            'name' => $requestData['name'],
+            'secteur_id' => $requestData['secteur_id'], 
+            'logo' => $requestData['logo'] ?? null,
+            'description' => $requestData['description'],
+            'link' => $requestData['link']
+        ]);
 
         return response()->json([
             'message' => 'Account created successfully',
             'check' => true,
+            'entreprise' => $newUser
         ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Server error: ' . $e->getMessage(),
+            'check' => false
+        ], 500);
+    }
+}
+
+    public function signUpTuteur(Request $request)
+{
+    $requestData = $request->all();
+
+    // Validation avec règles Laravel
+    $validator = Validator::make($requestData, [
+        'fullname' => 'required|string|max:255',
+        'email' => 'required|email|unique:tuteurs,email',
+        'password' => 'required|min:6',
+        'specialite_id' => 'required|integer|exists:specialites,id',
+        'experience' => 'required|integer|min:0',
+        'phone' => 'required|unique:tuteurs,phone',
+        'image' => 'sometimes|nullable|string'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => $validator->errors()->first(),
+            'check' => false
+        ], 422);
     }
 
-    public function signUpTuteur(Request $request){
-        $requestData = $request->all();
-    
-        // Vérifier si l'email ou le téléphone existe déjà
-        $existingEmail = Tuteur::where('email', $requestData['email'])->first();
-        $existingPhone = Tuteur::where('phone', $requestData['phone'])->first();
-    
-        if ($existingEmail) {
-            return response()->json([
-                'message' => 'Email already exists',
-                'check' => false,
-            ]);
-        }
-    
-        if ($existingPhone) {
-            return response()->json([
-                'message' => 'Phone number already exists',
-                'check' => false,
-            ]);
-        }
-    
-        // Création du nouveau tuteur
-        $newTuteur = new Tuteur();
-        $newTuteur->fullname = $requestData['fullname'];
-        $newTuteur->email = $requestData['email'];
-        $newTuteur->password = Hash::make($requestData['password']);
-        $newTuteur->specialite = $requestData['specialite'];
-        $newTuteur->experience = $requestData['experience'];
-        $newTuteur->phone = $requestData['phone'];
-        $newTuteur->image = $requestData['image'] ?? null; // Optionnel si l'image est fournie
-        $newTuteur->save();
-    
-        return response()->json([
-            'message' => 'Account created successfully',
-            'check' => true,
+    try {
+        $newTuteur = Tuteur::create([
+            'fullname' => $requestData['fullname'],
+            'email' => $requestData['email'],
+            'password' => Hash::make($requestData['password']),
+            'specialite_id' => $requestData['specialite_id'],
+            'experience' => $requestData['experience'],
+            'phone' => $requestData['phone'],
+            'image' => $requestData['image'] ?? null,
+            'status' => 'en attente' // Valeur par défaut
         ]);
+
+        return response()->json([
+            'message' => 'Compte créé avec succès',
+            'check' => true,
+            'tuteur' => $newTuteur
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Erreur de création : ' . $e->getMessage(),
+            'check' => false
+        ], 500);
     }
-    
+}
 
 
     public function LoginUser(Request $request)

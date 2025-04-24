@@ -1,10 +1,8 @@
 <template>
   <div id="app" class="flex flex-col h-screen">
-    <!-- Navbar & Sidebar -->
     <NavbarTuteur />
     <SidebarTuteur />
 
-    <!-- Contenu principal -->
     <section id="content" class="flex-1 flex justify-center items-center py-6">
       <div class="container mx-auto p-6">
         <h1 class="text-3xl font-bold text-indigo-700 text-center mb-6">
@@ -91,6 +89,7 @@ export default {
       file: null,
       idTuteur: null,
       createdBy: null,
+      tuteurName: "",
     };
   },
   methods: {
@@ -114,6 +113,7 @@ export default {
         const parsedData = JSON.parse(tuteurData);
         this.idTuteur = parsedData.id;
         this.createdBy = parsedData.id;
+        this.tuteurName = parsedData.name;
       } else {
         toast.error("Veuillez vous reconnecter");
         this.$router.push("/login");
@@ -140,24 +140,36 @@ export default {
       }
 
       try {
+        // Création du cours
         const response = await axios.post("http://localhost:8000/api/cours", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Authorization": `Bearer ${localStorage.getItem('token')}`
-
           },
         });
 
         if (response.data.success) {
+          // Création de la notification
+          const notificationData = {
+            idEtudiant: 0,
+            idEntreprise: 0,
+            idTuteur: this.idTuteur,
+            message: `${this.tuteurName} a ajouté un nouveau cours : ${this.titre}`,
+            destination: "Etudiant",
+            type: "cours",
+            visibility: "shown",
+            date: new Date().toISOString().split('T')[0] // Format YYYY-MM-DD
+          };
+
+          await axios.post("http://localhost:8000/api/notification", notificationData);
+
           toast.success("Cours ajouté avec succès !");
-          this.$router.push("/cours"); // Rediriger vers la liste des cours
+          this.$router.push("/cours");
         }
       } catch (error) {
         console.error("Erreur complète :", error);
         const errorMessage = error.response?.data?.error || "Erreur inconnue";
         toast.error(`Échec de l'ajout : ${errorMessage}`);
-
       }
     },
   },
@@ -188,8 +200,16 @@ export default {
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
+  transition: background-color 0.2s;
 }
 .btn-submit:hover {
   background-color: #4338ca;
+}
+
+.label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #374151;
 }
 </style>

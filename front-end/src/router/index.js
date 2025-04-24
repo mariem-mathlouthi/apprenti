@@ -75,6 +75,36 @@ import FeedbackForm from "../components/StudentDash/FeedbackForm.vue";
 import AdminFeedbacks from "../components/Admin/AdminFeedbacks.vue";
 import EditFeedback from "../components/StudentDash/EditFeedback.vue";
 
+
+import SpecialiteList from "../components/Admin/SpecialiteList.vue";
+import AddSpecialite from "../components/Admin/AddSpecialite.vue";
+import UpdateSpecialite from "../components/Admin/UpdateSpecialite.vue";
+import DetailSpecialite from "../components/Admin/DetailSpecialite.vue";
+
+
+import DomaineList from "../components/Admin/DomaineList.vue";
+import AddDomaine from "../components/Admin/AddDomaine.vue";
+import UpdateDomaine from "../components/Admin/UpdateDomaine.vue";
+import DetailDomaine from "../components/Admin/DetailDomaine.vue";
+
+
+import NiveauList from "../components/Admin/NiveauList.vue";
+import AddNiveau from "../components/Admin/AddNiveau.vue";
+import UpdateNiveau from "../components/Admin/UpdateNiveau.vue";
+import DetailNiveau from "../components/Admin/DetailNiveau.vue";
+
+
+
+import SecteurList from "../components/Admin/SecteurList.vue";
+import AddSecteur from "../components/Admin/AddSecteur.vue";
+import UpdateSecteur from "../components/Admin/UpdateSecteur.vue";
+
+
+
+import TypeStageList from "../components/EntrepriseDash/TypeStageList.vue";
+import AddTypeStage from "../components/EntrepriseDash/AddTypeStage.vue";
+import UpdateTypeStage from "../components/EntrepriseDash/UpdateTypeStage.vue";
+
 const routes = [
   {
     path: "/",
@@ -410,6 +440,104 @@ const routes = [
     component: QuestionList,
     props: true
   },
+
+  {
+    path: '/SpecialiteList',
+    name: 'SpecialiteList',
+    component: SpecialiteList
+  },
+  {
+    path: '/AddSpecialite',
+    name: 'AddSpecialite',
+    component: AddSpecialite
+  },
+  {
+    path: '/UpdateSpecialite/:id',
+    name: 'UpdateSpecialite',
+    component: UpdateSpecialite
+  },
+  {
+    path: '/DetailSpecialite/:id',
+    name: 'DetailSpecialite',
+    component: DetailSpecialite
+  },
+  {
+    path: '/DomaineList',
+    name: 'DomaineList',
+    component: DomaineList
+  },
+  {
+    path: '/AddDomaine',
+    name: 'AddDomaine',
+    component: AddDomaine
+  },
+  {
+    path: '/UpdateDomaine/:id',
+    name: 'UpdateDomaine',
+    component: UpdateDomaine,
+    props: true
+  },
+  {
+    path: '/DetailDomaine/:id',
+    name: 'DetailDomaine',
+    component: DetailDomaine,
+    props: true
+  },
+  {
+    path: '/NiveauList',
+    name: 'NiveauList',
+    component: NiveauList
+  },
+  {
+    path: '/AddNiveau',
+    name: 'AddNiveau',
+    component: AddNiveau
+  },
+  {
+    path: '/UpdateNiveau/:id',
+    name: 'UpdateNiveau',
+    component: UpdateNiveau,
+    props: true
+  },
+  {
+    path: '/DetailNiveau/:id',
+    name: 'DetailNiveau',
+    component: DetailNiveau,
+    props: true
+  },
+
+  {
+    path: '/SecteurList',
+    name: 'SecteurList',
+    component: SecteurList
+  },
+  {
+    path: '/AddSecteur',
+    name: 'AddSecteur',
+    component: AddSecteur
+  },
+  {
+    path: '/UpdateSecteur/:id',
+    name: 'UpdateSecteur',
+    component: UpdateSecteur
+  },
+
+  {
+    path: '/TypeStageList',
+    name: 'TypeStageList',
+    component: TypeStageList
+  },
+  {
+    path: '/AddTypeStage',
+    name: 'AddTypeStage',
+    component: AddTypeStage
+  },
+  {
+    path: '/UpdateTypeStage/:id',
+    name: 'UpdateTypeStage',
+    component:UpdateTypeStage,
+    props: true
+  }
 ];
 
 const router = createRouter({
