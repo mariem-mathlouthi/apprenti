@@ -196,16 +196,73 @@
                   
                   <p class="mt-4 text-gray-700">{{ feedback.commentaire }}</p>
                   
-                  <div class="mt-2 flex items-center">
-                    <img 
-                      v-if="feedback.etudiant.image" 
-                      :src="'/storage/' + feedback.etudiant.image" 
-                      class="w-8 h-8 rounded-full mr-2"
-                      alt="Photo de profil"
-                    >
-                    <span class="text-sm text-gray-500">
-                      Posté le {{ new Date(feedback.created_at).toLocaleDateString() }}
-                    </span>
+                  <div class="mt-2 flex items-center justify-between">
+                    <div class="flex items-center">
+                      <!-- <img 
+                        v-if="feedback.etudiant.image" 
+                        :src="'/storage/' + feedback.etudiant.image" 
+                        class="w-8 h-8 rounded-full mr-2"
+                        alt="Photo de profil"
+                      > -->
+                      <span class="text-sm text-gray-500">
+                        Posté le {{ new Date(feedback.created_at).toLocaleDateString() }}
+                      </span>
+                    </div>
+                    
+                    <!-- Menu déroulant pour les actions -->
+                    <div v-if="isMyFeedback(feedback)" class="relative">
+                      <!-- Bouton des trois points -->
+                      <button 
+                        @click.stop="toggleMenu(feedback.id)"
+                        class="text-gray-500 hover:text-gray-700 focus:outline-none p-1 rounded-full hover:bg-gray-200"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+                        </svg>
+                      </button>
+                      
+                      <!-- Menu déroulant -->
+                      <transition name="menu">
+                        <div 
+                          v-if="activeMenu === feedback.id"
+                          class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200"
+                          v-click-outside="closeMenu"
+                        >
+                          <!-- Option Modifier -->
+                          <router-link
+                            :to="{ name: 'EditFeedback', params: { id: feedback.id, idCours: idCours } }"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center menu-option"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            Modifier
+                          </router-link>
+                          
+                          <!-- Option Supprimer -->
+                          <button
+                            @click="confirmDeleteFeedback(feedback.id)"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center menu-option"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Supprimer
+                          </button>
+                          
+                          <!-- Option Copier -->
+                          <button
+                            @click="copyFeedback(feedback.commentaire)"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center menu-option"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                            </svg>
+                            Copier
+                          </button>
+                        </div>
+                      </transition>
+                    </div>
                   </div>
                 </div>
 
@@ -227,10 +284,13 @@ import NavBarStd from "./NavBarStd.vue";
 import Sidebar from "./Sidebar.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-
+import clickOutside from '../../directives/clickOutside';
 export default {
   name: "ConsultRessource",
   components: { NavBarStd, Sidebar },
+  directives: {
+    'click-outside': clickOutside
+  },
   data() {
     return {
       ressources: [],
@@ -240,7 +300,8 @@ export default {
       selectedRating: 0,
       searchQuery: "",
       isLoadingFeedbacks: false,
-      feedbackError: null
+      feedbackError: null,
+      activeMenu: null,
     };
   },
   computed: {
@@ -292,7 +353,6 @@ export default {
         
         if (response.data.success) {
           this.listeAvis = response.data.feedbacks.map(feedback => {
-            // Formatage des données étudiant
             return {
               ...feedback,
               etudiant: {
@@ -348,7 +408,57 @@ export default {
       if (!file) return false;
       const videoExtensions = [".mp4", ".webm", ".ogg"];
       return videoExtensions.some(ext => file.toLowerCase().endsWith(ext));
-    }
+    },
+    
+    isMyFeedback(feedback) {
+      const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
+      return studentInfo && studentInfo.id === feedback.etudiant_id;
+    },
+
+    async confirmDeleteFeedback(feedbackId) {
+      if (confirm('Êtes-vous sûr de vouloir supprimer votre avis ? Cette action est irréversible.')) {
+        try {
+          const token = localStorage.getItem('token');
+          await axios.delete(
+            `http://localhost:8000/api/feedbacks/${feedbackId}`,
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            }
+          );
+          
+          toast.success('Votre avis a été supprimé avec succès');
+          this.fetchAvis();
+          this.activeMenu = null;
+        } catch (error) {
+          console.error("Erreur lors de la suppression:", error);
+          const errorMessage = error.response?.data?.message || 
+            'Une erreur est survenue lors de la suppression';
+          toast.error(errorMessage);
+        }
+      }
+    },
+
+    toggleMenu(feedbackId) {
+      this.activeMenu = this.activeMenu === feedbackId ? null : feedbackId;
+    },
+    
+    closeMenu() {
+      this.activeMenu = null;
+    },
+    
+    copyFeedback(text) {
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          toast.success('Commentaire copié dans le presse-papier');
+          this.activeMenu = null;
+        })
+        .catch(err => {
+          console.error('Erreur lors de la copie:', err);
+          toast.error('Échec de la copie');
+        });
+    },
   },
   mounted() {
     this.fetchRessources();
@@ -430,6 +540,23 @@ export default {
 .btn-link:hover {
   color: #4338ca;
   text-decoration: underline;
+}
+
+/* Animation pour le menu déroulant */
+.menu-enter-active, .menu-leave-active {
+  transition: opacity 0.2s, transform 0.2s;
+}
+.menu-enter-from, .menu-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* Style pour les options du menu */
+.menu-option {
+  transition: background-color 0.2s;
+}
+.menu-option:hover {
+  background-color: #f3f4f6;
 }
 
 @media (min-width: 640px) {

@@ -73,6 +73,7 @@ import QuestionList from "../components/TuteurDash/QuestionList.vue";
 
 import FeedbackForm from "../components/StudentDash/FeedbackForm.vue";
 import AdminFeedbacks from "../components/Admin/AdminFeedbacks.vue";
+import EditFeedback from "../components/StudentDash/EditFeedback.vue";
 
 const routes = [
   {
@@ -397,11 +398,18 @@ const routes = [
   },
 
   {
+    path: '/cours/:idCours/feedback/:id/edit',
+    name: 'EditFeedback',
+    component:EditFeedback,
+    props: true
+  },
+
+  {
     path: '/question-list/:idCours/:titre',
     name: 'QuestionList',
     component: QuestionList,
     props: true
-  }
+  },
 ];
 
 const router = createRouter({
