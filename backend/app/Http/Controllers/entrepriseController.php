@@ -10,40 +10,45 @@ class entrepriseController extends Controller
     //
     public function ModifyEntrepriseInfo(Request $request)
 {
-    $requestData = $request->all();
+    $validated = $request->validate([
+        'email' => 'required|email',
+        'numeroSIRET' => 'required',
+        'name' => 'required',
+        'secteur_id' => 'required|exists:secteurs,id',
+        'description' => 'sometimes|string',
+        'logo' => 'sometimes|image|max:2048',
+    ]);
 
-    // Check if email already exists
-    $existingUser = Entreprise::where('email', $requestData['email'])->first();
+    $entreprise = Entreprise::where('email', $validated['email'])->first();
 
-    if ($existingUser) {
-        // Check if a logo file is uploaded
-        $logo = $request->file('logo');
-        // Generate a unique filename
-        $filename = time() . '_' . $logo->getClientOriginalName();
-        // Move the uploaded logo file to the uploads folder
-        $logo->move(public_path('storage/uploads'), $filename);
-        $url = asset('storage/uploads/'.$filename);
-
-        // Update other fields of the existing user
-        $existingUser->numeroSIRET = $requestData['numeroSIRET'];
-        $existingUser->name = $requestData['name'];
-        $existingUser->secteur = $requestData['secteur'];
-        $existingUser->logo = $url;
-        $existingUser->description = $requestData['description'];
-        $existingUser->save();
-
-        return response()->json([
-            'message' => 'Account updated successfully',
-            'update' => true,
-        ]);
-    } else {
+    if (!$entreprise) {
         return response()->json([
             'message' => 'Entreprise not found',
             'update' => false,
         ], 404);
     }
-}
 
+    // Gestion du logo
+    if ($request->hasFile('logo')) {
+        $filename = time() . '_' . $request->logo->getClientOriginalName();
+        $request->logo->move(public_path('storage/uploads'), $filename);
+        $entreprise->logo = asset('storage/uploads/'.$filename);
+    }
+
+    // Mise à jour des informations
+    $entreprise->update([
+        'numeroSIRET' => $validated['numeroSIRET'],
+        'name' => $validated['name'],
+        'secteur_id' => $validated['secteur_id'],
+        'description' => $validated['description'] ?? null,
+    ]);
+
+    return response()->json([
+        'message' => 'Account updated successfully',
+        'update' => true,
+        'entreprise' => $entreprise
+    ]);
+}
 
     public function getEntreprise(Request $request, $idEntreprise)
     {
