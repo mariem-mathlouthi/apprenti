@@ -7,39 +7,50 @@ use App\Models\Etudiant;
 class studentController extends Controller
 {
     //
-    public function ModifyEtudiantInfo(Request $request){
-        $requestData = $request->all();
-        // Check if email already exists
-        $existingUser = Etudiant::where('email', $requestData['email'])->first();
-        if ($existingUser) {
-            $image = $request->file('image');
-            // Generate a unique filename
-            $filename = time() . '_' . $image->getClientOriginalName();
-            // Move the uploaded logo file to the uploads folder
-            $image->move(public_path('storage/uploads'), $filename);
-            $url = asset('storage/uploads/'.$filename);
-            // Update Account user
-            $existingUser->fullname = $requestData['fullname'];
-            $existingUser->niveau = $requestData['niveau'];
-            $existingUser->domaine = $requestData['domaine'];
-            $existingUser->typeStage = $requestData['typeStage'];
-            $existingUser->specialite = $requestData['specialite']; // Corrected typo from 'specailite' to 'specialite'
-            $existingUser->etablissement = $requestData['etablissement'];
-            $existingUser->image = $url;
-            $existingUser->save();
-            return response()->json([
-                'message' => 'Account updated successfully',
-                'update' => true,
-            ]);
-            
-        }else {
-            return response()->json([
-                'message' => 'Student not found',
-                'update' => false,
-            ], 404);
-        }
+    public function ModifyEtudiantInfo(Request $request)
+{
+    $validated = $request->validate([
+        'email' => 'required|email',
+        'fullname' => 'required|string|max:255',
+        'niveau_id' => 'required|exists:niveaux,id',
+        'domaine_id' => 'required|exists:domaines,id',
+        'specialite_id' => 'required|exists:specialites,id',
+        'etablissement' => 'required|string|max:255',
+        'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
 
+    $etudiant = Etudiant::where('email', $validated['email'])->first();
+
+    if (!$etudiant) {
+        return response()->json([
+            'message' => 'Student not found',
+            'update' => false,
+        ], 404);
     }
+
+    // Gestion de l'image
+    if ($request->hasFile('image')) {
+        $image = $request->file('image');
+        $filename = time() . '_' . $image->getClientOriginalName();
+        $image->move(public_path('storage/etudiants'), $filename);
+        $etudiant->image = asset('storage/etudiants/'.$filename);
+    }
+
+    // Mise à jour des informations
+    $etudiant->update([
+        'fullname' => $validated['fullname'],
+        'niveau_id' => $validated['niveau_id'],
+        'domaine_id' => $validated['domaine_id'],
+        'specialite_id' => $validated['specialite_id'],
+        'etablissement' => $validated['etablissement'],
+    ]);
+
+    return response()->json([
+        'message' => 'Account updated successfully',
+        'update' => true,
+        'etudiant' => $etudiant
+    ]);
+}
 
 
     public function getStudentDetail($id)

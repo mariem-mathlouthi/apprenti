@@ -1,245 +1,254 @@
 <template>
-    <div>
-      <NavBarStd class="w-full fixed z-50 "></NavBarStd>
-
-        <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-3">
-            <Sidebar />
+  <div>
+    <NavBarStd class="w-full fixed z-50" />
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-3">
+        <Sidebar />
+      </div>
+      <div class="col-span-9 mt-24 mr-24">
+        <div class="relative md:left-10 md:w-3/4 my-4 border px-4 shadow-xl sm:rounded-xl sm:px-4 sm:py-4">
+          <div class="flex flex-col border-b py-4 sm:flex-row sm:items-start">
+            <div class="shrink-0 mr-auto sm:py-3">
+              <p class="font-medium">Détails du compte</p>
+              <p class="text-sm text-gray-600">Modifiez vos informations</p>
+            </div>
           </div>
-          <div class="col-span-9 mt-24 mr-24">
-    <div
-      class="relative md:left-10  md:w-3/4 my-4 border px-4 shadow-xl sm:mx-4 sm:rounded-xl sm:px-4 sm:py-4 md:mx-auto"
-      data-aos="fade-down"
-    >
-      <div class="flex flex-col border-b py-4 sm:flex-row sm:items-start">
-        <div class="shrink-0 mr-auto sm:py-3">
-          <p class="font-medium">Account Details</p>
-          <p class="text-sm text-gray-600">Edit your account details</p>
-        </div>
-      </div>
-      <div class="flex flex-col gap-4 border-b py-4 sm:flex-row">
-        <p class="shrink-0 w-32 font-medium">Full Name</p>
-        <input
-          v-model="fullname"
-          placeholder="Full Name"
-          class="w-full rounded-md border bg-white px-2 py-2 outline-none ring-gray-600 focus:ring-1"
-        />
-        <p class="shrink-1 w-32 font-medium">Niveau</p>
-        <input
-          v-model="niveau"
-          placeholder="2eme"
-          class="w-full rounded-md border bg-white px-2 py-2 outline-none ring-gray-600 focus:ring-1"
-        />
-      </div>
-      <div class="flex flex-col gap-4 border-b py-4 sm:flex-row">
-        <p class="shrink-0 w-32 font-medium">Email</p>
-        <input
-          v-model="email"
-          placeholder="your.email@domain.com"
-          class="w-full rounded-md border bg-white px-2 py-2 outline-none ring-gray-600 focus:ring-1"
-        />
-      </div>
-  
-      <div class="flex flex-col gap-4 border-b py-4 sm:flex-row">
-        <p class="shrink-0 w-32 font-medium">Domaine</p>
-        <input
-          v-model="domaine"
-          placeholder="Technologie Informatique"
-          class="w-full rounded-md border bg-white px-2 py-2 outline-none ring-gray-600 focus:ring-1"
-        />
-        <p class="shrink-1 w-32 font-medium">Specialite</p>
-        <input
-          v-model="specialite"
-          placeholder="DSI"
-          class="w-full rounded-md border bg-white px-2 py-2 outline-none ring-gray-600 focus:ring-1"
-        />
-      </div>
-  
-      <div class="flex flex-col gap-4 border-b py-4 sm:flex-row">
-        <p class="shrink-0 w-32 font-medium">Etablissement</p>
-        <input
-          v-model="etablissement"
-          placeholder="Technologie Informatique"
-          class="w-full rounded-md border bg-white px-2 py-2 outline-none ring-gray-600 focus:ring-1"
-        />
-        <p class="shrink-1 w-32 font-medium">TypeStage</p>
-        <input
-          v-model="typeStage"
-          placeholder="DSI"
-          class="w-full rounded-md border bg-white px-2 py-2 outline-none ring-gray-600 focus:ring-1"
-        />
-      </div>
-      
-      <div class="flex flex-col gap-4 py-4 lg:flex-row">
-        <div class="shrink-0 w-32 sm:py-4">
-          <p class="mb-auto font-medium">Avatar</p>
-          <p class="text-sm text-gray-600">Change your avatar</p>
-        </div>
-        <div
-          class="flex h-70 w-full flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-gray-300 p-5 text-center"
-        >
-          <img  v-if="imageUrl!=''"
-            class="h-16 w-16 rounded-full"
-            :src="imageUrl"
-            alt=""
-          />
-          <img  v-if="imageUrl==''"
-            class="h-16 w-16 rounded-full"
-            src="https://i.postimg.cc/mDWkzGDv/istockphoto-1200064810-170667a.jpg"
-            alt=""
-          />
 
-          
-          
-          <p class="text-sm text-gray-600">
-            Drop your desired image file here to start the upload
-          </p>
-          <input
-            type="file"
-            @change="handleImageChange"
-            class="max-w-full rounded-lg px-2 font-medium text-blue-600 outline-none ring-blue-600 focus:ring-1"
-          />
+          <form @submit.prevent="saveChanges" class="space-y-5">
+            <div class="grid grid-cols-2 gap-x-3">
+              <div>
+                <label class="font-medium">Nom complet</label>
+                <input
+                  v-model="form.fullname"
+                  class="w-full mt-2 px-3 py-2 border rounded-lg"
+                />
+              </div>
+
+              <div>
+                <label class="font-medium">Email</label>
+                <input
+                  v-model="form.email"
+                  type="email"
+                  class="w-full mt-2 px-3 py-2 border rounded-lg"
+                />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-x-3">
+              <div>
+                <label class="font-medium">Niveau</label>
+                <select
+                  v-model="form.niveau_id"
+                  class="w-full mt-2 px-3 py-2 border rounded-lg"
+                >
+                  <option disabled value="">Sélectionner un niveau</option>
+                  <option 
+                    v-for="niveau in niveaux" 
+                    :key="niveau.id"
+                    :value="niveau.id"
+                  >
+                    {{ niveau.description }}
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <label class="font-medium">Domaine</label>
+                <select
+                  v-model="form.domaine_id"
+                  class="w-full mt-2 px-3 py-2 border rounded-lg"
+                >
+                  <option disabled value="">Sélectionner un domaine</option>
+                  <option 
+                    v-for="domaine in domaines" 
+                    :key="domaine.id"
+                    :value="domaine.id"
+                  >
+                    {{ domaine.description }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-x-3">
+              <div>
+                <label class="font-medium">Spécialité</label>
+                <select
+                  v-model="form.specialite_id"
+                  class="w-full mt-2 px-3 py-2 border rounded-lg"
+                >
+                  <option disabled value="">Sélectionner une spécialité</option>
+                  <option 
+                    v-for="specialite in specialites" 
+                    :key="specialite.id"
+                    :value="specialite.id"
+                  >
+                    {{ specialite.description }}
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <label class="font-medium">Établissement</label>
+                <input
+                  v-model="form.etablissement"
+                  class="w-full mt-2 px-3 py-2 border rounded-lg"
+                />
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <label class="font-medium">Photo de profil</label>
+              <div class="flex items-center gap-4 mt-2">
+                <img 
+                  :src="imagePreview || defaultAvatar"
+                  class="h-24 w-24 rounded-full object-cover border-2"
+                />
+                <input
+                  type="file"
+                  accept="image/*"
+                  @change="handleImageChange"
+                  class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 rounded-lg duration-150"
+            >
+              Enregistrer les modifications
+            </button>
+          </form>
         </div>
       </div>
-      <div
-        class="flex flex-col gap-4 border-b py-4 sm:flex-row sm:justify-center"
-      >
-        <button
-          @click="saveChanges"
-          class="rounded-lg border-2 border-transparent bg-gray-950 px-4 py-2 font-medium text-white sm:inline focus:outline-none focus:ring hover:bg-gray-800"
-        >
-          Save Changes
-        </button>
-      </div>
     </div>
-    </div>
-    </div>
-    </div>
-  </template>
-  <script>
-  
-  import "aos/dist/aos.css";
-  import AOS from "aos";
-  import { toast } from "vue3-toastify";
-  import "vue3-toastify/dist/index.css";
-  import NavBarStd from "./NavBarStd.vue";
-  import axios from "axios";
-  import Sidebar from "./Sidebar.vue";
-  export default {
-    data() {
-      return {
-        idEtudiant: "",
-        fullname: "",
-        niveau: "",
-        email: "",
-        domaine: "",
-        specialite:"",
-        typeStage:"",
-        etablissement:"",
-        update: false,
-        storedImage: "",
-        imageUrl:"",
-  
-      };
-    },
-    components:{
-        NavBarStd,
-        Sidebar,
-    },
-  
-    methods: {
-     
-      getAccountData() {
-        let storedData = localStorage.getItem("StudentAccountInfo");
-        this.fullname = JSON.parse(storedData).fullname;
-        this.niveau = JSON.parse(storedData).niveau;
-        this.email = JSON.parse(storedData).email;
-        this.domaine =JSON.parse(storedData).domaine;
-        this.specialite=JSON.parse(storedData).specialite;
-        this.typeStage=JSON.parse(storedData).typeStage;
-        this.etablissement=JSON.parse(storedData).etablissement;
-  
-      },
-      async handleImageChange(event) {
-        const file = event.target.files[0];
-        this.imageUrl = file;
-      },
+  </div>
+</template>
 
-      async getImageUrl(){
-        let storedData = localStorage.getItem("StudentAccountInfo"); 
-        this.idEtudiant = JSON.parse(storedData).id;
-        console.log(this.idEtudiant);
-        try {
-        const response = await axios.get(
-          `http://localhost:8000/api/getStudentDetail/${this.idEtudiant}`);
-        if (response.data.check==true) {
-          console.log(response.data);
-          if( response.data.student.image=='test.jpg'){
-           this.imageUrl="";
-           console.log(this.imageUrl);
-          }
-          else{
-            this.imageUrl = "http://localhost:8000"+response.data.student.image;
-            console.log(this.imageUrl);
+<script>
+import axios from 'axios'
+import { toast } from 'vue3-toastify'
+import NavBarStd from './NavBarStd.vue'
+import Sidebar from './Sidebar.vue'
+
+export default {
+  components: { NavBarStd, Sidebar },
+  data() {
+    return {
+      form: {
+        id: '',
+        fullname: '',
+        email: '',
+        niveau_id: null,
+        domaine_id: null,
+        specialite_id: null,
+        etablissement: '',
+        image: null
+      },
+      niveaux: [],
+      domaines: [],
+      specialites: [],
+      imagePreview: null,
+      defaultAvatar: 'https://i.postimg.cc/mDWkzGDv/istockphoto-1200064810-170667a.jpg'
+    }
+  },
+  async mounted() {
+    await Promise.all([
+      this.fetchNiveaux(),
+      this.fetchDomaines(),
+      this.fetchSpecialites()
+    ])
+    this.loadStudentData()
+  },
+  methods: {
+    async fetchNiveaux() {
+      try {
+        const response = await axios.get("http://localhost:8000/api/niveaux")
+        this.niveaux = response.data
+      } catch (error) {
+        toast.error("Erreur de chargement des niveaux", { autoClose: 2000 })
+      }
+    },
+
+    async fetchDomaines() {
+      try {
+        const response = await axios.get("http://localhost:8000/api/domaines")
+        this.domaines = response.data
+      } catch (error) {
+        toast.error("Erreur de chargement des domaines", { autoClose: 2000 })
+      }
+    },
+
+    async fetchSpecialites() {
+      try {
+        const response = await axios.get("http://localhost:8000/api/specialites")
+        this.specialites = response.data
+      } catch (error) {
+        toast.error("Erreur de chargement des spécialités", { autoClose: 2000 })
+      }
+    },
+
+    async loadStudentData() {
+      try {
+        const storedData = JSON.parse(localStorage.getItem('StudentAccountInfo'))
+        if (storedData?.id) {
+          const response = await axios.get(`http://localhost:8000/api/getStudentDetail/${storedData.id}`)
+          const student = response.data.student
           
+          this.form = {
+            id: student.id,
+            fullname: student.fullname,
+            email: student.email,
+            niveau_id: student.niveau_id,
+            domaine_id: student.domaine_id,
+            specialite_id: student.specialite_id,
+            etablissement: student.etablissement
           }
-          
-        } else {
-          toast.error("error !", {
-            autoClose: 2000, 
-          });
+
+          this.imagePreview = student.image 
+            ? `http://localhost:8000${student.image}`
+            : this.defaultAvatar
         }
       } catch (error) {
-        console.error("Error:", error);
+        toast.error('Erreur de chargement du profil', { autoClose: 2000 })
       }
-      },
+    },
+
+    handleImageChange(event) {
+      const file = event.target.files[0]
+      if (file) {
+        this.form.image = file
+        this.imagePreview = URL.createObjectURL(file)
+      }
+    },
 
     async saveChanges() {
-
-      let formData = new FormData();
-      formData.append('fullname', this.fullname);
-      formData.append('niveau', this.niveau);
-      formData.append('email', this.email);
-      formData.append('domaine', this.domaine);
-      formData.append('typeStage', this.typeStage);
-      formData.append('specialite', this.specialite);
-      formData.append('etablissement', this.etablissement);
-      formData.append('image', this.imageUrl);
-      console.log(this.imageUrl);
-        try {
-          const response = await axios.post(
-            "http://localhost:8000/api/modifyStudent",
-            formData,
-            
-          );
-          if (response.data.update === true) {
-            toast.success("Account updated succesfully !", {
-              autoClose: 2000, 
-            });
-  
-          } else {
-            toast.error("Email not found !", {
-              autoClose: 2000, 
-            });
-          }
-        } catch (error) {
-          console.error("Error:", error);
+      const formData = new FormData()
+      
+      Object.entries(this.form).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          formData.append(key, value)
         }
-      },
-    },
-    mounted() {
-     this.getAccountData();
-     this.getImageUrl();
-    },
-    created() {
-      this.$nextTick(() => {
-        AOS.init({
-          duration: 2500,
-          easing: "ease-in-out",
-          once: true,
-          mirror: false,
-        });
-      });
-    },
-  };
-  </script>
+      })
+
+      try {
+        const { data } = await axios.post('http://localhost:8000/api/modifyStudent', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
+
+        if (data.update) {
+          localStorage.setItem('StudentAccountInfo', JSON.stringify({
+            ...this.form,
+            image: data.etudiant.image || this.imagePreview
+          }))
+          toast.success('Modifications enregistrées !', { autoClose: 2000 })
+        }
+      } catch (error) {
+        const errorMessage = error.response?.data?.message || 'Erreur de mise à jour'
+        toast.error(errorMessage, { autoClose: 2000 })
+      }
+    }
+  }
+}
+</script>
