@@ -7,6 +7,35 @@ use Illuminate\Http\Request;
 
 class TuteurController extends Controller
 {
+    public function ModifyTuteurInfo(Request $request)
+{
+    $validated = $request->validate([
+        'email' => 'required|email|unique:tuteurs,email,'.$request->id,
+        'fullname' => 'required|string|max:255',
+        'specialite_id' => 'required|exists:specialites,id',
+        'experience' => 'required|integer|min:0',
+        'phone' => 'required|string|unique:tuteurs,phone,'.$request->id,
+        'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
+
+    $tuteur = Tuteur::findOrFail($request->id);
+
+    if ($request->hasFile('image')) {
+        $image = $request->file('image');
+        $filename = time() . '_' . $image->getClientOriginalName();
+        $image->move(public_path('storage/tuteurs'), $filename);
+        $tuteur->image = asset('storage/tuteurs/'.$filename);
+    }
+
+    $tuteur->update($validated);
+
+    return response()->json([
+        'message' => 'Profil mis à jour',
+        'update' => true,
+        'tuteur' => $tuteur
+    ]);
+}
+
 
 
     public function getTuteurDetail(Request $request, $id)

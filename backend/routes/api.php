@@ -69,6 +69,8 @@ Route::group(['middleware' => 'cors'], function () {
     Route::delete('/tuteurs/{id}', [AdminController::class, 'deleteTuteur']);
     Route::post('/tuteurs', [AdminController::class, 'addTuteur']);
     Route::get('/tuteurs/{id}', [TuteurController::class, 'getTuteurDetail']);
+    Route::post('/modifyTuteur', [TuteurController::class, 'ModifyTuteurInfo']);
+    Route::get('/getTuteurDetail/{id}', [TuteurController::class, 'getTuteurDetail']); 
 
 
 });

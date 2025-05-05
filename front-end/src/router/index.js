@@ -49,6 +49,7 @@ import TuteurDashboard from "../components/TuteurDash/TuteurDashboard.vue";
 import CoursListe from "../components/TuteurDash/CoursListe.vue";
 import Cours from "../components/TuteurDash/Cours.vue";
 import CoursEdit from "../components/TuteurDash/CoursEdit.vue";
+import TuteurProfile from "../components/TuteurDash/TuteurProfile.vue";
 
 import AddCategory from "../components/Admin/AddCategory.vue";
 import DetailCategory from "../components/Admin/DetailCategory.vue";
@@ -221,6 +222,11 @@ const routes = [
     path: "/EtudiantAccount",
     name: "EtudiantAccount",
     component: EtudiantAccount,
+  },
+  {
+    path: '/TuteurProfile',
+    name: 'TuteurProfile',
+    component: TuteurProfile,
   },
   {
     path: "/Consulternotif",
