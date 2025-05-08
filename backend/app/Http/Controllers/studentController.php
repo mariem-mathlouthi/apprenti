@@ -74,5 +74,10 @@ class studentController extends Controller
         ]);
     }
     
+    public function getAllStudents()
+    {
+        $students = Etudiant::all();
+        return response()->json($students);
+    }
 
 }
