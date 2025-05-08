@@ -7,6 +7,7 @@ use App\Http\Controllers\studentController;
 use App\Http\Controllers\entrepriseController;
 use App\Http\Controllers\demandeController;
 use App\Http\Controllers\adminController;
+use App\Http\Controllers\AppoinmentController;
 use App\Http\Controllers\offreController;
 use App\Http\Controllers\notificationController;
 use App\Http\Controllers\attestationController;
@@ -32,6 +33,12 @@ use App\Http\Controllers\TypeStageController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+Route::post('/appointCall', [AppoinmentController::class, 'create']);
+Route::get('/appointsCall', [AppoinmentController::class, 'getAllAppointments']);
+Route::put('/appointsCall/{id}', [AppoinmentController::class, 'updateAppointment']);
+Route::delete('/appointsCall/{id}', [AppoinmentController::class, 'deleteAppointment']);
+Route::get('/etudiants', [studentController::class, 'getAllStudents']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
