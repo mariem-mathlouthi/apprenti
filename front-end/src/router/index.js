@@ -48,8 +48,10 @@ import CreateTuteur from "../components/Admin/CreateTuteur.vue";
 import TuteurDashboard from "../components/TuteurDash/TuteurDashboard.vue";
 import CoursListe from "../components/TuteurDash/CoursListe.vue";
 import Cours from "../components/TuteurDash/Cours.vue";
+// import Appointment from "../components/TuteurDash/apptest.vue";
 import CoursEdit from "../components/TuteurDash/CoursEdit.vue";
 import TuteurProfile from "../components/TuteurDash/TuteurProfile.vue";
+import AppointmentView from "../components/StudentDash/AppointmentView.vue";
 
 import AddCategory from "../components/Admin/AddCategory.vue";
 import DetailCategory from "../components/Admin/DetailCategory.vue";
@@ -126,6 +128,11 @@ const routes = [
     path: "/DetailStudent",
     name: "DetailStudent",
     component: DetailStudent,
+  },
+  {
+    path: "/AppointVideoCall",
+    name: "AppointVideoCall",
+    component: () => import("../components/TuteurDash/AppointVideoCall.vue"),
   },
   {
     path: "/EntrepriseAccount",
@@ -349,6 +356,11 @@ const routes = [
     path: "/ConsultListCours",
     name: "ConsultListCours",
     component: ConsultListCours,
+  },
+  {
+    path: "/AppointmentView",
+    name: "AppointmentView",
+    component: AppointmentView,
   },
   {
     path: "/TuteursListAdmin",
