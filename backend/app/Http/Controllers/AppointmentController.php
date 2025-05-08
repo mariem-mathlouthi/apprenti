@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 
-class AppoinmentController extends Controller
+class AppointmentController extends Controller
 {
     public function create( Request $request)
     {
