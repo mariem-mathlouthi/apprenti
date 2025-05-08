@@ -437,8 +437,8 @@ export default {
     
     // Start a video call for an appointment
     const startVideoCall = (appointment) => {
-      const appID = 1872274816;
-      const serverSecret = "47faaf9cf109cbfb8ba3591467336a0b";
+      const appID = 'AppID'; 
+      const serverSecret = "ServerSecret";
       const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, appointment.roomId, 'Tuteur', appointment.id.toString());
       const zp = ZegoUIKitPrebuilt.create(kitToken);
       

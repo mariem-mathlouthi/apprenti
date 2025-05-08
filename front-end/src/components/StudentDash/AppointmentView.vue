@@ -88,7 +88,6 @@
       // Load appointments on component mount
       onMounted( async () => {
         await fetchAppointments();
-        // Check if we're coming from a direct link to join a call
         const roomID = route.query.roomID;
         const appointmentId = route.query.appointmentId;
         
@@ -103,33 +102,6 @@
           }, 1000);
         }
 
-        
-        // In a real app, you would fetch appointments from your API
-        // For now, we'll use mock data - this would be filtered to show only
-        // appointments that include the current student
-        // appointments.value = [
-        //   {
-        //     id: 1,
-        //     title: 'Révision pour l\'examen final',
-        //     date: new Date(Date.now() + 86400000), // Tomorrow
-        //     description: 'Session de révision pour préparer l\'examen final du module.',
-        //     tutorName: 'Prof. Ahmed',
-        //     roomId: 'abc123',
-        //     active: false
-        //   },
-        //   {
-        //     id: 2,
-        //     title: 'Consultation de projet',
-        //     date: new Date(Date.now() + 172800000), // Day after tomorrow
-        //     description: 'Discussion sur l\'avancement des projets de fin d\'études.',
-        //     tutorName: 'Prof. Fatima',
-        //     roomId: 'def456',
-        //     active: false
-        //   }
-        // ];
-        
-        // In a real app, you would use websockets to listen for when a tutor starts a call
-        // For demonstration, we'll check session storage for active calls
         checkForActiveCalls();
       });
 
@@ -186,8 +158,8 @@
       
       // Join a video call for an appointment
       const joinVideoCall = (appointment) => {
-        const appID = 1872274816;
-        const serverSecret = "47faaf9cf109cbfb8ba3591467336a0b";
+        const appID = 'AppID'; 
+        const serverSecret = "ServerSecret";
         const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, appointment.roomId, 'Etudiant', Date.now().toString());
         const zp = ZegoUIKitPrebuilt.create(kitToken);
         
