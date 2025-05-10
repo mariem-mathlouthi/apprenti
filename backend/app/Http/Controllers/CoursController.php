@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cours;
+use App\Models\CoursSubscriptions;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -163,6 +164,35 @@ class CoursController extends Controller
                 'success' => false,
                 'message' => 'Cours non trouvé'
             ], 404);
+        }
+    }
+
+    public function subscribeToCourse(Request $request)
+    {
+        $request->validate([
+            'cours_id' => 'required|exists:cours,id',
+            'etudiant_id' => 'required|exists:etudiants,id',
+            'tuteur_id' => 'required|exists:tuteurs,id'
+        ]);
+
+        try {
+            $subscription = CoursSubscriptions::create([
+                'cours_id' => $request->cours_id,
+                'etudiant_id' => $request->etudiant_id,
+                'tuteur_id' => $request->tuteur_id
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Inscription réussie',
+                'subscription' => $subscription
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de l\'inscription',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }

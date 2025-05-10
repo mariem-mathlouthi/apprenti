@@ -15,8 +15,9 @@ class AppointmentController extends Controller
             'date' => 'required|string',
             'description' => 'nullable|string',
             // 'roomID' => 'nullable|string',
-            'student_id' => 'exists:etudiants,id',
-            'tuteur_id' => 'exists:tuteurs,id',
+            'student_id' => 'required|exists:etudiants,id',
+            'tuteur_id' => 'required|exists:tuteurs,id',
+            'cours_id' => 'required|exists:cours,id',
 
         ]);
 

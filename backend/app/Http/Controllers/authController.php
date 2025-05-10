@@ -175,42 +175,50 @@ class authController extends Controller
         // Check if the user exists as a student
         $student = Etudiant::where('email', $email)->first();
         if ($student && Hash::check($password, $student->password)) {
+            $token = $student->createToken('auth_token')->plainTextToken;
             // If the user exists and the password matches, return success
             return response()->json([
                 'message' => 'Student login successful',
                 'user' => $student,
                 'role' => 'student',
+                'token' => $token,
                 'check' => true,
             ]);
         }
         // Check if the user exists as an entreprise
         $entreprise = Entreprise::where('email', $email)->first();
         if ($entreprise && Hash::check($password, $entreprise->password)) {
+            $token = $entreprise->createToken('auth_token')->plainTextToken;
             // If the user exists and the password matches, return success
             return response()->json([
                 'message' => 'Entreprise login successful',
                 'user' => $entreprise,
                 'role' => 'entreprise',
+                'token' => $token,
                 'check' => true,
             ]);
         }
         $admin = Admin::where('email', $email)->first();
         if ($admin && Hash::check($password, $admin->password)) {
+            $token = $admin->createToken('auth_token')->plainTextToken;
             // If the user exists and the password matches, return success
             return response()->json([
                 'message' => 'Admin login successful',
                 'admin' => $admin,
                 'role' => 'admin',
+                'token' => $token,
                 'check' => true,
             ]);
         }
 
         $tuteur = Tuteur::where('email', $email)->first();
         if ($tuteur && Hash::check($password, $tuteur->password)) {
+            $token = $tuteur->createToken('auth_token')->plainTextToken;
             return response()->json([
                 'message' => 'Tuteur login successful',
                 'user' => $tuteur,
                 'role' => 'tuteur',
+                'token' => $token,
                 'check' => true,
             ]);
         }

@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Models\Cours;
+use App\Models\CoursSubscriptions;
 use Illuminate\Http\Request;
 use App\Models\Etudiant;
 
@@ -74,5 +77,30 @@ class studentController extends Controller
         ]);
     }
     
+    public function getAllStudentsSubscripted(Request $request)
+    {
+        $validated = request()->validate([
+            'cours_id' => 'required|exists:cours,id',
+        ]);
+        // Fetch all students
+        $students = CoursSubscriptions::where('cours_id', $validated['cours_id'])->with('etudiant')->get();
+            // ->pluck('etudiant');
+        // $students = 
+
+        if ($students->isEmpty()) {
+            // Return a 404 Not Found response if no students are found
+            return response()->json([
+                'message' => 'No students found',
+                'check' => false,
+            ], 404);
+        }
+    
+        // Return the list of students
+        return response()->json([
+            'students' => $students,
+            'message' => 'Students fetched successfully',
+            'check' => true,
+        ]);
+    }
 
 }

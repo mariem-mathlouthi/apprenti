@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Sanctum\HasApiTokens;
 
 class Etudiant extends Model
 {
     use HasFactory;
+    use HasApiTokens;
     protected $fillable = [
         'fullname',
         'niveau_id',
@@ -36,9 +38,10 @@ class Etudiant extends Model
     }
 
     public function niveau()
-{
-    return $this->belongsTo(Niveau::class);
-}
+    {
+        return $this->belongsTo(Niveau::class);
+    }
+
     public function typeStage()
     {
         return $this->belongsTo(TypeStage::class);

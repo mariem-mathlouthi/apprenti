@@ -15,6 +15,7 @@ class Appointment extends Model
         'date',
         'student_id',
         'tuteur_id',
+        'cours_id'
     ];
     protected $casts = [
         'date' => 'datetime',

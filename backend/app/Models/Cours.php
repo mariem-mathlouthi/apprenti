@@ -38,9 +38,14 @@ class Cours extends Model
     }
     
     public function feedbacks()
-{
-    return $this->hasMany(Feedback::class);
-}
+    {
+        return $this->hasMany(Feedback::class);
+    }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(CoursSubscriptions::class);
+    }
 
     
 }

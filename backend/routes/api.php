@@ -33,18 +33,21 @@ use App\Http\Controllers\TypeStageController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
-Route::post('/appointCall', [AppointmentController::class, 'create']);
-Route::get('/appointsCall', [AppointmentController::class, 'getAllAppointments']);
-Route::put('/appointsCall/{id}', [AppointmentController::class, 'updateAppointment']);
-Route::delete('/appointsCall/{id}', [AppointmentController::class, 'deleteAppointment']);
-Route::get('/etudiants', [studentController::class, 'getAllStudents']);
+Route::middleware('auth:sanctum')->group(function() {
+    Route::post('/appointCall', [AppointmentController::class, 'create']);
+    Route::get('/appointsCall', [AppointmentController::class, 'getAllAppointments']);
+    Route::put('/appointsCall/{id}', [AppointmentController::class, 'updateAppointment']);
+    Route::delete('/appointsCall/{id}', [AppointmentController::class, 'deleteAppointment']);
+    Route::get('/etudiants', [studentController::class, 'getAllStudentsSubscripted']);
+});
+Route::post('/subscribeToCourse', [CoursController::class, 'subscribeToCourse']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
 Route::group(['middleware' => 'cors'], function () {
+// Route::middleware('auth:sanctum')->group(function() {
     Route::post('/singupEtudiant', [authController::class, 'signUpEtudiant']);
     Route::post('/signupEntreprise', [authController::class, 'signUpEntreprise']);
     Route::post('/signupTuteur', [authController::class, 'signUpTuteur']);
