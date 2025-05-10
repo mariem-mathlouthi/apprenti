@@ -158,9 +158,9 @@
       
       // Join a video call for an appointment
       const joinVideoCall = (appointment) => {
-        const appID = 'AppID'; 
-        const serverSecret = "ServerSecret";
-        const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, appointment.roomId, 'Etudiant', Date.now().toString());
+        const appID = 591798701; 
+        const serverSecret = "ef2324e49ea8c00e7faa3a7f947c5080";
+        const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, 'test123', 'Etudiant', Date.now().toString());
         const zp = ZegoUIKitPrebuilt.create(kitToken);
         
         // Make video container visible and enter fullscreen mode
