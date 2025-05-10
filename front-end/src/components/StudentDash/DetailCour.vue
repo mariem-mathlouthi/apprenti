@@ -1,65 +1,100 @@
 <template>
-  <div id="app" class="flex flex-col h-screen bg-gray-50">
-    <!-- Navbar & Sidebar -->
-    <NavbarTuteur />
-    <SidebarTuteur />
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50/20">
+    <NavbarTuteur class="fixed top-0 left-0 w-full z-50 shadow-sm bg-white/90 backdrop-blur-md" />
+    <SidebarTuteur class="fixed left-0 top-0 h-full z-40" />
 
-    <!-- Contenu principal -->
-    <section id="content" class="flex-1 flex justify-center items-center py-4 overflow-y-auto">
-      <div class="container mx-auto p-4 max-w-2xl">
-        <h1 class="text-2xl font-bold text-gray-800 text-center mb-4 transform hover:scale-105 transition-transform">
-          Détails du Cours
-        </h1>
+    <main class="pt-24 pl-72 pr-8 pb-8 min-h-screen">
+      <div class="max-w-4xl mx-auto space-y-12">
+        <!-- En-tête animé -->
+        <div class="relative group">
+          <div class="absolute inset-0 bg-gradient-to-r from-indigo-600/10 to-purple-500/10 rounded-xl blur-2xl opacity-40 animate-pulse-slow"></div>
+          <h1 class="relative text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-500 bg-clip-text text-transparent text-center animate-fade-in-down">
+            Détails du Cours
+          </h1>
+        </div>
 
-        <!-- Détails du cours -->
-        <div class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
-          <div class="flex flex-col space-y-3">
-            <!-- Titre -->
-            <div class="flex items-center">
-              <span class="font-medium text-gray-700">Titre :</span>
-              <span class="ml-2 text-gray-900">{{ cours.titre }}</span>
-            </div>
+        <!-- Carte détaillée -->
+        <div class="relative bg-white/95 backdrop-blur-xl rounded-[2rem] shadow-2xl p-8 border border-white/20 hover:shadow-3xl transition-shadow duration-300">
+          <!-- Effet de halo au survol -->
+          <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-purple-500/5 opacity-0 hover:opacity-100 rounded-[2rem] transition-opacity duration-300 -z-10"></div>
 
-            <!-- Catégorie -->
-            <div class="flex items-center">
-              <span class="font-medium text-gray-700">Catégorie :</span>
-              <span class="ml-2 text-gray-900">{{ cours.category ? cours.category.description : "Non spécifiée" }}</span>
-            </div>
+          <div class="space-y-6">
+            <!-- Section Informations -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Colonne Gauche -->
+              <div class="space-y-4">
+                <div class="flex items-center p-4 bg-gray-50/50 rounded-xl">
+                  <svg class="w-6 h-6 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                  </svg>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Titre</p>
+                    <p class="text-lg font-semibold text-gray-900">{{ cours.titre }}</p>
+                  </div>
+                </div>
 
-            <!-- Prix -->
-            <div class="flex items-center">
-              <span class="font-medium text-gray-700">Prix :</span>
-              <span class="ml-2 text-gray-900">{{ cours.prix }} €</span>
-            </div>
+                <div class="flex items-center p-4 bg-gray-50/50 rounded-xl">
+                  <svg class="w-6 h-6 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Durée</p>
+                    <p class="text-lg font-semibold text-gray-900">{{ cours.duration }} heures</p>
+                  </div>
+                </div>
+              </div>
 
-            <!-- Durée -->
-            <div class="flex items-center">
-              <span class="font-medium text-gray-700">Durée :</span>
-              <span class="ml-2 text-gray-900">{{ cours.duration }} heures</span>
+              <!-- Colonne Droite -->
+              <div class="space-y-4">
+                <div class="flex items-center p-4 bg-gray-50/50 rounded-xl">
+                  <svg class="w-6 h-6 mr-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Prix</p>
+                    <p class="text-lg font-semibold text-gray-900">{{ cours.prix }} €</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center p-4 bg-gray-50/50 rounded-xl">
+                  <svg class="w-6 h-6 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                  </svg>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Catégorie</p>
+                    <p class="text-lg font-semibold text-gray-900">{{ cours.category?.description || "Non spécifiée" }}</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Description -->
-            <div class="flex items-center">
-              <span class="font-medium text-gray-700">Description :</span>
-              <span class="ml-2 text-gray-900">{{ cours.description }}</span>
+            <div class="p-6 bg-gradient-to-br from-gray-50 to-indigo-50/20 rounded-xl border border-gray-100">
+              <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Description
+              </h3>
+              <p class="text-gray-600 leading-relaxed">{{ cours.description }}</p>
             </div>
-          </div>
 
-          <!-- Bouton Ajouter Ressource -->
-          <div class="mt-4 text-center">
-            <router-link 
-                        :to="'/DetailsCours/' + cours.id" 
-                        class="flex items-center px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-lg transition-all duration-300 transform hover:scale-105"
-                      >
-                        <span>s'inscrire</span>
-                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                        </svg>
-                      </router-link>
+            <!-- Bouton d'action -->
+            <div class="pt-6 text-center">
+              <router-link 
+                :to="'/DetailsCours/' + cours.id"
+                class="inline-flex items-center px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-500 text-white rounded-2xl text-lg font-bold hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] group/button"
+              >
+                <span>S'inscrire maintenant</span>
+                <svg class="w-5 h-5 ml-3 transform group-hover/button:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+              </router-link>
+            </div>
           </div>
         </div>
       </div>
-    </section>
+    </main>
   </div>
 </template>
 
@@ -78,62 +113,50 @@ export default {
   },
   data() {
     return {
-      cours: {}, // Détails du cours
+      cours: {},
     };
   },
   methods: {
-    // Récupérer les détails du cours
     async fetchCoursDetails() {
       try {
         const coursId = this.$route.params.id;
         const response = await axios.get(`http://localhost:8000/api/cours/${coursId}`);
         this.cours = response.data.cours;
       } catch (error) {
-        console.error("Erreur lors de la récupération des détails du cours :", error);
-        toast.error("Impossible de récupérer les détails du cours.");
+        console.error("Erreur :", error);
+        toast.error("Erreur de chargement des détails", {
+          icon: "⚠️",
+          theme: "colored",
+          position: "bottom-right",
+          transition: "flip",
+        });
       }
     },
   },
   mounted() {
-    this.fetchCoursDetails(); // Charger les détails du cours au montage du composant
+    this.fetchCoursDetails();
   },
 };
 </script>
 
 <style scoped>
-.btn-submit {
-  background-color: #4f46e5;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 14px;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-  display: inline-block;
-  text-decoration: none;
+.animate-pulse-slow {
+  animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-.btn-submit:hover {
-  background-color: #4338ca;
-  transform: translateY(-1px);
+.animate-fade-in-down {
+  animation: fadeInDown 0.6s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-/* Animation for the main heading */
-h1 {
-  animation: fadeInDown 0.8s ease-out;
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.1; }
 }
 
-/* Animation for the card */
-.bg-white {
-  animation: fadeInUp 0.8s ease-out;
-}
-
-/* Keyframes for animations */
 @keyframes fadeInDown {
   0% {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-15px);
   }
   100% {
     opacity: 1;
@@ -141,14 +164,7 @@ h1 {
   }
 }
 
-@keyframes fadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.backdrop-blur-xl {
+  backdrop-filter: blur(24px);
 }
 </style>
