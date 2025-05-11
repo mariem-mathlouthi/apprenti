@@ -575,6 +575,7 @@
   </template>
   
   <script>
+  import axios from 'axios';
   export default {
     data() {
       return {
@@ -603,7 +604,7 @@
           cardName: '',
           expiryDate: '',
           cvv: '',
-          amount: 149.99
+          amount: JSON.parse(localStorage.getItem('coursDetails')).prix || 0,
         },
         billing: {
           email: '',
@@ -804,13 +805,13 @@
             const response = await axios.post("http://localhost:8000/api/subscribeToCourse", {
                 cours_id: this.$route.params.id,
                 etudiant_id: JSON.parse(localStorage.getItem('StudentAccountInfo')).id,
-                tuteur_id: JSON.parse(localStorage.getItem('coursDetails')).tidTuteur,
+                tuteur_id: JSON.parse(localStorage.getItem('coursDetails')).idTuteur,
             }, {
                 headers: {
                     'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('StudentAccountInfo')).token,
                     'Content-Type': 'application/json'
             }});
-            if (response.status === 200) {
+            if (response.status === 201) {
                 this.$router.push({ name: 'ConsultListCours' });
             } else {
                 console.error("Erreur lors de l'inscription au cours:", response.data);

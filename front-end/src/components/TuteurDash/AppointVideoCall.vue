@@ -312,7 +312,7 @@ export default {
             },
           }
         );
-        // window.location.reload();
+        window.location.reload();
         return response.data;
       } catch (error) {
         console.error("Error creating appointment:", error);
