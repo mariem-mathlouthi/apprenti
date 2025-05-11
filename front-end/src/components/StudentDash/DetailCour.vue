@@ -82,7 +82,7 @@
             <!-- Bouton d'action -->
             <div class="pt-6 text-center">
               <router-link 
-                :to="'/DetailsCours/' + cours.id"
+                :to="'/Payment/' + cours.id"
                 class="inline-flex items-center px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-500 text-white rounded-2xl text-lg font-bold hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] group/button"
               >
                 <span>S'inscrire maintenant</span>
@@ -122,6 +122,7 @@ export default {
         const coursId = this.$route.params.id;
         const response = await axios.get(`http://localhost:8000/api/cours/${coursId}`);
         this.cours = response.data.cours;
+        localStorage.setItem("coursDetails", JSON.stringify(this.cours));
       } catch (error) {
         console.error("Erreur :", error);
         toast.error("Erreur de chargement des détails", {

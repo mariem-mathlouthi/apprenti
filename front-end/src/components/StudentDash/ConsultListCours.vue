@@ -94,7 +94,7 @@
                   :to="`/DetailCour/${cours.id}`"
                   class="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl text-sm font-semibold hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group/button"
                 >
-                  <span>Voir plus</span>
+                  <span @click="voirPlus" >Voir plus</span>
                   <svg class="w-4 h-4 ml-2 transform group-hover/button:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                   </svg>
@@ -155,7 +155,7 @@ export default {
     this.filteredCours = this.cours.filter(cours => 
       cours.titre.toLowerCase().includes(this.searchQuery.toLowerCase())
     )
-  }
+    }
 },
   watch: {
     searchQuery() {

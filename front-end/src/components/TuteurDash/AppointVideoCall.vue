@@ -7,8 +7,7 @@
     <!-- Main Content -->
     <div class="main-content">
       <!-- Video call container - Positioned to not cover navigation -->
-      <div ref="videoContainer" class="video-container">
-      </div>
+      <div ref="videoContainer" class="video-container"></div>
       <div class="calendar-container">
         <div class="header">
           <h1 class="title">Calendrier</h1>
@@ -128,7 +127,6 @@
                     required
                   />
                 </div>
-
                 <div class="form-group">
                   <label for="description">Description</label>
                   <textarea
@@ -137,6 +135,25 @@
                     placeholder="Décrivez l'objectif de cette session"
                     rows="3"
                   ></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label for="course">Cours</label>
+                  <select
+                    id="course"
+                    v-model="appointmentForm.selectedCourse"
+                    required
+                    class="w-full px-4 py-2 border rounded-md"
+                  >
+                    <option value="" disabled>Sélectionnez un cours</option>
+                    <option
+                      v-for="course in courses"
+                      :key="course.id"
+                      :value="course.id"
+                    >
+                      {{ course.titre }}
+                    </option>
+                  </select>
                 </div>
 
                 <div class="form-group">
@@ -154,7 +171,7 @@
                         v-model="appointmentForm.selectedStudents"
                       />
                       <label :for="`student-${student.id}`">{{
-                        student.fullname
+                        student.etudiant[0].fullname
                       }}</label>
                     </div>
                   </div>
@@ -178,64 +195,67 @@
 <script>
 import SidebarTuteur from "./SidebarTut.vue";
 import NavbarTuteur from "./NavBarTut.vue";
-import { ZegoUIKitPrebuilt } from '@zegocloud/zego-uikit-prebuilt';
-import { ref, reactive, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import axios from 'axios';
+import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
+import { ref, reactive, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import axios from "axios";
 
 export default {
-  name: 'CalendarComponent',
+  name: "CalendarComponent",
   components: { SidebarTuteur, NavbarTuteur },
   setup() {
     const router = useRouter();
-    const API_BASE_URL = 'http://localhost:8000'; // Change this to your actual API URL
+    const API_BASE_URL = "http://localhost:8000"; // Change this to your actual API URL
     const appointments = ref([]);
     const showAppointmentModal = ref(false);
     const editingAppointment = ref(null);
     const isLoading = ref(false);
     const isSaving = ref(false);
     const videoContainer = ref(null);
-    
+    const courses = ref([]);
+
     const notification = reactive({
       show: false,
-      message: '',
-      type: 'success', // success, error
-      icon: 'fas fa-check-circle',
-      timeout: null
+      message: "",
+      type: "success", // success, error
+      icon: "fas fa-check-circle",
+      timeout: null,
     });
-    
+
     const appointmentForm = reactive({
-      title: '',
-      date: '',
-      description: '',
-      selectedStudents: [1,2]
+      title: "",
+      date: "",
+      description: "",
+      selectedStudents: [],
+      selectedCourse: "", // Added for course selection
     });
-    
+
     const availableStudents = ref([]);
-    
+
     // Load appointments and students on component mount
     onMounted(async () => {
       await fetchAppointments();
       await fetchStudents();
+      await fetchCourses();
     });
-
+    const token = JSON.parse(localStorage.getItem("TuteurAccountInfo")).token;
     // API calls
     const fetchAppointments = async () => {
       isLoading.value = true;
       try {
         const response = await axios.get(`${API_BASE_URL}/api/appointsCall`, {
-          headers: { 
-            // Authorization: `Bearer ${localStorage.getItem('token')}` 
-          }
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
-        
-        appointments.value = response.data.map(appointment => ({
+
+        appointments.value = response.data.map((appointment) => ({
           ...appointment,
-          date: new Date(appointment.date) // Convert date string to Date object
+          date: new Date(appointment.date), // Convert date string to Date object
         }));
       } catch (error) {
-        console.error('Error fetching appointments:', error);
-        showNotification('Erreur lors du chargement des rendez-vous', 'error');
+        console.error("Error fetching appointments:", error);
+        showNotification("Erreur lors du chargement des rendez-vous", "error");
       } finally {
         isLoading.value = false;
       }
@@ -244,34 +264,58 @@ export default {
     const fetchStudents = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/etudiants`, {
-          headers: { 
-            // Authorization: `Bearer ${localStorage.getItem('token')}` 
-          }
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
-        availableStudents.value = response.data;
+        availableStudents.value = response.data.students;
+        console.log(availableStudents.value);
       } catch (error) {
-        console.error('Error fetching students:', error);
-        showNotification('Erreur lors du chargement des étudiants', 'error');
+        console.error("Error fetching students:", error);
+        showNotification("Erreur lors du chargement des étudiants", "error");
+      }
+    };
+
+    const fetchCourses = async () => {
+      try {
+        const tuteurId = JSON.parse(
+          localStorage.getItem("TuteurAccountInfo")
+        ).id;
+        const response = await axios.get(
+          `${API_BASE_URL}/api/cours-by-tuteur?tuteurId=${tuteurId}`
+        );
+        if (response.data.success) {
+          courses.value = response.data.cours;
+        }
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+        showNotification("Erreur lors du chargement des cours", "error");
       }
     };
 
     const createAppointment = async (appointmentData) => {
       appointmentData = {
         ...appointmentData,
-        student_id: JSON.parse(localStorage.getItem('StudentAccountInfo')).id,
-        tuteur_id: JSON.parse(localStorage.getItem('TuteurAccountInfo')).id
-      }
+        student_ids: appointmentForm.selectedStudents,
+        tuteur_id: JSON.parse(localStorage.getItem("TuteurAccountInfo")).id,
+        cours_id: appointmentForm.selectedCourse
+      };
+      console.log(appointmentData.date)
       try {
-        const response = await axios.post(`${API_BASE_URL}/api/appointCall`, appointmentData, {
-          headers: { 
-            // Authorization: `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
+        const response = await axios.post(
+          `${API_BASE_URL}/api/appointCall`,
+          appointmentData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
           }
-        });
-        window.location.reload();
+        );
+        // window.location.reload();
         return response.data;
       } catch (error) {
-        console.error('Error creating appointment:', error);
+        console.error("Error creating appointment:", error);
         throw error;
       }
     };
@@ -279,20 +323,25 @@ export default {
     const updateAppointment = async (id, appointmentData) => {
       appointmentData = {
         ...appointmentData,
-        student_id: JSON.parse(localStorage.getItem('StudentAccountInfo')).id,
-        tuteur_id: JSON.parse(localStorage.getItem('TuteurAccountInfo')).id
-      }
+        student_ids: appointmentForm.selectedStudents,
+        tuteur_id: JSON.parse(localStorage.getItem("TuteurAccountInfo")).id,
+        cours_id: appointmentForm.selectedCourse,
+      };
       try {
-        const response = await axios.put(`${API_BASE_URL}/api/appointsCall/${id}`, appointmentData, {
-          headers: { 
-            // Authorization: `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json'
+        const response = await axios.put(
+          `${API_BASE_URL}/api/appointsCall/${id}`,
+          appointmentData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
           }
-        });
+        );
         window.location.reload();
         return response.data;
       } catch (error) {
-        console.error('Error updating appointment:', error);
+        console.error("Error updating appointment:", error);
         throw error;
       }
     };
@@ -300,30 +349,33 @@ export default {
     const deleteAppointmentAPI = async (id) => {
       try {
         await axios.delete(`${API_BASE_URL}/api/appointsCall/${id}`, {
-          headers: { 
-            // Authorization: `Bearer ${localStorage.getItem('token')}` 
-          }
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
         window.location.reload();
       } catch (error) {
-        console.error('Error deleting appointment:', error);
+        console.error("Error deleting appointment:", error);
         throw error;
       }
     };
-    
+
     // Format functions for displaying dates
     const formatDay = (date) => {
       return new Date(date).getDate();
     };
-    
+
     const formatMonth = (date) => {
-      return new Date(date).toLocaleString('default', { month: 'short' });
+      return new Date(date).toLocaleString("default", { month: "short" });
     };
-    
+
     const formatTime = (date) => {
-      return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return new Date(date).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     };
-    
+
     // Toggle student selection in the form
     const toggleStudentSelection = (student) => {
       const index = appointmentForm.selectedStudents.indexOf(student.id);
@@ -333,177 +385,216 @@ export default {
         appointmentForm.selectedStudents.splice(index, 1);
       }
     };
-    
+
     // Open modal for creating a new appointment
     const openCreateModal = () => {
       editingAppointment.value = null;
-      appointmentForm.title = '';
-      appointmentForm.date = '';
-      appointmentForm.description = '';
+      appointmentForm.title = "";
+      appointmentForm.date = "";
+      appointmentForm.description = "";
       appointmentForm.selectedStudents = [];
+      appointmentForm.selectedCourse = ""; // Reset selected course
       showAppointmentModal.value = true;
     };
-    
+
     // Open modal for editing an existing appointment
     const editAppointment = (appointment) => {
       editingAppointment.value = appointment;
       appointmentForm.title = appointment.title;
-      appointmentForm.date = new Date(appointment.date).toISOString().slice(0, 16);
+      appointmentForm.date = new Date(appointment.date)
+        .toISOString()
+        .slice(0, 16);
       appointmentForm.description = appointment.description;
-      appointmentForm.selectedStudents = appointment.students ? 
-        appointment.students.map(student => student.id) : [];
+      appointmentForm.selectedCourse = appointment.courseId || ""; // Set selected course
+      appointmentForm.selectedStudents = appointment.students
+        ? appointment.students.map((student) => student.id)
+        : [];
       showAppointmentModal.value = true;
-    };
-    
-    // Close the modal
+    }; // Close the modal
     const closeModal = () => {
       showAppointmentModal.value = false;
+      appointmentForm.selectedCourse = ""; // Reset selected course
     };
-    
+
     // Save the appointment (create or update)
     const saveAppointment = async () => {
       isSaving.value = true;
-      
+
       const appointmentData = {
         title: appointmentForm.title,
         date: new Date(appointmentForm.date).toISOString(),
         description: appointmentForm.description,
         students: appointmentForm.selectedStudents,
-        roomId: editingAppointment.value?.roomId || Math.random().toString(36).substring(2, 8) // Generate a random room ID for new appointments
+        courseId: appointmentForm.selectedCourse,
+        roomId:
+          editingAppointment.value?.roomId ||
+          Math.random().toString(36).substring(2, 8), // Generate a random room ID for new appointments
       };
-      
+
       try {
         if (editingAppointment.value) {
           // Update existing appointment
-          const updatedAppointment = await updateAppointment(editingAppointment.value.id, appointmentData);
-          
+          const updatedAppointment = await updateAppointment(
+            editingAppointment.value.id,
+            appointmentData
+          );
+
           // Update local state
-          const index = appointments.value.findIndex(a => a.id === editingAppointment.value.id);
+          const index = appointments.value.findIndex(
+            (a) => a.id === editingAppointment.value.id
+          );
           if (index !== -1) {
             appointments.value[index] = {
               ...updatedAppointment,
-              date: new Date(updatedAppointment.date)
+              date: new Date(updatedAppointment.date),
             };
           }
-          
-          showNotification('Rendez-vous mis à jour avec succès', 'success');
+
+          showNotification("Rendez-vous mis à jour avec succès", "success");
         } else {
           // Create new appointment
           const newAppointment = await createAppointment(appointmentData);
-          
+
           // Add to local state
           appointments.value.push({
             ...newAppointment,
-            date: new Date(newAppointment.date)
+            date: new Date(newAppointment.date),
           });
-          
-          showNotification('Rendez-vous créé avec succès', 'success');
+
+          showNotification("Rendez-vous créé avec succès", "success");
         }
-        
+
         closeModal();
       } catch (error) {
-        showNotification(`Erreur: ${error.response?.data?.message || 'Une erreur est survenue'}`, 'error');
+        showNotification(
+          `Erreur: ${
+            error.response?.data?.message || "Une erreur est survenue"
+          }`,
+          "error"
+        );
       } finally {
         isSaving.value = false;
       }
     };
-    
+
     // Delete an appointment
     const deleteAppointment = async (appointment) => {
-      if (confirm('Êtes-vous sûr de vouloir supprimer ce rendez-vous ?')) {
+      if (confirm("Êtes-vous sûr de vouloir supprimer ce rendez-vous ?")) {
         try {
           await deleteAppointmentAPI(appointment.id);
-          
+
           // Update local state
-          appointments.value = appointments.value.filter(a => a.id !== appointment.id);
-          
-          showNotification('Rendez-vous supprimé avec succès', 'success');
+          appointments.value = appointments.value.filter(
+            (a) => a.id !== appointment.id
+          );
+
+          showNotification("Rendez-vous supprimé avec succès", "success");
         } catch (error) {
-          showNotification('Erreur lors de la suppression du rendez-vous', 'error');
+          showNotification(
+            "Erreur lors de la suppression du rendez-vous",
+            "error"
+          );
         }
       }
     };
-    
+
     // Start a video call for an appointment
     const startVideoCall = (appointment) => {
-      const appID = 591798701; 
+      const appID = 591798701;
       const serverSecret = "ef2324e49ea8c00e7faa3a7f947c5080";
-      const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, 'test123', 'Tuteur', appointment.id.toString());
+      const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
+        appID,
+        serverSecret,
+        "test123",
+        "Tuteur",
+        appointment.id.toString()
+      );
       const zp = ZegoUIKitPrebuilt.create(kitToken);
-      
+
       // Make video container visible
       if (videoContainer.value) {
-        videoContainer.value.style.display = 'block';
+        videoContainer.value.style.display = "block";
       } else {
-        document.querySelector('.video-container').style.display = 'block';
+        document.querySelector(".video-container").style.display = "block";
       }
-      
+
       // Store the current appointment for reference
-      sessionStorage.setItem('currentCallAppointment', JSON.stringify(appointment));
-      
+      sessionStorage.setItem(
+        "currentCallAppointment",
+        JSON.stringify(appointment)
+      );
+
       // Generate a shareable link for students
-      const shareableLink = window.location.protocol + '//' + 
-                          window.location.host + '/etudiant/appointments?roomID=' + 
-                          appointment.roomId + '&appointmentId=' + appointment.id;
-      
+      const shareableLink =
+        window.location.protocol +
+        "//" +
+        window.location.host +
+        "/etudiant/appointments?roomID=" +
+        appointment.roomId +
+        "&appointmentId=" +
+        appointment.id;
+
       zp.joinRoom({
-            container: videoContainer.value || document.querySelector('.video-container'),
-            sharedLinks: [
-              {
-                name: 'Lien pour les étudiants',
-                url: shareableLink
-              },
-            ],
-            scenario: {
-              mode: ZegoUIKitPrebuilt.VideoConference,
-            },
-            turnOnCameraWhenJoining: true,
-            showTurnOffRemoteCameraButton: true,
-            showTurnOffRemoteMicrophoneButton: true,
-            showRemoveUserButton: true
-          });
+        container:
+          videoContainer.value || document.querySelector(".video-container"),
+        sharedLinks: [
+          {
+            name: "Lien pour les étudiants",
+            url: shareableLink,
+          },
+        ],
+        scenario: {
+          mode: ZegoUIKitPrebuilt.VideoConference,
+        },
+        turnOnCameraWhenJoining: true,
+        showTurnOffRemoteCameraButton: true,
+        showTurnOffRemoteMicrophoneButton: true,
+        showRemoveUserButton: true,
+      });
     };
-    
+
     // Close the video call completely
     const closeVideoCall = () => {
       if (videoContainer.value) {
-        videoContainer.value.style.display = 'none';
+        videoContainer.value.style.display = "none";
       } else {
-        document.querySelector('.video-container').style.display = 'none';
+        document.querySelector(".video-container").style.display = "none";
       }
       // Clean up any resources if needed
-      sessionStorage.removeItem('currentCallAppointment');
+      sessionStorage.removeItem("currentCallAppointment");
     };
-    
+
     // Return to the appointments list while keeping the call active in background
     const returnToAppointments = () => {
       if (videoContainer.value) {
-        videoContainer.value.style.display = 'none';
+        videoContainer.value.style.display = "none";
       } else {
-        document.querySelector('.video-container').style.display = 'none';
+        document.querySelector(".video-container").style.display = "none";
       }
       // We don't remove the session storage item so the call state is preserved
     };
-    
+
     // Show notification toast
-    const showNotification = (message, type = 'success') => {
+    const showNotification = (message, type = "success") => {
       // Clear any existing timeout
       if (notification.timeout) {
         clearTimeout(notification.timeout);
       }
-      
+
       // Set notification properties
       notification.show = true;
       notification.message = message;
       notification.type = type;
-      notification.icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
-      
+      notification.icon =
+        type === "success"
+          ? "fas fa-check-circle"
+          : "fas fa-exclamation-circle";
+
       // Auto-hide after 5 seconds
       notification.timeout = setTimeout(() => {
         notification.show = false;
       }, 5000);
     };
-    
     return {
       appointments,
       showAppointmentModal,
@@ -514,6 +605,7 @@ export default {
       isSaving,
       notification,
       videoContainer,
+      courses,
       formatDay,
       formatMonth,
       formatTime,
@@ -525,9 +617,9 @@ export default {
       deleteAppointment,
       startVideoCall,
       closeVideoCall,
-      returnToAppointments
+      returnToAppointments,
     };
-  }
+  },
 };
 </script>
 
@@ -912,5 +1004,19 @@ textarea:focus {
 
 .save-btn:hover {
   background-color: #4338ca;
+}
+
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  transition: border-color 0.2s;
+}
+
+select:focus {
+  border-color: #4f46e5;
+  outline: none;
 }
 </style>

@@ -93,6 +93,7 @@ export default {
                 name:response.data.user.name,
                 secteur:response.data.user.secteur,
                 description:response.data.user.description,
+                token:response.data.token,
               }
             localStorage.setItem("EntrepriseAccountInfo",JSON.stringify(EntrepriseAccount));
             this.$router.push('/EntrepriseDash'); // Redirection vers le tableau de bord de l'entreprise
@@ -108,6 +109,7 @@ export default {
                 specialite:response.data.user.specialite,
                 typeStage:response.data.user.typeStage,
                 etablissement:response.data.user.etablissement,
+                token:response.data.token,
                 
               }
             localStorage.setItem("StudentAccountInfo",JSON.stringify(StudentAccount));
@@ -120,7 +122,9 @@ export default {
             email:response.data.user.email,
             domaine:response.data.user.domaine,
             specialite:response.data.user.specialite,
-            experience:response.data.user.experience
+            experience:response.data.user.experience,
+            token:response.data.token,
+
           }
           localStorage.setItem("TuteurAccountInfo", JSON.stringify(TuteurAccount));
           this.$router.push('/TuteurDashboard');

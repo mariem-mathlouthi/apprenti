@@ -14,8 +14,8 @@ class AppointmentController extends Controller
             'title' => 'required|string|max:255',
             'date' => 'required|string',
             'description' => 'nullable|string',
-            // 'roomID' => 'nullable|string',
-            'student_id' => 'required|exists:etudiants,id',
+            'student_ids' => 'required|array',
+            'student_ids.*' => 'exists:etudiants,id',
             'tuteur_id' => 'required|exists:tuteurs,id',
             'cours_id' => 'required|exists:cours,id',
 
@@ -26,8 +26,9 @@ class AppointmentController extends Controller
         $appointment->title = $request->input('title');
         $appointment->description = $request->input('description');
         $appointment->date = $request->input('date');
-        $appointment->student_id = $request->input('student_id');
+        $appointment->student_ids = $request->input('student_ids');
         $appointment->tuteur_id = $request->input('tuteur_id');
+        $appointment->cours_id = $request->input('cours_id');
         $appointment->save();
     
         // Logic to create an appointment
@@ -55,12 +56,13 @@ class AppointmentController extends Controller
     {
         // Validate the request data
         $request->validate([
-            'title' => 'required|string|max:255',
-            'date' => 'required|string',
+            'title' => 'string|max:255',
+            'date' => 'string',
             'description' => 'nullable|string',
-            // 'roomID' => 'nullable|string',
-            'student_id' => 'exists:etudiants,id',
-            'tuteur_id' => 'exists:tuteurs,id',
+            'student_ids' => 'array',
+            'student_ids.*' => 'exists:etudiants,id',
+            'tuteur_id' => 'required|exists:tuteurs,id',
+            'cours_id' => 'required|exists:cours,id',
 
         ]);
 
@@ -71,8 +73,9 @@ class AppointmentController extends Controller
             $appointment->title = $request->input('title');
             $appointment->description = $request->input('description');
             $appointment->date = $request->input('date');
-            $appointment->student_id = $request->input('student_id');
+            $appointment->student_ids = $request->input('student_ids');
             $appointment->tuteur_id = $request->input('tuteur_id');
+            $appointment->cours_id = $request->input('cours_id');
             $appointment->save();
 
             return response()->json(['message' => 'Appointment updated successfully']);

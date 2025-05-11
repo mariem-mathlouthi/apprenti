@@ -13,12 +13,13 @@ class Appointment extends Model
         'title',
         'description',
         'date',
-        'student_id',
+        'student_ids',
         'tuteur_id',
         'cours_id'
     ];
     protected $casts = [
-        'date' => 'datetime',
+        // 'date' => 'datetime',
+        'student_ids' => 'array',
     ];
     public function etudiant()
     {

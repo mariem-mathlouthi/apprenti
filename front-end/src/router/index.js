@@ -109,6 +109,8 @@ import TypeStageList from "../components/EntrepriseDash/TypeStageList.vue";
 import AddTypeStage from "../components/EntrepriseDash/AddTypeStage.vue";
 import UpdateTypeStage from "../components/EntrepriseDash/UpdateTypeStage.vue";
 
+import Payment from "../components/StudentDash/Payment.vue";
+
 const routes = [
   {
     path: "/",
@@ -124,6 +126,11 @@ const routes = [
     path: "/DetailDemande/:id",
     name: "DetailDemande",
     component: DetailDemande,
+  },
+  {
+    path: "/Payment/:id",
+    name: "Payment",
+    component: Payment,
   },
   {
     path: "/DetailStudent",
