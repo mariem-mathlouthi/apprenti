@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\RealTimeNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\authController;
@@ -33,6 +34,23 @@ use App\Http\Controllers\TypeStageController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+Route::get('/notify', function () {
+    broadcast(new RealTimeNotification('Hello from Laravel!'));
+    return 'Notification sent!';
+});
+
+Route::post('/send-notification', function (Request $request) {
+    $message = $request->input('message');
+    // $userId = $request->input('userId');
+    
+    event(new RealTimeNotification($message));
+    
+    return response()->json(['status' => 'success']);
+});
+
+
+
 Route::middleware('auth:sanctum')->group(function() {
     Route::post('/appointCall', [AppointmentController::class, 'create']);
     Route::get('/appointsCall', [AppointmentController::class, 'getAllAppointments']);
