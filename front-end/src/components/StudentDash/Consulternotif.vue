@@ -10,86 +10,10 @@
           <h1 class="text-3xl font-bold text-gray-800" style="color:purple">Notifications</h1>
         </header>
         <div class="bg-purple-100 rounded-lg shadow-md p-6">
-          <div v-if="notifications.length === 0" class="text-center text-gray-500">
-            Aucune notification pour le moment.
-          </div>
-          <div v-else>
-            <div 
-              v-for="(notification, index) in notifications" 
-              :key="index" 
-              class="mb-4 p-4 bg-white rounded-lg shadow-sm"
-            >
-              <!-- Notification de demande -->
-              <div v-if="notification.type === 'demande'" class="border-l-4 border-green-500 pl-3">
-                <h2 class="text-lg font-semibold text-green-600">
-                  📩 {{ notification.title }}
-                </h2>
-                <p class="text-gray-600 mt-2">
-                  {{ notification.message }}
-                  <span class="block text-sm text-gray-400 mt-1">
-                    {{ formatDate(notification.date) }}
-                  </span>
-                </p>
-              </div>
-
-              <!-- Notification d'offre -->
-              <div v-if="notification.type === 'offre'" class="border-l-4 border-blue-500 pl-3">
-                <h2 class="text-lg font-semibold text-blue-600">
-                  💼 {{ notification.title }}
-                </h2>
-                <p class="text-gray-600 mt-2">
-                  {{ notification.message }}
-                  <router-link 
-                    to="/OffersListStd" 
-                    class="inline-block mt-2 text-blue-600 hover:text-blue-800"
-                  >
-                    Voir l'offre →
-                  </router-link>
-                  <span class="block text-sm text-gray-400 mt-1">
-                    {{ formatDate(notification.date) }}
-                  </span>
-                </p>
-              </div>
-
-              <!-- Notification de cours -->
-              <div v-if="notification.type === 'cours'" class="border-l-4 border-purple-500 pl-3">
-                <h2 class="text-lg font-semibold text-purple-600">
-                  📚 {{ notification.title }}
-                </h2>
-                <p class="text-gray-600 mt-2">
-                  {{ notification.message }}
-                  <router-link 
-                    to="/ConsultListCours" 
-                    class="inline-block mt-2 text-purple-600 hover:text-purple-800"
-                  >
-                    Accéder au cours →
-                  </router-link>
-                  <span class="block text-sm text-gray-400 mt-1">
-                    {{ formatDate(notification.date) }}
-                  </span>
-                </p>
-              </div>
-
-              <!-- Notification d'attestation -->
-              <div v-if="notification.type === 'attestation'" class="border-l-4 border-orange-500 pl-3">
-                <h2 class="text-lg font-semibold text-orange-600">
-                  📄 {{ notification.title }}
-                </h2>
-                <p class="text-gray-600 mt-2">
-                  {{ notification.message }}
-                  <button 
-                    @click="voirAttestation(notification.attestation)"
-                    class="ml-2 text-orange-600 hover:text-orange-800"
-                  >
-                    Télécharger ↓
-                  </button>
-                  <span class="block text-sm text-gray-400 mt-1">
-                    {{ formatDate(notification.date) }}
-                  </span>
-                </p>
-              </div>
-            </div>
-          </div>
+            <h2>Notifications</h2>
+            <ul>
+              <li v-for="(message, index) in messages" :key="index">{{ message }}</li>
+            </ul>
         </div>
       </div>
     </div>
@@ -100,12 +24,18 @@
 import Navbar from './NavBarStd.vue'
 import Sidebar from './Sidebar.vue'
 import axios from "axios";
+import Pusher from 'pusher-js';
+
 
 export default {
   data() {
     return {
       notifications: [],
-      idEtudiant: null
+      idEtudiant: null,
+      userId: null,
+      messages: [],
+      pusher: null,
+      channel: null,
     };
   },
   components: {
@@ -113,6 +43,38 @@ export default {
     Navbar
   },
   methods: {
+    created() {
+      Pusher.logToConsole = true;
+
+      this.pusher = new Pusher("edc2943b2a2068f8b38c", {
+        cluster: "eu",
+      });
+
+      this.channel = this.pusher.subscribe("notifications");
+      this.channel.bind("my-event", (data) => {
+        this.messages.push(data.message);
+      });
+
+      console.log(data)
+    },
+    beforeDestroy() {
+      // Clean up Pusher connection when component is destroyed
+      if (this.channel) {
+        this.channel.unbind_all();
+        this.channel.unsubscribe();
+      }
+      if (this.pusher) {
+        this.pusher.disconnect();
+      }
+    },
+
+    showNotification(title, options) {
+      if (Notification.permission === 'granted') {
+        new Notification(title, options);
+      } else if (Notification.permission !== 'denied') {
+        requestNotificationPermission();
+      }
+    },
     getAccountData() {
       const storedData = localStorage.getItem("StudentAccountInfo");
       if (storedData) {
@@ -195,8 +157,15 @@ export default {
     }
   },
   mounted() {
+    this.created();
+    this.beforeDestroy();
     this.getAccountData();
     this.getNotifications();
+    this.showNotification("Bienvenue sur votre tableau de bord !", {
+      body: "Vous avez de nouvelles notifications.",
+      icon: "https://cdn0.iconfinder.com/data/icons/customicondesignoffice5/256/examples.png",
+      sound: "../assets/sounds/mixkit-software-interface-start-2574.mp3"
+    });
   }
 }
 </script>
@@ -208,5 +177,15 @@ export default {
 
 .notification-card:hover {
   transform: translateX(5px);
+}
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+li {
+  margin: 5px 0;
+  padding: 8px;
+  background: #f5f5f5;
+  border-radius: 4px;
 }
 </style>

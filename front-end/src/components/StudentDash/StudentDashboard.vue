@@ -51,9 +51,19 @@ export default {
  },
  
  methods:{
+    requestNotificationPermission() {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          console.log('the permission for notifications has been granted');
+        } else {
+          console.log('the permission for notifications has been denied');
+        }
+      });
+    },
   
  },
  mounted(){
+    this.requestNotificationPermission();
    toast.success("Hi you're Welcome ", {
              autoClose: 2000, 
    });/*
