@@ -90,29 +90,26 @@
           </div>
 
           <!-- Empty state -->
-          <div v-else class="text-center py-8">
-            <div class="text-purple-300 flex justify-center">
+          <div v-else class="py-8">
+            <div v-if="messages.length === 0" class="text-purple-300 flex justify-center">
               <span class="material-icons text-5xl">notifications_off</span>
             </div>
-            <p class="mt-2 text-gray-500">Aucune notification pour le moment</p>
+            <p v-if="messages.length === 0" class="mt-2 text-gray-500">Aucune notification pour le moment</p>
+            <div
+              v-if="messages.length > 0"
+              class="mt-6 pt-6 border-t border-purple-200"
+            >
+              <div
+                v-for="(message, index) in messages.reverse()"
+                :key="index"
+                class="bg-purple-50 p-3 rounded-md mb-2 border-l-4 border-purple-300 animate-pulse"
+              >
+                {{ message }}
+              </div>
+            </div>
           </div>
 
           <!-- Pusher real-time messages -->
-          <div
-            v-if="messages.length > 0"
-            class="mt-6 pt-6 border-t border-purple-200"
-          >
-            <h3 class="text-lg font-medium text-purple-800 mb-3">
-              Messages en temps réel
-            </h3>
-            <div
-              v-for="(message, index) in messages"
-              :key="index"
-              class="bg-purple-50 p-3 rounded-md mb-2 border-l-4 border-purple-300 animate-pulse"
-            >
-              {{ message }}
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -210,14 +207,30 @@ export default {
 
       this.channel = this.pusher.subscribe(`notifications.${this.idEtudiant}`);
       this.channel.bind("notification-event", (data) => {
-        this.messages.push(data.message);
+        // if (data && data.message) {
+        //   this.$nextTick(() => {
+            this.messages.push(data.message);
+          // });
+        // }
+      // this.messages.push(data.message);
         // Show notification when new message arrives
-        this.showNotification("Nouvelle notification", {
-          body: data.message,
-          icon: "https://cdn0.iconfinder.com/data/icons/customicondesignoffice5/256/examples.png",
-          sound: "../assets/sounds/mixkit-software-interface-start-2574.mp3",
-        });
+      this.showNotification("Nouvelle notification", {
+        body: data.message,
+        icon: "https://cdn0.iconfinder.com/data/icons/customicondesignoffice5/256/examples.png",
+        sound: "../assets/sounds/mixkit-software-interface-start-2574.mp3",
       });
+      });
+    },
+
+    beforeDestroy() {
+      // Clean up Pusher connection when component is destroyed
+      if (this.channel) {
+        this.channel.unbind_all();
+        this.channel.unsubscribe();
+      }
+      if (this.pusher) {
+        this.pusher.disconnect();
+      }
     },
 
     requestNotificationPermission() {
@@ -227,16 +240,6 @@ export default {
             console.log("Notification permission granted");
           }
         });
-      }
-    },
-    beforeDestroy() {
-      // Clean up Pusher connection when component is destroyed
-      if (this.channel) {
-        this.channel.unbind_all();
-        this.channel.unsubscribe();
-      }
-      if (this.pusher) {
-        this.pusher.disconnect();
       }
     },
 
@@ -272,7 +275,7 @@ export default {
         });
 
         // Show notification for new items
-        if (notifResponse.length > 0) {
+        if (notifResponse.data.length > 0) {
           this.showNotification("Nouvelle notification", {
             body: 'Vous avez de nouvelles notifications.',
             icon: "https://cdn0.iconfinder.com/data/icons/customicondesignoffice5/256/examples.png",

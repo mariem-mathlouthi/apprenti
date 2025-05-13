@@ -44,11 +44,11 @@
                   <button 
                     @click="joinVideoCall(appointment)" 
                     class="join-call-btn"
-                    :disabled="!isAppointmentActive(appointment)"
-                    :class="{ 'disabled': !isAppointmentActive(appointment) }"
+                    :disabled="!appointment.isCallStarted"
+                    :class="{ 'disabled': !appointment.isCallStarted }"
                   >
                     <i class="fas fa-video"></i>
-                    <span class="tooltip">{{ isAppointmentActive(appointment) ? 'Rejoindre' : 'Pas encore commencé' }}</span>
+                    <span class="tooltip">{{ appointment.isCallStarted ? 'Rejoindre' : 'Pas encore commencé' }}</span>
                   </button>
                 </div>
               </div>
@@ -67,6 +67,7 @@
   import { ref, onMounted, computed } from 'vue';
   import { useRoute } from 'vue-router';
   import axios from 'axios';
+  import Pusher from "pusher-js";
   
   export default {
     name: 'AppointmentView',
@@ -76,10 +77,15 @@
       const route = useRoute();
       const appointments = ref([]);
       const isLoading = ref(false);
-      const activeCallAppointment = ref(null);
+      const  pusher = ref(null);
+      const  channel = ref(null);
+      const  idEtudiant = ref(null);
+      const  activeCallAppointment = ref(null);
+      const isVideoCallActive = ref(false);
       
       // Load appointments on component mount
       onMounted( async () => {
+        initializePusher();
         await fetchAppointments();
         const roomID = route.query.roomID;
         const appointmentId = route.query.appointmentId;
@@ -98,6 +104,39 @@
         checkForActiveCalls();
       });
 
+      const showNotification = (title, options) => {
+        if (Notification.permission === "granted") {
+          new Notification(title, options);
+        } else if (Notification.permission !== "denied") {
+          // requestNotificationPermission();
+          console.log("Notification permission denied");
+        }
+      };
+
+      const initializePusher = () => {
+        Pusher.logToConsole = true;
+
+        pusher.value = new Pusher("edc2943b2a2068f8b38c", {
+          cluster: "eu",
+        });
+        idEtudiant.value = JSON.parse(localStorage.getItem("StudentAccountInfo")).id;
+
+        channel.value = pusher.value.subscribe(`appointement.${idEtudiant.value}`);
+        channel.value.bind("notification-event", (data) => {
+          if (data && data.appointmentId) {
+            const appointment = appointments.value.find(app => app.id === data.appointmentId);
+            if (appointment) {
+              appointment.isCallStarted = true;
+              isVideoCallActive.value = true;
+              showNotification("Rendez-vous", {
+                body: `Le rendez-vous est prêt à être rejoint`,
+                icon: "./logo.png",
+              });
+            }
+          }
+        });
+      };
+
       const fetchAppointments = async () => {
           isLoading.value = true;
           try {
@@ -109,7 +148,8 @@
             
             appointments.value = response.data.map(appointment => ({
               ...appointment,
-              date: new Date(appointment.date) // Convert date string to Date object
+              date: new Date(appointment.date),
+              isCallStarted: false, // Default value
             }));
           } catch (error) {
             console.error('Error fetching appointments:', error);
@@ -133,11 +173,11 @@
       };
       
       // Check if an appointment is currently active (tutor has started the call)
-      const isAppointmentActive = (appointment) => {
-        // In a real app, this would check with the backend if the call is active
-        // For demonstration, we'll just return the active property
-        return appointment.active;
-      };
+      // const isAppointmentActive = (appointment) => {
+      //   // In a real app, this would check with the backend if the call is active
+      //   // For demonstration, we'll just return the active property
+      //   return appointment.active;
+      // };
       
       // Check for active calls (in a real app, this would use websockets)
       const checkForActiveCalls = () => {
@@ -160,7 +200,7 @@
         formatDay,
         formatMonth,
         formatTime,
-        isAppointmentActive,
+        // isAppointmentActive,
         joinVideoCall,
       };
     }

@@ -20,11 +20,13 @@ class RealTimeNotification implements ShouldBroadcastNow
      */
     public $message;
     public $userId;
+    public $appointmentId;
 
-    public function __construct($message, $userId)
+    public function __construct($message, $userId, $appointmentId)
     {
         $this->message = $message;
         $this->userId = $userId; 
+        $this->appointmentId = $appointmentId;
     }
 
     /**
@@ -42,9 +44,12 @@ class RealTimeNotification implements ShouldBroadcastNow
     //     ];
     // }
 
-    public function broadcastOn()
+    public function broadcastOn(): array
     {
-        return new Channel('notifications.'.$this->userId);
+        return [
+            new Channel('appointement.'.$this->userId),
+            new Channel('notifications.'.$this->userId)
+        ];
     }
 
     public function broadcastAs()

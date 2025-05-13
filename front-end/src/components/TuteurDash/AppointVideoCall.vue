@@ -384,13 +384,14 @@ export default {
       }
     };
 
-    async function sendNotification(message, userId) {
+    async function sendNotification(message, userId, appointmentId) {
         try {
           await axios.post(
             `${API_BASE_URL}/api/send-notification`,
             {
-              message: message,
-              userId: userId,
+                message: message,
+                userId: userId,
+                appointmentId: appointmentId
             }
           );
         }catch (error) {
@@ -422,7 +423,7 @@ export default {
             `Un rendez-vous a été créé pour vous le ${new Date(
               appointmentData.date
             ).toLocaleString()}`,
-            Number(student)+1
+            Number(student)+1,
           );
         }
         window.location.reload();
@@ -610,12 +611,13 @@ export default {
     };
 
     // Start a video call for an appointment
-    const startVideoCall = (appointment) => {
+    const startVideoCall = async (appointment) => {
       window.open(`/video-call/?roomID=${appointment.roomId}&userName=${JSON.parse(localStorage.getItem('TuteurAccountInfo')).fullname}`, '_blank');
-      for (const student of appointmentForm.selectedStudents) {
-        sendNotification(
+      for (const student in appointment.student_ids) {
+        await sendNotification(
           `Un appel vidéo a été démarré pour le rendez-vous "${appointment.title}"`,
-          student
+          Number(student)+1,
+          appointment.id
         );
       }
     };

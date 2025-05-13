@@ -14,6 +14,7 @@ class NotificationsController extends Controller
         $request->validate([
             'userId' => 'required|exists:etudiants,id',
             'message' => 'required|string|max:255',
+            'appointmentId' => 'sometimes|exists:appointments,id',
         ]);
 
         // Create a new notification
@@ -22,7 +23,7 @@ class NotificationsController extends Controller
         $notification->message = $request->message;
         $notification->save();
 
-        event(new RealTimeNotification($notification->message, $notification->userId));
+        event(new RealTimeNotification($notification->message, $notification->userId, $request->appointmentId));
 
         return response()->json(['message' => 'Notification sent successfully!'], 200);
     }
