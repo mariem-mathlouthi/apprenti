@@ -663,27 +663,47 @@
               {{ billing.email }} avec les instructions de paiement.
             </template>
           </p>
-          <div class="mt-6">
+            <div class="mt-6 space-x-4">
             <button
-              @click="goToHome"
+              @click="goTo('consult')"
               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Retour à l'accueil
               <svg
-                class="ml-2 h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+              class="ml-2 h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 5l7 7-7 7"
-                />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
               </svg>
             </button>
-          </div>
+
+            <button
+              @click="goTo('resource')" 
+              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            >
+              Retour à la ressource
+              <svg
+              class="ml-2 h-5 w-5"
+              fill="none" 
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round" 
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+              </svg>
+            </button>
+            </div>
         </div>
 
         <!-- Navigation Buttons -->
@@ -1091,7 +1111,7 @@ export default {
       this.currentStep++;
       this.processingPayment = false;
     },
-    async goToHome() {
+    async goTo(place) {
       try {
         const response = await axios.post(
           "http://localhost:8000/api/subscribeToCourse",
@@ -1112,7 +1132,11 @@ export default {
           }
         );
         if (response.status === 201) {
-          this.$router.push({ name: "ConsultListCours" });
+          if (place === "resource") {
+            this.$router.push({ name: `/DetailsCours/${this.$route.params.id}` });
+          } else if (place === "consult") {
+            this.$router.push({ name: "ConsultListCours" });
+          }
         } else {
           console.error(
             "Erreur lors de l'inscription au cours:",
