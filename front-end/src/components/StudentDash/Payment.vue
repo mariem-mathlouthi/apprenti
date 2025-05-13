@@ -820,7 +820,7 @@ let stripe;
 let elements;
 let cardElement;
 const stripePromise = loadStripe(
-  "pk_test_public_key_here"
+  "pk_test_51Qr5Z7F7RN1bvuhw6bs7KjPMYL247PSdj71j2OYVV617KcloMBuA9K6ZomCJDodCt9jId38fEr2sitFGpylR4Ebf00rXkaHQRz"
 );
 export default {
   data() {

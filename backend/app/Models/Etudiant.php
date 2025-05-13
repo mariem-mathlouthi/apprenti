@@ -17,7 +17,6 @@ class Etudiant extends Model
         'email',
         'password',
         'domaine_id',
-        'type_stage_id',
         'specialite_id',
         'etablissement',
         'image'

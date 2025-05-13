@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->foreignId('domaine_id')->constrained()->onDelete('cascade');
-            $table->foreignId('type_stage_id')->constrained()->onDelete('cascade');
             $table->foreignId('specialite_id')->constrained()->onDelete('cascade');
             $table->string('etablissement');
             $table->string('image');

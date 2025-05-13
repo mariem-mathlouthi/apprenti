@@ -21,66 +21,44 @@
         </div>
 
         <form @submit.prevent="signUp" class="space-y-5">
-          <div class="grid grid-cols-2 gap-x-3">
-            <div>
-              <label class="font-medium">Domaine</label>
-              <select
-                v-model="selectedDomaineId"
-                required
-                class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+          <div>
+            <label class="font-medium">Domaine</label>
+            <select
+              v-model="selectedDomaineId"
+              required
+              class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+            >
+              <option disabled value="">Sélectionner votre domaine</option>
+              <option 
+                v-for="domaine in domaines" 
+                :key="domaine.id"
+                :value="domaine.id"
               >
-                <option disabled value="">sélectionner votre domaine</option>
-                <option 
-                  v-for="domaine in domaines" 
-                  :key="domaine.id"
-                  :value="domaine.id"
-                >
-                  {{ domaine.description }}
-                </option>
-              </select>
-            </div>
-            
-            <div>
-              <label class="font-medium">Type stage cherché</label>
-              <select
-                v-model="selectedTypeStageId"
-                required
-                class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
-              >
-                <option disabled value="">Selectionner un type</option>
-                <option 
-                  v-for="typeStage in typeStages" 
-                  :key="typeStage.id"
-                  :value="typeStage.id"
-                >
-                  {{ typeStage.description }}
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-x-3">
-            <div>
-              <label class="font-medium">Specialité</label>
-              <select
-                v-model="selectedSpecialiteId"
-                required
-                class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
-              >
-                <option disabled value="">Selectionner une specialité</option>
-                <option 
-                  v-for="specialite in specialites" 
-                  :key="specialite.id"
-                  :value="specialite.id"
-                >
-                  {{ specialite.description }}
-                </option>
-              </select>
-            </div>
+                {{ domaine.description }}
+              </option>
+            </select>
           </div>
 
           <div>
-            <label class="font-medium">établissement</label>
+            <label class="font-medium">Specialité</label>
+            <select
+              v-model="selectedSpecialiteId"
+              required
+              class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+            >
+              <option disabled value="">Sélectionner une specialité</option>
+              <option 
+                v-for="specialite in specialites" 
+                :key="specialite.id"
+                :value="specialite.id"
+              >
+                {{ specialite.description }}
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label class="font-medium">Établissement</label>
             <input
               v-model="etablissement"
               type="text"
@@ -111,12 +89,10 @@ export default {
     return {
       etablissement: "",
       selectedDomaineId: null,
-      selectedTypeStageId: null,
       selectedSpecialiteId: null,
       image: "default.jpg",
       domaines: [],
       specialites: [],
-      typeStages: [],
       loading: false
     };
   },
@@ -124,8 +100,7 @@ export default {
   async mounted() {
     await Promise.all([
       this.fetchDomaines(),
-      this.fetchSpecialites(),
-      this.fetchTypeStages()
+      this.fetchSpecialites()
     ]);
   },
 
@@ -150,16 +125,6 @@ export default {
       }
     },
 
-    async fetchTypeStages() {
-      try {
-        const response = await axios.get("http://localhost:8000/api/type-stages");
-        this.typeStages = response.data;
-      } catch (error) {
-        toast.error("Error loading internship types", { autoClose: 2000 });
-        console.error("Error:", error);
-      }
-    },
-
     async signUp() {
       this.loading = true;
       const storedData = JSON.parse(localStorage.getItem("Etudiant"));
@@ -171,7 +136,6 @@ export default {
         email: storedData.email,
         password: storedData.password,
         domaine_id: this.selectedDomaineId,
-        type_stage_id: this.selectedTypeStageId,
         specialite_id: this.selectedSpecialiteId,
         etablissement: this.etablissement,
         image: this.image

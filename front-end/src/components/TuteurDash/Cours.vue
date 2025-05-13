@@ -150,16 +150,16 @@ export default {
 
         if (response.data.success) {
           // Création de la notification
-          const notificationData = {
-            idEtudiant: 0,
-            idEntreprise: 0,
-            idTuteur: this.idTuteur,
-            message: `${this.tuteurName} a ajouté un nouveau cours : ${this.titre}`,
-            destination: "Etudiant",
-            type: "cours",
-            visibility: "shown",
-            date: new Date().toISOString().split('T')[0] // Format YYYY-MM-DD
-          };
+        // const notificationData = {
+        //     idEtudiant: 0,
+        //     idEntreprise: 0,
+        //     idTuteur: this.idTuteur,
+        //     message: `${this.tuteurName} a ajouté un nouveau cours : ${this.titre}`,
+        //     destination: "Etudiant",
+        //     type: "cours",
+        //     visibility: "shown",
+        //     date: new Date().toISOString().split('T')[0] // Format YYYY-MM-DD
+        //   };
 
           // await axios.post("http://localhost:8000/api/notification", notificationData);
 
