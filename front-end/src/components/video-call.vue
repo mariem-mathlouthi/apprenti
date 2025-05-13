@@ -30,7 +30,7 @@ export default {
   components: {},
   mounted() {
     const roomID = getUrlParams().get('roomID');
-    const userName = getUrlParams().get('userName');
+    const userName = getUrlParams().get('userName') || randomID(5);
     // generate Kit Token
     const appID = 591798701;
     const serverSecret = "ef2324e49ea8c00e7faa3a7f947c5080";

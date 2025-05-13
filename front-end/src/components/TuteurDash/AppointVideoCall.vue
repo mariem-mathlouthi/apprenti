@@ -202,12 +202,12 @@
                       >
                         <input
                           type="checkbox"
-                          :id="`student-${student.id}`"
-                          :value="student.id"
+                          :id="`student-${student.etudiant.id}`"
+                          :value="student.etudiant.id"
                           v-model="appointmentForm.selectedStudents"
                         />
-                        <label :for="`student-${student.id}`">{{
-                          student.etudiant[0].fullname
+                        <label :for="`student-${student.etudiant.id}`">{{
+                          student.etudiant.fullname
                         }}</label>
                       </div>
                     </div>

@@ -94,13 +94,13 @@ Route::group(['middleware' => 'cors'], function () {
 
 
 
-Route::group(['middleware' => 'cors'], function () {
-    Route::post('/notification', [notificationController::class, 'notification']);
-    Route::get('/getAllNotifications', [notificationController::class, 'getAllNotifications']);
-    Route::post('/attestation', [attestationController::class, 'addAttestation']);
-    Route::get('/getAttestation/{idEtudiant}', [attestationController::class, 'getAttestationByEtudiant_Offer']);
+// Route::group(['middleware' => 'cors'], function () {
+//     Route::post('/notification', [notificationController::class, 'notification']);
+//     Route::get('/getAllNotifications', [notificationController::class, 'getAllNotifications']);
+//     Route::post('/attestation', [attestationController::class, 'addAttestation']);
+//     Route::get('/getAttestation/{idEtudiant}', [attestationController::class, 'getAttestationByEtudiant_Offer']);
 
-});
+// });
 
 
 Route::group(['middleware' => 'cors'], function () {

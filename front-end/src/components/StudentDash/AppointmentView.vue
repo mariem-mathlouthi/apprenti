@@ -116,24 +116,24 @@
       const initializePusher = () => {
         Pusher.logToConsole = true;
 
-        pusher.value = new Pusher("edc2943b2a2068f8b38c", {
+        pusher.value = new Pusher("d46657216dc865de1519", {
           cluster: "eu",
         });
         idEtudiant.value = JSON.parse(localStorage.getItem("StudentAccountInfo")).id;
 
         channel.value = pusher.value.subscribe(`appointement.${idEtudiant.value}`);
         channel.value.bind("notification-event", (data) => {
-          if (data && data.appointmentId) {
-            const appointment = appointments.value.find(app => app.id === data.appointmentId);
-            if (appointment) {
+          // if (data && data.appointmentId) {
+            // const appointment = appointments.value.find(app => app.id === data.appointmentId);
+            // if (appointment) {
               appointment.isCallStarted = true;
               isVideoCallActive.value = true;
               showNotification("Rendez-vous", {
                 body: `Le rendez-vous est prêt à être rejoint`,
                 icon: "./logo.png",
               });
-            }
-          }
+            // }
+          // }
         });
       };
 
