@@ -150,7 +150,7 @@ export default {
 
         if (response.data.success) {
           // Création de la notification
-          const notificationData = {
+        /*  const notificationData = {
             idEtudiant: 0,
             idEntreprise: 0,
             idTuteur: this.idTuteur,
@@ -161,7 +161,7 @@ export default {
             date: new Date().toISOString().split('T')[0] // Format YYYY-MM-DD
           };
 
-          await axios.post("http://localhost:8000/api/notification", notificationData);
+          await axios.post("http://localhost:8000/api/notification", notificationData);*/
 
           toast.success("Cours ajouté avec succès !");
           this.$router.push("/cours");
