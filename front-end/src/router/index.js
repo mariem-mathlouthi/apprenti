@@ -110,7 +110,7 @@ import AddTypeStage from "../components/EntrepriseDash/AddTypeStage.vue";
 import UpdateTypeStage from "../components/EntrepriseDash/UpdateTypeStage.vue";
 
 import Payment from "../components/StudentDash/Payment.vue";
-
+import videoCall from "../components/video-call.vue";
 const routes = [
   {
     path: "/",
@@ -126,6 +126,11 @@ const routes = [
     path: "/DetailDemande/:id",
     name: "DetailDemande",
     component: DetailDemande,
+  },
+  {
+    path: "/video-call",
+    name: "videoCall",
+    component: videoCall,
   },
   {
     path: "/Payment/:id",

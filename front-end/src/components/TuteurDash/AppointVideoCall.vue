@@ -104,84 +104,125 @@
                 <i class="fas fa-times"></i>
               </button>
             </div>
-
             <div class="modal-body">
               <form @submit.prevent="saveAppointment">
-                <div class="form-group">
-                  <label for="title">Titre</label>
-                  <input
-                    type="text"
-                    id="title"
-                    v-model="appointmentForm.title"
-                    required
-                    placeholder="Ex: Session de révision"
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label for="date">Date et heure</label>
-                  <input
-                    type="datetime-local"
-                    id="date"
-                    v-model="appointmentForm.date"
-                    required
-                  />
-                </div>
-                <div class="form-group">
-                  <label for="description">Description</label>
-                  <textarea
-                    id="description"
-                    v-model="appointmentForm.description"
-                    placeholder="Décrivez l'objectif de cette session"
-                    rows="3"
-                  ></textarea>
-                </div>
-
-                <div class="form-group">
-                  <label for="course">Cours</label>
-                  <select
-                    id="course"
-                    v-model="appointmentForm.selectedCourse"
-                    required
-                    class="w-full px-4 py-2 border rounded-md"
-                  >
-                    <option value="" disabled>Sélectionnez un cours</option>
-                    <option
-                      v-for="course in courses"
-                      :key="course.id"
-                      :value="course.id"
-                    >
-                      {{ course.titre }}
-                    </option>
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label>Étudiants</label>
-                  <div class="students-selection">
-                    <div
-                      v-for="student in availableStudents"
-                      :key="student.id"
-                      class="student-checkbox"
-                    >
-                      <input
-                        type="checkbox"
-                        :id="`student-${student.id}`"
-                        :value="student.id"
-                        v-model="appointmentForm.selectedStudents"
-                      />
-                      <label :for="`student-${student.id}`">{{
-                        student.etudiant[0].fullname
-                      }}</label>
-                    </div>
+                <!-- Steps indicator -->
+                <div class="steps-indicator">
+                  <div :class="['step', formStep === 1 ? 'active' : '']">
+                    1. Sélection du cours
+                  </div>
+                  <div :class="['step', formStep === 2 ? 'active' : '']">
+                    2. Détails du rendez-vous
                   </div>
                 </div>
 
-                <div class="form-actions">
-                  <button type="button" @click="closeModal" class="cancel-btn">
-                    Annuler
-                  </button>
-                  <button type="submit" class="save-btn">Enregistrer</button>
+                <!-- Step 1: Course and Title -->
+                <div v-if="formStep === 1">
+                  <div class="form-group">
+                    <label for="course">Cours</label>
+                    <select
+                      id="course"
+                      v-model="appointmentForm.selectedCourse"
+                      required
+                      class="w-full px-4 py-2 border rounded-md"
+                    >
+                      <option value="" disabled>Sélectionnez un cours</option>
+                      <option
+                        v-for="course in courses"
+                        :key="course.id"
+                        :value="course.id"
+                      >
+                        {{ course.titre }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="title">Titre</label>
+                    <input
+                      type="text"
+                      id="title"
+                      v-model="appointmentForm.title"
+                      required
+                      placeholder="Ex: Session de révision"
+                    />
+                  </div>
+
+                  <div class="form-actions">
+                    <button
+                      type="button"
+                      @click="closeModal"
+                      class="cancel-btn"
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      type="button"
+                      @click="nextStep"
+                      class="save-btn"
+                      :disabled="
+                        !appointmentForm.selectedCourse ||
+                        !appointmentForm.title
+                      "
+                    >
+                      Suivant
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Step 2: Appointment Details -->
+                <div v-if="formStep === 2">
+                  <div class="form-group">
+                    <label for="date">Date et heure</label>
+                    <input
+                      type="datetime-local"
+                      id="date"
+                      v-model="appointmentForm.date"
+                      required
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea
+                      id="description"
+                      v-model="appointmentForm.description"
+                      placeholder="Décrivez l'objectif de cette session"
+                      rows="3"
+                    ></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Étudiants</label>
+                    <div class="students-selection">
+                      <div
+                        v-for="student in availableStudents"
+                        :key="student.id"
+                        class="student-checkbox"
+                      >
+                        <input
+                          type="checkbox"
+                          :id="`student-${student.id}`"
+                          :value="student.id"
+                          v-model="appointmentForm.selectedStudents"
+                        />
+                        <label :for="`student-${student.id}`">{{
+                          student.etudiant[0].fullname
+                        }}</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-actions">
+                    <button
+                      type="button"
+                      @click="previousStep"
+                      class="cancel-btn"
+                    >
+                      Retour
+                    </button>
+                    <button type="submit" class="save-btn">Enregistrer</button>
+                  </div>
                 </div>
               </form>
             </div>
@@ -200,6 +241,33 @@ import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 
+function randomID(len) {
+  let result = '';
+  if (result) return result;
+  var chars = '12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP',
+    maxPos = chars.length,
+    i;
+  len = len || 5;
+  for (i = 0; i < len; i++) {
+    result += chars.charAt(Math.floor(Math.random() * maxPos));
+  }
+  return result;
+}
+
+async function sendNotification(message, userId) {
+  try {
+    await axios.post(
+      `${API_BASE_URL}/api/send-notification`,
+      {
+        message: message,
+        userId: userId,
+      }
+    );
+  }catch (error) {
+    console.error("Error sending notification:", error);
+  }
+}
+
 export default {
   name: "CalendarComponent",
   components: { SidebarTuteur, NavbarTuteur },
@@ -213,6 +281,43 @@ export default {
     const isSaving = ref(false);
     const videoContainer = ref(null);
     const courses = ref([]);
+    const formStep = ref(1);
+    const nextStep = async () => {
+      if (appointmentForm.selectedCourse && appointmentForm.title) {
+        formStep.value = 2;
+        // Fetch students for the selected course
+        const Tut_token = JSON.parse(localStorage.getItem("TuteurAccountInfo")).token;
+        console.log(`tutuer token ${Tut_token}`)
+        try {
+          const response = await axios.get(
+            `${API_BASE_URL}/api/etudiants`,
+            {
+              params: {
+              cours_id: appointmentForm.selectedCourse,
+              tuteur_id: JSON.parse(
+                localStorage.getItem("TuteurAccountInfo")
+              ).id,
+              },
+              headers: {
+                Authorization: `Bearer ${Tut_token}`,
+                'Content-Type': 'application/json'
+              },
+            }
+
+          );
+          // create for each student a new object with the courseId
+          availableStudents.value = response.data.students;
+          console.log(availableStudents.value);
+        } catch (error) {
+          console.error("Error fetching students:", error);
+          showNotification("Erreur lors du chargement des étudiants", "error");
+        }
+      }
+    };
+
+    const previousStep = () => {
+      formStep.value = 1;
+    };
 
     const notification = reactive({
       show: false,
@@ -235,7 +340,7 @@ export default {
     // Load appointments and students on component mount
     onMounted(async () => {
       await fetchAppointments();
-      await fetchStudents();
+      // await fetchStudents();
       await fetchCourses();
     });
     const token = JSON.parse(localStorage.getItem("TuteurAccountInfo")).token;
@@ -261,20 +366,21 @@ export default {
       }
     };
 
-    const fetchStudents = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/api/etudiants`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        availableStudents.value = response.data.students;
-        console.log(availableStudents.value);
-      } catch (error) {
-        console.error("Error fetching students:", error);
-        showNotification("Erreur lors du chargement des étudiants", "error");
-      }
-    };
+    // const fetchStudents = async () => {
+    //   try {
+    //     const response = await axios.get(`${API_BASE_URL}/api/etudiants`, {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`,
+    //       },
+    //     });
+    //     availableStudents.value = response.data.students[0];
+    //     // console.log(availableStudents.value);
+    //     console.log(availableStudents.value);
+    //   } catch (error) {
+    //     console.error("Error fetching students:", error);
+    //     showNotification("Erreur lors du chargement des étudiants", "error");
+    //   }
+    // };
 
     const fetchCourses = async () => {
       try {
@@ -298,9 +404,9 @@ export default {
         ...appointmentData,
         student_ids: appointmentForm.selectedStudents,
         tuteur_id: JSON.parse(localStorage.getItem("TuteurAccountInfo")).id,
-        cours_id: appointmentForm.selectedCourse
+        cours_id: appointmentForm.selectedCourse,
       };
-      console.log(appointmentData.date)
+      console.log(appointmentData.date);
       try {
         const response = await axios.post(
           `${API_BASE_URL}/api/appointCall`,
@@ -312,6 +418,14 @@ export default {
             },
           }
         );
+        for (const student of appointmentForm.selectedStudents) {
+          await sendNotification(
+            `Un rendez-vous a été créé pour vous le ${new Date(
+              appointmentData.date
+            ).toLocaleString()}`,
+            student
+          );
+        }
         window.location.reload();
         return response.data;
       } catch (error) {
@@ -426,9 +540,7 @@ export default {
         description: appointmentForm.description,
         students: appointmentForm.selectedStudents,
         courseId: appointmentForm.selectedCourse,
-        roomId:
-          editingAppointment.value?.roomId ||
-          Math.random().toString(36).substring(2, 8), // Generate a random room ID for new appointments
+        roomId: randomID(5), // Generate a random room ID for new appointments
       };
 
       try {
@@ -500,57 +612,13 @@ export default {
 
     // Start a video call for an appointment
     const startVideoCall = (appointment) => {
-      const appID = 591798701;
-      const serverSecret = "ef2324e49ea8c00e7faa3a7f947c5080";
-      const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
-        appID,
-        serverSecret,
-        "test123",
-        "Tuteur",
-        appointment.id.toString()
-      );
-      const zp = ZegoUIKitPrebuilt.create(kitToken);
-
-      // Make video container visible
-      if (videoContainer.value) {
-        videoContainer.value.style.display = "block";
-      } else {
-        document.querySelector(".video-container").style.display = "block";
+      window.open(`/video-call/?roomID=${appointment.roomId}&userName=${JSON.parse(localStorage.getItem('TuteurAccountInfo')).fullname}`, '_blank');
+      for (const student of appointmentForm.selectedStudents) {
+        sendNotification(
+          `Un appel vidéo a été démarré pour le rendez-vous "${appointment.title}"`,
+          student
+        );
       }
-
-      // Store the current appointment for reference
-      sessionStorage.setItem(
-        "currentCallAppointment",
-        JSON.stringify(appointment)
-      );
-
-      // Generate a shareable link for students
-      const shareableLink =
-        window.location.protocol +
-        "//" +
-        window.location.host +
-        "/etudiant/appointments?roomID=" +
-        appointment.roomId +
-        "&appointmentId=" +
-        appointment.id;
-
-      zp.joinRoom({
-        container:
-          videoContainer.value || document.querySelector(".video-container"),
-        sharedLinks: [
-          {
-            name: "Lien pour les étudiants",
-            url: shareableLink,
-          },
-        ],
-        scenario: {
-          mode: ZegoUIKitPrebuilt.VideoConference,
-        },
-        turnOnCameraWhenJoining: true,
-        showTurnOffRemoteCameraButton: true,
-        showTurnOffRemoteMicrophoneButton: true,
-        showRemoveUserButton: true,
-      });
     };
 
     // Close the video call completely
@@ -606,6 +674,9 @@ export default {
       notification,
       videoContainer,
       courses,
+      formStep,
+      nextStep,
+      previousStep,
       formatDay,
       formatMonth,
       formatTime,
@@ -885,6 +956,36 @@ export default {
   z-index: 1000;
 }
 
+.steps-indicator {
+  display: flex;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.step {
+  flex: 1;
+  padding: 12px;
+  text-align: center;
+  color: #6b7280;
+  font-weight: 500;
+  position: relative;
+}
+
+.step.active {
+  color: #4f46e5;
+}
+
+.step.active::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #4f46e5;
+}
+
+/* Rest of modal styles */
 .modal-container {
   background-color: white;
   border-radius: 8px;

@@ -7,13 +7,6 @@
     <!-- Main Content -->
     <div class="main-content">
       <!-- Video call container - Positioned to not cover navigation -->
-      <div ref="videoContainer" class="video-container">
-        <div class="video-call-controls">
-          <button @click="closeVideoCall" class="close-video-call-btn">
-            <i class="fas fa-times"></i> Fermer l'appel
-          </button>
-        </div>
-      </div>
       <div class="calendar-container">
         <div class="header">
           <h1 class="title">Mes rendez-vous</h1>
@@ -110,7 +103,7 @@
           try {
             const response = await axios.get(`${API_BASE_URL}/api/appointsCall`, {
               headers: { 
-                // Authorization: `Bearer ${localStorage.getItem('token')}` 
+                Authorization: `Bearer ${JSON.parse(localStorage.getItem('StudentAccountInfo')).token}` 
               }
             });
             
@@ -158,41 +151,9 @@
       
       // Join a video call for an appointment
       const joinVideoCall = (appointment) => {
-        const appID = 591798701; 
-        const serverSecret = "ef2324e49ea8c00e7faa3a7f947c5080";
-        const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appID, serverSecret, 'test123', 'Etudiant', Date.now().toString());
-        const zp = ZegoUIKitPrebuilt.create(kitToken);
-        
-        // Make video container visible and enter fullscreen mode
-        const videoContainer = document.querySelector('.video-container');
-        videoContainer.style.display = 'block';
-        
-        // Store the current appointment for reference
-        activeCallAppointment.value = appointment;
-        
-        zp.joinRoom({
-          container: videoContainer,
-          scenario: {
-            mode: ZegoUIKitPrebuilt.VideoConference,
-          },
-          turnOnCameraWhenJoining: true,
-          showTurnOffRemoteCameraButton: false,
-          showTurnOffRemoteMicrophoneButton: false,
-          showRemoveUserButton: false
-        });
-        
-        // Don't request fullscreen mode to keep navigation accessible
-        // Instead, just make the video container visible
-        // This allows users to still access the navbar and sidebar during calls
+        window.open(`/video-call?roomID=${appointment.roomId}&userName=${JSON.parse(localStorage.getItem('StudentAccountInfo')).fullname}`, '_blank');
       };
       
-      // Close the video call completely
-      const closeVideoCall = () => {
-        document.querySelector('.video-container').style.display = 'none';
-        activeCallAppointment.value = null;
-        
-        // No need to exit fullscreen as we're not using it anymore
-      };
       
       return {
         appointments,
@@ -201,7 +162,6 @@
         formatTime,
         isAppointmentActive,
         joinVideoCall,
-        closeVideoCall
       };
     }
   };
