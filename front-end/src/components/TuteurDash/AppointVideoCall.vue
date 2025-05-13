@@ -236,7 +236,6 @@
 <script>
 import SidebarTuteur from "./SidebarTut.vue";
 import NavbarTuteur from "./NavBarTut.vue";
-import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
@@ -252,20 +251,6 @@ function randomID(len) {
     result += chars.charAt(Math.floor(Math.random() * maxPos));
   }
   return result;
-}
-
-async function sendNotification(message, userId) {
-  try {
-    await axios.post(
-      `${API_BASE_URL}/api/send-notification`,
-      {
-        message: message,
-        userId: userId,
-      }
-    );
-  }catch (error) {
-    console.error("Error sending notification:", error);
-  }
 }
 
 export default {
@@ -399,6 +384,20 @@ export default {
       }
     };
 
+    async function sendNotification(message, userId) {
+        try {
+          await axios.post(
+            `${API_BASE_URL}/api/send-notification`,
+            {
+              message: message,
+              userId: userId,
+            }
+          );
+        }catch (error) {
+          console.error("Error sending notification:", error);
+        }
+    };
+
     const createAppointment = async (appointmentData) => {
       appointmentData = {
         ...appointmentData,
@@ -418,12 +417,12 @@ export default {
             },
           }
         );
-        for (const student of appointmentForm.selectedStudents) {
+        for (const student in appointmentForm.selectedStudents) {
           await sendNotification(
             `Un rendez-vous a été créé pour vous le ${new Date(
               appointmentData.date
             ).toLocaleString()}`,
-            student
+            Number(student)+1
           );
         }
         window.location.reload();

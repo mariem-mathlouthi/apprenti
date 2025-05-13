@@ -257,70 +257,24 @@ export default {
 
     async getNotifications() {
       try {
-        const [notifResponse, attestResponse] = await Promise.all([
-          axios.get("http://localhost:8000/api/getAllNotifications"),
-          axios.get(
-            `http://localhost:8000/api/getAttestation/${this.idEtudiant}`
-          ),
-        ]);
-
-        this.notifications = [];
-
-        // Traitement des notifications principales
-        notifResponse.data.notifications.forEach((notif) => {
-          // Demandes spécifiques
-          if (notif.type === "demande" && notif.idEtudiant == this.idEtudiant) {
-            this.notifications.push({
-              title: "Mise à jour de demande",
-              message: notif.message,
-              date: notif.date,
-              type: "demande",
-            });
+        const notifResponse = await axios.get(
+          `http://localhost:8000/api/notifications`,
+          {
+            params: {
+              userId: this.idEtudiant,
+            },
           }
+        );
 
-          // Offres globales ou spécifiques
-          if (
-            notif.type === "offre" &&
-            (notif.idEtudiant == 0 || notif.idEtudiant == this.idEtudiant)
-          ) {
-            this.notifications.push({
-              title: "Nouvelle offre disponible",
-              message: notif.message,
-              date: notif.date,
-              type: "offre",
-            });
-          }
-
-          // Cours globaux
-          if (notif.type === "cours" && notif.idEtudiant == 0) {
-            this.notifications.push({
-              title: "Nouveau cours publié",
-              message: notif.message,
-              date: notif.date,
-              type: "cours",
-            });
-          }
+        notifResponse.data.forEach(msg => {
+          console.log('notif', msg);
+          this.messages.push(msg.message);
         });
 
-        // Ajout des attestations
-        if (attestResponse.data?.check) {
-          attestResponse.data.attestation.forEach((att) => {
-            this.notifications.push({
-              title: "Attestation de stage",
-              message: att.message,
-              date: att.date,
-              type: "attestation",
-              attestation: att.attestation,
-            });
-          });
-        } // Tri par date décroissante
-        this.notifications.sort((a, b) => new Date(b.date) - new Date(a.date));
-
         // Show notification for new items
-        if (this.notifications.length > 0) {
-          const latestNotif = this.notifications[0];
+        if (notifResponse.length > 0) {
           this.showNotification("Nouvelle notification", {
-            body: latestNotif.message,
+            body: 'Vous avez de nouvelles notifications.',
             icon: "https://cdn0.iconfinder.com/data/icons/customicondesignoffice5/256/examples.png",
             sound: "../assets/sounds/mixkit-software-interface-start-2574.mp3",
           });
@@ -360,13 +314,6 @@ export default {
   mounted() {
     this.getAccountData();
     this.getNotifications();
-    setTimeout(() => {
-      this.playNotificationSound(); // Use the new method
-      this.showNotification("Bienvenue sur votre tableau de bord !", {
-        body: "Vous avez de nouvelles notifications.",
-        icon: "https://cdn0.iconfinder.com/data/icons/customicondesignoffice5/256/examples.png",
-      });
-    }, 1000);
   },
 };
 </script>
