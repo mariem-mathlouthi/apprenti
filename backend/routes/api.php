@@ -21,6 +21,7 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\SpecialiteController;
 use App\Http\Controllers\DomaineController;
 use App\Http\Controllers\NiveauController;
+use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\SecteurController;
 use App\Http\Controllers\TypeStageController;
 
@@ -35,20 +36,8 @@ use App\Http\Controllers\TypeStageController;
 |
 */
 
-Route::get('/notify', function () {
-    broadcast(new RealTimeNotification('Hello from Laravel!'));
-    return 'Notification sent!';
-});
-
-Route::post('/send-notification', function (Request $request) {
-    $message = $request->input('message');
-    // $userId = $request->input('userId');
-    
-    event(new RealTimeNotification($message));
-    
-    return response()->json(['status' => 'success']);
-});
-
+Route::post('/send-notification', [NotificationsController::class, 'sendNotification']);
+Route::get('/notifications', [NotificationsController::class, 'getNotificationsByUserId']);
 
 
 Route::middleware('auth:sanctum')->group(function() {

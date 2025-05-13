@@ -19,12 +19,12 @@ class RealTimeNotification implements ShouldBroadcastNow
      * Create a new event instance.
      */
     public $message;
-    // public $userId;
+    public $userId;
 
-    public function __construct($message)
+    public function __construct($message, $userId)
     {
         $this->message = $message;
-        // $this->userId = $userId; 
+        $this->userId = $userId; 
     }
 
     /**
@@ -44,11 +44,11 @@ class RealTimeNotification implements ShouldBroadcastNow
 
     public function broadcastOn()
     {
-        return new Channel('notifications');
+        return new Channel('notifications.'.$this->userId);
     }
 
     public function broadcastAs()
     {
-        return 'my-event';
+        return 'notification-event';
     }
 }

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->text('date');
+            $table->string('roomId');
             $table->json('student_ids');
             $table->foreignId('tuteur_id')->constrained('tuteurs')->onDelete('cascade');
             $table->foreignId('cours_id')->constrained('cours')->onDelete('cascade');

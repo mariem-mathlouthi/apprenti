@@ -13,6 +13,7 @@ class Appointment extends Model
         'title',
         'description',
         'date',
+        'roomId',
         'student_ids',
         'tuteur_id',
         'cours_id'
@@ -24,5 +25,13 @@ class Appointment extends Model
     public function etudiant()
     {
         return $this->belongsTo(Etudiant::class);
+    }
+    public function tuteur()
+    {
+        return $this->belongsTo(Tuteur::class);
+    }
+    public function cours()
+    {
+        return $this->belongsTo(Cours::class);
     }
 }

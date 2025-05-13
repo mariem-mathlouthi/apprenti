@@ -13,6 +13,7 @@ class AppointmentController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'date' => 'required|string',
+            'roomId' => 'required|string',
             'description' => 'nullable|string',
             'student_ids' => 'required|array',
             'student_ids.*' => 'exists:etudiants,id',
@@ -24,8 +25,9 @@ class AppointmentController extends Controller
         // Create the appointment
         $appointment = new Appointment();
         $appointment->title = $request->input('title');
-        $appointment->description = $request->input('description');
         $appointment->date = $request->input('date');
+        $appointment->roomId = $request->input('roomId');
+        $appointment->description = $request->input('description');
         $appointment->student_ids = $request->input('student_ids');
         $appointment->tuteur_id = $request->input('tuteur_id');
         $appointment->cours_id = $request->input('cours_id');

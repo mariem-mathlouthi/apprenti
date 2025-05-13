@@ -77,9 +77,20 @@ class studentController extends Controller
         ]);
     }
 
-    public function getAllStudentsSubscripted() 
+    public function getAllStudentsSubscripted(Request $request)
     {
-        $students = CoursSubscriptions::with('etudiant')->get();
+        $request->validate([
+            'tuteur_id' => 'required|exists:tuteurs,id',
+            'cours_id' => 'required|exists:cours,id',
+        ]);
+        // Fetch all students who are subscribed to courses
+        // $students = CoursSubscriptions::with('etudiant')->get();
+        $students = CoursSubscriptions::where('tuteur_id', $request->tuteur_id)
+            ->where('cours_id', $request->cours_id)
+            ->with(['etudiant' => function ($query) {
+                $query->select('etudiants.id', 'fullname');
+            }])
+            ->get();
         return response()->json([
             'students' => $students,
             'message' => 'Students fetched successfully',
