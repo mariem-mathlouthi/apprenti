@@ -14,8 +14,19 @@ class CoursSubscriptions extends Model
         'tuteur_id'
     ];
     protected $table = 'cours_subscriptions';
-    public function etudiant()
+
+        public function etudiant()
     {
-        return $this->belongsToMany(Etudiant::class, 'cours_subscriptions', 'etudiant_id', 'id');
+        return $this->belongsTo(Etudiant::class, 'etudiant_id');
+    }
+
+    public function cours()
+    {
+        return $this->belongsTo(Cours::class, 'cours_id');
+    }
+
+    public function tuteur()
+    {
+        return $this->belongsTo(Tuteur::class, 'tuteur_id');
     }
 }

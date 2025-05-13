@@ -46,4 +46,14 @@ class Etudiant extends Model
     {
         return $this->belongsTo(TypeStage::class);
     }
+
+    public function courseSubscriptions()
+    {
+        return $this->hasMany(CoursSubscriptions::class, 'etudiant_id');
+    }
+
+    public function subscribedCourses()
+    {
+        return $this->belongsToMany(Cours::class, 'cours_subscriptions', 'etudiant_id', 'cours_id');
+    }
 }

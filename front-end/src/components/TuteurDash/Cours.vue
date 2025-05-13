@@ -161,7 +161,7 @@ export default {
             date: new Date().toISOString().split('T')[0] // Format YYYY-MM-DD
           };
 
-          await axios.post("http://localhost:8000/api/notification", notificationData);
+          // await axios.post("http://localhost:8000/api/notification", notificationData);
 
           toast.success("Cours ajouté avec succès !");
           this.$router.push("/cours");
