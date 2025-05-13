@@ -17,7 +17,6 @@ class Etudiant extends Model
         'email',
         'password',
         'domaine_id',
-        'type_stage_id',
         'specialite_id',
         'etablissement',
         'image'
@@ -42,8 +41,5 @@ class Etudiant extends Model
         return $this->belongsTo(Niveau::class);
     }
 
-    public function typeStage()
-    {
-        return $this->belongsTo(TypeStage::class);
-    }
+   
 }

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('domaine');
             $table->date('dateDebut');
             $table->date('dateFin');
-            $table->string('typeOffre');
+            $table->foreignId('type_stage_id')->constrained('type_stages')->cascadeOnDelete();
             $table->string('cahierCharge'); // file path?
             $table->timestamps();
             $table->foreign('idEntreprise')->references('id')->on('entreprises')->onDelete('cascade')->onUpdate('cascade');

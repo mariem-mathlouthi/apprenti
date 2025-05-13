@@ -25,7 +25,6 @@ class authController extends Controller
             'email' => 'required|email|unique:etudiants,email',
             'password' => 'required|min:6',
             'domaine_id' => 'required|integer|exists:domaines,id',
-            'type_stage_id' => 'required|integer|exists:type_stages,id', 
             'specialite_id' => 'required|integer|exists:specialites,id',
             'etablissement' => 'required|string|max:255',
             'image' => 'sometimes|nullable|string'
@@ -46,7 +45,6 @@ class authController extends Controller
                 'email' => $requestData['email'],
                 'password' => Hash::make($requestData['password']),
                 'domaine_id' => $requestData['domaine_id'],
-                'type_stage_id' => $requestData['type_stage_id'],
                 'specialite_id' => $requestData['specialite_id'],
                 'etablissement' => $requestData['etablissement'],
                 'image' => $requestData['image'] ?? null
