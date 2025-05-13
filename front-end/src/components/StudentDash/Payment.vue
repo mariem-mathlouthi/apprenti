@@ -1133,7 +1133,7 @@ export default {
         );
         if (response.status === 201) {
           if (place === "resource") {
-            this.$router.push({ name: `/DetailsCours/${this.$route.params.id}` });
+            this.$router.push({ name: '/DetailsCours/', params: {id: this.$route.params.id}});
           } else if (place === "consult") {
             this.$router.push({ name: "ConsultListCours" });
           }
