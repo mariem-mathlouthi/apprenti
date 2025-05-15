@@ -29,7 +29,7 @@ class offreController extends Controller
         $new->status = $requestData['status'];
         $new->titre= $requestData['titre'];
         $new->description= $requestData['description'];
-        $new->domaine= $requestData['domaine'];
+        $new->domaine_id= $requestData['domaine_id'];
     
         $date = $requestData['dateDebut'];;
         $formattedDate = date('Y-m-d', strtotime($date));
@@ -39,7 +39,7 @@ class offreController extends Controller
         $formattedDate2 = date('Y-m-d', strtotime($date2));
         $new->dateFin = $formattedDate2;
     
-        $new->typeOffre= $requestData['typeOffre'];
+        $new->type_stage_id= $requestData['type_stage_id'];
         $new->cahierCharge= $url; // Save filename or path
     
         $new->save();
@@ -71,7 +71,7 @@ public function updateOffre(Request $request){
         $ExistingOffre->status = $requestData['status'];
         $ExistingOffre->titre= $requestData['titre'];
         $ExistingOffre->description= $requestData['description'];
-        $ExistingOffre->domaine= $requestData['domaine'];
+        $ExistingOffre->domaine_id= $requestData['domaine_id'];
 
         $date = $requestData['dateDebut'];;
         $formattedDate = date('Y-m-d', strtotime($date));
@@ -81,7 +81,7 @@ public function updateOffre(Request $request){
         $formattedDate2 = date('Y-m-d', strtotime($date2));
         $ExistingOffre->dateFin = $formattedDate2;
 
-        $ExistingOffre->typeOffre= $requestData['typeOffre'];
+        $ExistingOffre->type_stage_id= $requestData['type_stage_id'];
         $ExistingOffre->cahierCharge= $url;
 
         $ExistingOffre->save();

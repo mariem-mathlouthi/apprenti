@@ -17,7 +17,7 @@ return new class extends Migration
             $table->enum('status',['en attente','accepté','refusé']); // modif to apply later
             $table->string('titre');
             $table->string('description',255);
-            $table->string('domaine');
+            $table->foreignId('domaine_id')->constrained('domaines')->onDelete('cascade');
             $table->date('dateDebut');
             $table->date('dateFin');
             $table->foreignId('type_stage_id')->constrained('type_stages')->cascadeOnDelete();
