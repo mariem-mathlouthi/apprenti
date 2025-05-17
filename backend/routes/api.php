@@ -69,7 +69,7 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get('/getStudentDetail/{id}', [studentController::class, 'getStudentDetail']);
     Route::get('/getEntreprise/{idEntreprise}', [entrepriseController::class, 'getEntreprise']);
     Route::post('/updateSatutDemandeaddDemande', [demandeController::class, 'addDemande']);
-    Route::post('//{id}', [demandeController::class, 'updateStatut']);
+    Route::post('/updateStatut/{id}', [demandeController::class, 'updateStatut']);
     Route::delete('/deleteDemande/{id}', [demandeController::class, 'deleteDemande']);
     Route::get('/getDemandes/{idEtudiant}', [demandeController::class, 'getAllDemandes']);
     Route::get('/getDemandeById/{id}', [demandeController::class, 'getDemandeById']);
@@ -126,12 +126,12 @@ Route::group(['middleware' => 'cors'], function () {
 
 
 
+    // Route::get('/cours', [CoursController::class, 'getAllCourses']);
     Route::get('/cours', [CoursController::class, 'getAllCourses']);         
     Route::post('/cours', [CoursController::class, 'createCourse']);         
     Route::get('/cours/{id}', [CoursController::class, 'getCourseById']);    
     Route::put('/cours/{id}', [CoursController::class, 'updateCourse']);     
     Route::delete('/cours/{id}', [CoursController::class, 'deleteCourse']); 
-    Route::get('/cours', [CoursController::class, 'getAllCourses']);
     Route::get('/cours-by-tuteur', [CoursController::class, 'getAllCoursesByTuteur']);
 
     Route::get('ressources/cours/{idCours}', [RessourceController::class, 'getRessourcesByCours']);
