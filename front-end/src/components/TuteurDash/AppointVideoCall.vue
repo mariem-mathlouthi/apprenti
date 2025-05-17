@@ -217,8 +217,6 @@
                           type="checkbox"
                           :id="`student-${student.etudiant.id}`"
                           :value="student.etudiant.id"
-                          :id="`student-${student.etudiant.id}`"
-                          :value="student.etudiant.id"
                           v-model="appointmentForm.selectedStudents"
                         />
                         <label :for="`student-${student.etudiant.id}`">{{  
@@ -644,6 +642,7 @@ export default {
     // Start a video call for an appointment
     const startVideoCall = async (appointment) => {
       appointment.student_ids.forEach(async (studentId) => {
+        console.log("student id:: ",studentId);
         await sendNotification(studentId, null, null, "Votre appel vidéo a été démarré", "Etudiant", "appointment", new Date(), appointment.id)
       })
       // await sendNotification(studentId, null, null, "Votre appel vidéo a été démarré", "Etudiant", "appointment", new Date(), appointment.id)
