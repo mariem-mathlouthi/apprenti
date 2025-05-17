@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\RealTimeNotification;
 use App\Models\Appointment;
+use App\Models\Tuteur;
 use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
@@ -42,6 +44,42 @@ class AppointmentController extends Controller
         $appointments = Appointment::all();
         return response()->json($appointments);
     }
+
+    public function getAppointmentById($id)
+    {
+        $appointment = Appointment::find($id);
+        if ($appointment) {
+            return response()->json($appointment);
+        } else {
+            return response()->json(['message' => 'Appointment not found'], 404);
+        }
+    }
+
+    public function getAppointmentsByStudentId($studentId)
+    {
+        $appointments = Appointment::where('student_ids', 'like', '%' . $studentId . '%')->get();
+        $formattedAppointments = $appointments->map(function ($appointment) {
+            return [
+                'id' => $appointment->id,
+                'title' => $appointment->title,
+                'date' => $appointment->date,
+                'description' => $appointment->description,
+                'roomId' => $appointment->roomId,
+                'tuteur_name' => $appointment->tuteur->fullname,
+                'cours_id' => $appointment->cours_id,
+            ];
+        });
+        $appointments = $formattedAppointments;
+        // $appointments = Appointment::where($studentId, 'in', 'student_ids')->get();
+        return response()->json($appointments);
+    }
+
+    public function getAppointmentsByTuteurId($tuteurId)
+    {
+        $appointments = Appointment::where('tuteur_id', $tuteurId)->get();
+        return response()->json($appointments);
+    }
+
 
     public function deleteAppointment($id)
     {

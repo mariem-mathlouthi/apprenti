@@ -35,7 +35,7 @@
                     <i class="fas fa-clock"></i> {{ formatTime(appointment.date) }}
                   </div>
                   <div class="appointment-tutor">
-                    <i class="fas fa-user-tie"></i> {{ appointment.tutorName || 'Tuteur' }}
+                    <i class="fas fa-user-tie"></i> {{ appointment.tuteur_name || 'Tuteur' }}
                   </div>
                   <div class="appointment-description">{{ appointment.description }}</div>
                 </div>
@@ -85,7 +85,7 @@
       
       // Load appointments on component mount
       onMounted( async () => {
-        initializePusher();
+        // initializePusher();
         await fetchAppointments();
         const roomID = route.query.roomID;
         const appointmentId = route.query.appointmentId;
@@ -113,43 +113,44 @@
         }
       };
 
-      const initializePusher = () => {
-        Pusher.logToConsole = true;
+      // const initializePusher = () => {
+      //   Pusher.logToConsole = true;
 
-        pusher.value = new Pusher("edc2943b2a2068f8b38c", {
-          cluster: "eu",
-        });
-        idEtudiant.value = JSON.parse(localStorage.getItem("StudentAccountInfo")).id;
+      //   pusher.value = new Pusher("edc2943b2a2068f8b38c", {
+      //     cluster: "eu",
+      //   });
+      //   idEtudiant.value = JSON.parse(localStorage.getItem("StudentAccountInfo")).id;
 
-        channel.value = pusher.value.subscribe(`appointement.${idEtudiant.value}`);
-        channel.value.bind("notification-event", (data) => {
-          if (data && data.appointmentId) {
-            const appointment = appointments.value.find(app => app.id === data.appointmentId);
-            if (appointment) {
-              appointment.isCallStarted = true;
-              isVideoCallActive.value = true;
-              showNotification("Rendez-vous", {
-                body: `Le rendez-vous est prêt à être rejoint`,
-                icon: "./logo.png",
-              });
-            }
-          }
-        });
-      };
+      //   channel.value = pusher.value.subscribe(`appointement.${idEtudiant.value}`);
+      //   channel.value.bind("notification-event", (data) => {
+      //     if (data && data.appointmentId) {
+      //       const appointment = appointments.value.find(app => app.id === data.appointmentId);
+      //       if (appointment) {
+      //         appointment.isCallStarted = true;
+      //         isVideoCallActive.value = true;
+      //         showNotification("Rendez-vous", {
+      //           body: `Le rendez-vous est prêt à être rejoint`,
+      //           icon: "./logo.png",
+      //         });
+      //       }
+      //     }
+      //   });
+      // };
 
       const fetchAppointments = async () => {
           isLoading.value = true;
           try {
-            const response = await axios.get(`${API_BASE_URL}/api/appointsCall`, {
+            idEtudiant.value = JSON.parse(localStorage.getItem("StudentAccountInfo")).id;
+            const response = await axios.get(`${API_BASE_URL}/api/appointByStudent/${idEtudiant.value}`, {
               headers: { 
                 Authorization: `Bearer ${JSON.parse(localStorage.getItem('StudentAccountInfo')).token}` 
               }
             });
-            
+            console.log(idEtudiant.value);
             appointments.value = response.data.map(appointment => ({
               ...appointment,
               date: new Date(appointment.date),
-              isCallStarted: false, // Default value
+              isCallStarted: appointment.id === JSON.parse(localStorage.getItem('appointmentId')) || false, // Default value
             }));
           } catch (error) {
             console.error('Error fetching appointments:', error);

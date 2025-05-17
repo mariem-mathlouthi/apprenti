@@ -11,15 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notification', function (Blueprint $table) {
+        Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('idEtudiant');
-            $table->unsignedBigInteger('idEntreprise');
-            $table->unsignedBigInteger('idTuteur');
+            $table->unsignedBigInteger('idEtudiant')->nullable();
+            $table->unsignedBigInteger('idEntreprise')->nullable();
+            $table->unsignedBigInteger('idTuteur')->nullable();
             $table->String('message');
             $table->enum('destination',['Etudiant','Entreprise','Tuteur']);
-            $table->enum('type',['offre','demande','cours']);
+            $table->enum('type',['offre','demande','cours', 'ressource', 'appointment']);
             $table->enum('visibility',['shown','hidden']);
+            $table->unsignedBigInteger('appointmentId')->nullable();
             $table->date('date');
             $table->timestamps();
         });

@@ -143,6 +143,26 @@ export default {
       }
     },
 
+    async sendNotification(idEtudiant, idEntreprise, idTuteur ,message, destination, type, date, appointmentId) {
+      const notificationData = {
+        idEtudiant: idEtudiant,
+        idEntreprise: idEntreprise,
+        idTuteur: idTuteur,
+        message: message,
+        destination: destination,
+        type: type,
+        visibility: "shown",
+        date: date,
+        appointmentId: appointmentId,
+      }
+
+      await axios.post(
+        "http://localhost:8000/api/notification",
+        notificationData
+      )
+
+    },
+
     // Ajouter une ressource
     async createRessource() {
       // Valider le formulaire avant de soumettre
@@ -165,6 +185,26 @@ export default {
         const response = await axios.post("http://localhost:8000/api/ressources", requestData);
         toast.success("Ressource ajoutée avec succès !");
 
+        // Envoyer une notification
+        const idEtudiantsSubscripted = await axios.get("http://localhost:8000/api/etudiants",
+          {
+            params: {
+              tuteur_id: JSON.parse(localStorage.getItem('TuteurAccountInfo')).id,
+              cours_id: this.form.idCours 
+            }
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + JSON.parse(localStorage.getItem('TuteurAccountInfo')).token
+            }
+          }
+        );
+
+        idEtudiantsSubscripted.data.students.forEach(etudiant => {
+          console.log(etudiant.etudiant_id);
+          this.sendNotification(etudiant.etudiant_id, null, JSON.parse(localStorage.getItem('TuteurAccountInfo')).id, "Un nouveau fichier a été ajouté à votre cours", "Etudiant", "ressource", new Date(), null);
+        });
         // Rediriger vers la liste des ressources
         this.$router.push({ name: "RessourceList", params: { id: this.form.idCours } });
       } catch (error) {

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Events\RealTimeNotification;
-use App\Models\Notifications;
+use App\Models\Notifications2;
 use Illuminate\Http\Request;
 
-class NotificationsController extends Controller
+class Notifications2Controller extends Controller
 {
     public function sendNotification(Request $request)
     {
@@ -18,7 +18,7 @@ class NotificationsController extends Controller
         ]);
 
         // Create a new notification
-        $notification = new Notifications();
+        $notification = new Notifications2();
         $notification->userId = $request->userId;
         $notification->message = $request->message;
         $notification->save();
@@ -33,7 +33,7 @@ class NotificationsController extends Controller
         $request->validate([
             'userId' => 'required|exists:etudiants,id',
         ]);
-        $notifications = Notifications::where('userId', $request->userId)->get();
+        $notifications = Notifications2::where('userId', $request->userId)->get();
         
         return response()->json($notifications, 200);
     }

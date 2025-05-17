@@ -10,7 +10,7 @@
       <div ref="videoContainer" class="video-container"></div>
       <div class="calendar-container">
         <div class="header">
-          <h1 class="title">Calendrier</h1>
+          <h1 class="title">Rendez-vous</h1>
           <p class="subtitle">
             Planifiez vos sessions de vidéoconférence avec vos étudiants
           </p>
@@ -178,6 +178,7 @@
                       type="datetime-local"
                       id="date"
                       v-model="appointmentForm.date"
+                      :min="new Date().toISOString().slice(0, 16)"
                       required
                     />
                   </div>
@@ -195,19 +196,31 @@
                   <div class="form-group">
                     <label>Étudiants</label>
                     <div class="students-selection">
+                      <!-- Select All Checkbox - Fixed implementation -->
+                      <div class="student-checkbox select-all-checkbox">
+                        <input
+                          type="checkbox"
+                          id="select-all-students"
+                          v-model="selectAllStudents"
+                          @change="toggleAllStudents"
+                        />
+                        <label for="select-all-students"><strong>Sélectionner tous</strong></label>
+                      </div>
+                      <!-- Individual Student Checkboxes -->
                       <div
+                        v-if="availableStudents.length > 0"
                         v-for="student in availableStudents"
-                        :key="student.id"
+                        :key="student.etudiant.id"
                         class="student-checkbox"
                       >
                         <input
                           type="checkbox"
-                          :id="`student-${student.id}`"
-                          :value="student.id"
+                          :id="`student-${student.etudiant.id}`"
+                          :value="student.etudiant.id"
                           v-model="appointmentForm.selectedStudents"
                         />
-                        <label :for="`student-${student.id}`">{{
-                          student.etudiant[0].fullname
+                        <label :for="`student-${student.etudiant.id}`">{{  
+                          student.etudiant.fullname
                         }}</label>
                       </div>
                     </div>
@@ -236,14 +249,14 @@
 <script>
 import SidebarTuteur from "./SidebarTut.vue";
 import NavbarTuteur from "./NavBarTut.vue";
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 
 function randomID(len) {
-  let result = '';
+  let result = "";
   if (result) return result;
-  var chars = '12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP',
+  var chars = "12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP",
     maxPos = chars.length,
     i;
   len = len || 5;
@@ -254,7 +267,7 @@ function randomID(len) {
 }
 
 export default {
-  name: "CalendarComponent",
+  name: "AppointmentComponent",
   components: { SidebarTuteur, NavbarTuteur },
   setup() {
     const router = useRouter();
@@ -267,32 +280,56 @@ export default {
     const videoContainer = ref(null);
     const courses = ref([]);
     const formStep = ref(1);
+    const selectAllStudents = ref(false);
+    const availableStudents = ref([]);
+    const appointmentForm = reactive({
+      title: "",
+      date: "",
+      description: "",
+      selectedStudents: [],
+      selectedCourse: "", // Added for course selection
+    });
+    
+    // Watch for changes in the availableStudents or selectedStudents to update the selectAll state
+    watch(() => availableStudents.value, updateSelectAllState, { deep: true });
+    watch(() => appointmentForm.selectedStudents, updateSelectAllState, { deep: true });
+
+    function updateSelectAllState() {
+      if (availableStudents.value.length === 0) {
+        selectAllStudents.value = false;
+        return;
+      }
+      
+      const allSelected = availableStudents.value.length > 0 && 
+        appointmentForm.selectedStudents.length === availableStudents.value.length;
+        
+      selectAllStudents.value = allSelected;
+    }
+    
     const nextStep = async () => {
       if (appointmentForm.selectedCourse && appointmentForm.title) {
         formStep.value = 2;
         // Fetch students for the selected course
-        const Tut_token = JSON.parse(localStorage.getItem("TuteurAccountInfo")).token;
-        console.log(`tutuer token ${Tut_token}`)
+        const Tut_token = JSON.parse(
+          localStorage.getItem("TuteurAccountInfo")
+        ).token;
+        console.log(`tutuer token ${Tut_token}`);
         try {
-          const response = await axios.get(
-            `${API_BASE_URL}/api/etudiants`,
-            {
-              params: {
+          const response = await axios.get(`${API_BASE_URL}/api/etudiants`, {
+            params: {
               cours_id: appointmentForm.selectedCourse,
-              tuteur_id: JSON.parse(
-                localStorage.getItem("TuteurAccountInfo")
-              ).id,
-              },
-              headers: {
-                Authorization: `Bearer ${Tut_token}`,
-                'Content-Type': 'application/json'
-              },
-            }
-
-          );
+              tuteur_id: JSON.parse(localStorage.getItem("TuteurAccountInfo"))
+                .id,
+            },
+            headers: {
+              Authorization: `Bearer ${Tut_token}`,
+              "Content-Type": "application/json",
+            },
+          });
           // create for each student a new object with the courseId
           availableStudents.value = response.data.students;
           console.log(availableStudents.value);
+          updateSelectAllState(); // Update the selectAll state when students are loaded
         } catch (error) {
           console.error("Error fetching students:", error);
           showNotification("Erreur lors du chargement des étudiants", "error");
@@ -312,32 +349,40 @@ export default {
       timeout: null,
     });
 
-    const appointmentForm = reactive({
-      title: "",
-      date: "",
-      description: "",
-      selectedStudents: [],
-      selectedCourse: "", // Added for course selection
-    });
+    // const availableStudents = ref([]);
 
-    const availableStudents = ref([]);
+    // Fixed toggle all students function
+    const toggleAllStudents = () => {
+      if (selectAllStudents.value) {
+        // Select all students
+        appointmentForm.selectedStudents = availableStudents.value.map(
+          student => student.etudiant.id
+        );
+      } else {
+        // Deselect all students
+        appointmentForm.selectedStudents = [];
+      }
+    };
 
     // Load appointments and students on component mount
     onMounted(async () => {
       await fetchAppointments();
-      // await fetchStudents();
       await fetchCourses();
     });
-    const token = JSON.parse(localStorage.getItem("TuteurAccountInfo")).token;
+    
+    const tuteur = JSON.parse(localStorage.getItem("TuteurAccountInfo"));
     // API calls
     const fetchAppointments = async () => {
       isLoading.value = true;
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/appointsCall`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `${API_BASE_URL}/api/appointByTuteur/${tuteur.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${tuteur.token}`,
+            },
+          }
+        );
 
         appointments.value = response.data.map((appointment) => ({
           ...appointment,
@@ -350,22 +395,6 @@ export default {
         isLoading.value = false;
       }
     };
-
-    // const fetchStudents = async () => {
-    //   try {
-    //     const response = await axios.get(`${API_BASE_URL}/api/etudiants`, {
-    //       headers: {
-    //         Authorization: `Bearer ${token}`,
-    //       },
-    //     });
-    //     availableStudents.value = response.data.students[0];
-    //     // console.log(availableStudents.value);
-    //     console.log(availableStudents.value);
-    //   } catch (error) {
-    //     console.error("Error fetching students:", error);
-    //     showNotification("Erreur lors du chargement des étudiants", "error");
-    //   }
-    // };
 
     const fetchCourses = async () => {
       try {
@@ -384,49 +413,57 @@ export default {
       }
     };
 
-    async function sendNotification(message, userId, appointmentId) {
-        try {
-          await axios.post(
-            `${API_BASE_URL}/api/send-notification`,
-            {
-                message: message,
-                userId: userId,
-                appointmentId: appointmentId
-            }
-          );
-        }catch (error) {
-          console.error("Error sending notification:", error);
-        }
+    const sendNotification = async (idEtudiant, idEntreprise, idTuteur ,message, destination, type, date, appointmentId) => {
+      const notificationData = {
+        idEtudiant: idEtudiant,
+        idEntreprise: idEntreprise,
+        idTuteur: idTuteur,
+        message: message,
+        destination: destination,
+        type: type,
+        visibility: "shown",
+        date: date,
+        appointmentId: appointmentId,
+      }
+
+      await axios.post(
+        "http://localhost:8000/api/notification",
+        notificationData
+      )
+
     };
+
 
     const createAppointment = async (appointmentData) => {
       appointmentData = {
         ...appointmentData,
         student_ids: appointmentForm.selectedStudents,
-        tuteur_id: JSON.parse(localStorage.getItem("TuteurAccountInfo")).id,
+        tuteur_id: tuteur.id,
         cours_id: appointmentForm.selectedCourse,
       };
-      console.log(appointmentData.date);
       try {
         const response = await axios.post(
           `${API_BASE_URL}/api/appointCall`,
           appointmentData,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${tuteur.token}`,
               "Content-Type": "application/json",
             },
           }
         );
-        for (const student in appointmentForm.selectedStudents) {
-          await sendNotification(
-            `Un rendez-vous a été créé pour vous le ${new Date(
-              appointmentData.date
-            ).toLocaleString()}`,
-            Number(student)+1,
-          );
-        }
-        window.location.reload();
+
+          // appointmentData.student_ids.forEach(async (studentId) => {
+          //   console.log("student id:: ",studentId);
+          //   await sendNotification(studentId, null, appointmentData.tuteur_id, "Vous avez un nouveau rendez-vous", "Etudiant", "appointment", new Date())
+          // })
+          
+          
+        Promise.all(appointmentData.student_ids.map(async (studentId) => {
+          await sendNotification(studentId, null, appointmentData.tuteur_id, "Vous avez un nouveau rendez-vous", "Etudiant", "appointment", new Date(), null)
+        })).then(() => {
+          window.location.reload();
+        });
         return response.data;
       } catch (error) {
         console.error("Error creating appointment:", error);
@@ -447,7 +484,7 @@ export default {
           appointmentData,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${tuteur.token}`,
               "Content-Type": "application/json",
             },
           }
@@ -464,7 +501,7 @@ export default {
       try {
         await axios.delete(`${API_BASE_URL}/api/appointsCall/${id}`, {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${tuteur.token}`,
           },
         });
         window.location.reload();
@@ -488,16 +525,6 @@ export default {
         hour: "2-digit",
         minute: "2-digit",
       });
-    };
-
-    // Toggle student selection in the form
-    const toggleStudentSelection = (student) => {
-      const index = appointmentForm.selectedStudents.indexOf(student.id);
-      if (index === -1) {
-        appointmentForm.selectedStudents.push(student.id);
-      } else {
-        appointmentForm.selectedStudents.splice(index, 1);
-      }
     };
 
     // Open modal for creating a new appointment
@@ -524,7 +551,9 @@ export default {
         ? appointment.students.map((student) => student.id)
         : [];
       showAppointmentModal.value = true;
-    }; // Close the modal
+    }; 
+    
+    // Close the modal
     const closeModal = () => {
       showAppointmentModal.value = false;
       appointmentForm.selectedCourse = ""; // Reset selected course
@@ -612,14 +641,23 @@ export default {
 
     // Start a video call for an appointment
     const startVideoCall = async (appointment) => {
-      window.open(`/video-call/?roomID=${appointment.roomId}&userName=${JSON.parse(localStorage.getItem('TuteurAccountInfo')).fullname}`, '_blank');
-      for (const student in appointment.student_ids) {
-        await sendNotification(
-          `Un appel vidéo a été démarré pour le rendez-vous "${appointment.title}"`,
-          Number(student)+1,
-          appointment.id
-        );
-      }
+      appointment.student_ids.forEach(async (studentId) => {
+        await sendNotification(studentId, null, null, "Votre appel vidéo a été démarré", "Etudiant", "appointment", new Date(), appointment.id)
+      })
+      // await sendNotification(studentId, null, null, "Votre appel vidéo a été démarré", "Etudiant", "appointment", new Date(), appointment.id)
+      window.open(
+        `/video-call/?roomID=${appointment.roomId}&userName=${
+          JSON.parse(localStorage.getItem("TuteurAccountInfo")).fullname
+        }`,
+        "_blank"
+      );
+      // for (const student in appointment.student_ids) {
+      //   await sendNotification(
+      //     `Un appel vidéo a été démarré pour le rendez-vous "${appointment.title}"`,
+      //     Number(student) + 1,
+      //     appointment.id
+      //   );
+      // }
     };
 
     // Close the video call completely
@@ -664,6 +702,7 @@ export default {
         notification.show = false;
       }, 5000);
     };
+    
     return {
       appointments,
       showAppointmentModal,
@@ -681,7 +720,6 @@ export default {
       formatDay,
       formatMonth,
       formatTime,
-      toggleStudentSelection,
       openCreateModal,
       editAppointment,
       closeModal,
@@ -690,6 +728,8 @@ export default {
       startVideoCall,
       closeVideoCall,
       returnToAppointments,
+      selectAllStudents,
+      toggleAllStudents,
     };
   },
 };
@@ -1057,19 +1097,28 @@ textarea:focus {
 .students-selection {
   max-height: 200px;
   overflow-y: auto;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
 }
 
 .student-checkbox {
-  margin-bottom: 8px;
   display: flex;
   align-items: center;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem 0;
 }
 
 .student-checkbox input[type="checkbox"] {
-  margin-right: 8px;
+  margin-right: 0.5rem;
+}
+
+.select-all-checkbox {
+  padding: 0.5rem;
+  margin-bottom: 0.75rem;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  font-weight: 500;
 }
 
 .form-actions {

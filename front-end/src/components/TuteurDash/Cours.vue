@@ -113,12 +113,51 @@ export default {
         const parsedData = JSON.parse(tuteurData);
         this.idTuteur = parsedData.id;
         this.createdBy = parsedData.id;
-        this.tuteurName = parsedData.name;
+        this.tuteurName = parsedData.fullname;
       } else {
         toast.error("Veuillez vous reconnecter");
         this.$router.push("/login");
       }
     },
+
+    showNotification(title, options) {
+            if (Notification.permission === "granted") {
+                new Notification(title, options);
+            } else if (Notification.permission !== "denied") {
+                this.requestNotificationPermission();
+            }
+        },
+            
+    requestNotificationPermission() {
+        if ("Notification" in window) {
+            Notification.requestPermission().then((permission) => {
+            if (permission === "granted") {
+                console.log("Notification permission granted");
+            }
+            });
+        }
+    },
+
+    async sendNotification(idEtudiant, idEntreprise, idTuteur ,message, destination, type, date, appointmentId) {
+      const notificationData = {
+        idEtudiant: idEtudiant,
+        idEntreprise: idEntreprise,
+        idTuteur: idTuteur,
+        message: message,
+        destination: destination,
+        type: type,
+        visibility: "shown",
+        date: date,
+        appointmentId: appointmentId,
+      }
+
+      await axios.post(
+        "http://localhost:8000/api/notification",
+        notificationData
+      )
+
+    },
+
 
     async createCours() {
       if (!this.idTuteur) {
@@ -150,6 +189,12 @@ export default {
 
         if (response.data.success) {
           // Création de la notification
+          // const Tuteur = JSON.parse(localStorage.getItem("TuteurAccountInfo"));
+          const notificationMessage = `${this.tuteurName} a ajouté un nouveau cours : ${this.titre}`;
+          this.sendNotification(0, null, this.idTuteur, notificationMessage, "Etudiant", "cours", new Date().toISOString().split('T')[0], null);
+          this.showNotification("Nouveau cours ajouté", {
+            body: notificationMessage,
+          });
         // const notificationData = {
         //     idEtudiant: 0,
         //     idEntreprise: 0,

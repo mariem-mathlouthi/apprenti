@@ -1,6 +1,5 @@
 <?php
 
-use App\Events\RealTimeNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\authController;
@@ -14,6 +13,7 @@ use App\Http\Controllers\notificationController;
 use App\Http\Controllers\attestationController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CoursController;
+use App\Http\Controllers\CoursSubscriptionsController;
 use App\Http\Controllers\RessourceController;
 use App\Http\Controllers\TuteurController;
 use App\Http\Controllers\QuizzController;
@@ -21,7 +21,7 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\SpecialiteController;
 use App\Http\Controllers\DomaineController;
 use App\Http\Controllers\NiveauController;
-use App\Http\Controllers\NotificationsController;
+use App\Http\Controllers\Notifications2Controller;
 use App\Http\Controllers\SecteurController;
 use App\Http\Controllers\TypeStageController;
 
@@ -36,8 +36,8 @@ use App\Http\Controllers\TypeStageController;
 |
 */
 
-Route::post('/send-notification', [NotificationsController::class, 'sendNotification']);
-Route::get('/notifications', [NotificationsController::class, 'getNotificationsByUserId']);
+Route::post('/send-notification', [Notifications2Controller::class, 'sendNotification']);
+Route::get('/notifications', [Notifications2Controller::class, 'getNotificationsByUserId']);
 
 
 Route::middleware('auth:sanctum')->group(function() {
@@ -45,9 +45,12 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('/appointsCall', [AppointmentController::class, 'getAllAppointments']);
     Route::put('/appointsCall/{id}', [AppointmentController::class, 'updateAppointment']);
     Route::delete('/appointsCall/{id}', [AppointmentController::class, 'deleteAppointment']);
-    Route::get('/etudiants', [studentController::class, 'getAllStudentsSubscripted']);
 });
+Route::get('/etudiants', [CoursSubscriptionsController::class, 'getAllStudentsSubscripted']);
+Route::get('/appointByStudent/{id}', [AppointmentController::class, 'getAppointmentsByStudentId']);
+Route::get('/appointByTuteur/{id}', [AppointmentController::class, 'getAppointmentsByTuteurId']);
 Route::post('/subscribeToCourse', [CoursController::class, 'subscribeToCourse']);
+Route::get('subscribtions/cours/{id}', [CoursSubscriptionsController::class, 'getIsStudentSubscribedToCourse']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

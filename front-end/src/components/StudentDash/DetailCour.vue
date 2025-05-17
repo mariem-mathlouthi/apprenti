@@ -81,13 +81,27 @@
 
             <!-- Bouton d'action -->
             <div class="pt-6 text-center">
+              <!-- Bouton S'inscrire si l'étudiant n'a pas payé -->
               <router-link 
+                v-if="!isPaid"
                 :to="'/Payment/' + cours.id"
                 class="inline-flex items-center px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-500 text-white rounded-2xl text-lg font-bold hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] group/button"
               >
                 <span>S'inscrire maintenant</span>
                 <svg class="w-5 h-5 ml-3 transform group-hover/button:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+              </router-link>
+              
+              <!-- Bouton Ressources si l'étudiant a déjà payé -->
+              <router-link 
+                v-if="isPaid"
+                :to="'/DetailsCours/' + cours.id"
+                class="inline-flex items-center px-8 py-3.5 bg-gradient-to-r from-green-600 to-teal-500 text-white rounded-2xl text-lg font-bold hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] group/button"
+              >
+                <span>Ressources</span>
+                <svg class="w-5 h-5 ml-3 transform group-hover/button:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
               </router-link>
             </div>
@@ -114,6 +128,9 @@ export default {
   data() {
     return {
       cours: {},
+      isPaid: false,
+      studentInfo: null,
+      tuteurInfo: null,
     };
   },
   methods: {
@@ -123,6 +140,7 @@ export default {
         const response = await axios.get(`http://localhost:8000/api/cours/${coursId}`);
         this.cours = response.data.cours;
         localStorage.setItem("coursDetails", JSON.stringify(this.cours));
+        this.checkPaymentStatus();
       } catch (error) {
         console.error("Erreur :", error);
         toast.error("Erreur de chargement des détails", {
@@ -133,9 +151,45 @@ export default {
         });
       }
     },
+    
+    async checkPaymentStatus() {
+      try {
+        this.studentInfo = JSON.parse(localStorage.getItem("StudentAccountInfo"));
+        this.tuteurInfo = JSON.parse(localStorage.getItem("TuteurAccountInfo"));
+        if (!this.studentInfo && !this.tuteurInfo) return;
+        
+        const coursId = this.$route.params.id;
+        const studentId = this.studentInfo.id;
+        const tuteurId = this.tuteurInfo.id;
+        
+        // Vérifier si l'étudiant a déjà payé pour ce cours
+        const response = await axios.get(`http://localhost:8000/api/subscribtions/cours/${coursId}`, 
+        {
+          params: {
+            etudiant_id: studentId,
+            tuteur_id: tuteurId
+          }
+        });
+        this.isPaid = response.data.isSubscribed;
+      } catch (error) {
+        console.error("Erreur lors de la vérification du paiement :", error);
+        // Si l'API renvoie une erreur 404, cela signifie que l'étudiant n'a pas payé
+        if (error.response && error.response.status === 404) {
+          this.isPaid = false;
+        }
+      }
+    },
   },
   mounted() {
     this.fetchCoursDetails();
+  },
+  
+  created() {
+    // Vérifier si l'étudiant est connecté
+    const studentInfo = localStorage.getItem("StudentAccountInfo");
+    if (studentInfo) {
+      this.studentInfo = JSON.parse(studentInfo);
+    }
   },
 };
 </script>

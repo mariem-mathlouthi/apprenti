@@ -23,6 +23,7 @@
     "flowbite": "^2.3.0",
     "laravel-echo": "^2.1.0",
     "lottie-web": "^5.12.2",
+    "pinia": "^3.0.2",
     "pusher-js": "^8.4.0",
     "square": "^42.2.0",
     "vue": "^3.4.21",

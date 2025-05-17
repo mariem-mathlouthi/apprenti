@@ -6,8 +6,8 @@ window.Pusher = Pusher;
 
 window.Echo = new Echo({
     broadcaster: 'pusher',
-    key: process.env.MIX_PUSHER_APP_KEY,
-    cluster: process.env.MIX_PUSHER_APP_CLUSTER,
+    key: "edc2943b2a2068f8b38c",
+    cluster: "eu",
     forceTLS: true,
     encrypted: true
 });

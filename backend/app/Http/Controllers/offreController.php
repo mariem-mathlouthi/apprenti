@@ -39,7 +39,8 @@ class offreController extends Controller
         $formattedDate2 = date('Y-m-d', strtotime($date2));
         $new->dateFin = $formattedDate2;
     
-        $new->typeOffre= $requestData['typeOffre'];
+        // $new->typeOffre= $requestData['typeOffre'];
+        $new->type_stage_id = $requestData['type_stage_id'];
         $new->cahierCharge= $url; // Save filename or path
     
         $new->save();

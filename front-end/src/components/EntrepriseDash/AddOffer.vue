@@ -185,6 +185,26 @@
       handleFileUpload(event) {
         this.cahierCharge = event.target.files[0]
       },
+      // ${this.entrepriseName} a ajouté une nouvelle offre : ${this.titre}
+      async sendNotification(idEtudiant, idEntreprise, idTuteur ,message, destination, type, date, appointmentId) {
+        const notificationData = {
+          idEtudiant: idEtudiant,
+          idEntreprise: idEntreprise,
+          idTuteur: idTuteur,
+          message: message,
+          destination: destination,
+          type: type,
+          visibility: "shown",
+          date: date,
+          appointmentId: appointmentId,
+        }
+
+        await axios.post(
+          "http://localhost:8000/api/notification",
+          notificationData
+        )
+
+      },
   
       async addOffre() {
         if (!this.idEntreprise) {
@@ -209,37 +229,13 @@
           // Création de l'offre
           const response = await axios.post(
             "http://localhost:8000/api/addOffre",
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-              }
-            }
+            formData
           )
   
           if (response.data.check) {
             // Création de la notification
-            const notificationData = {
-              idEtudiant: 0,
-              idEntreprise: this.idEntreprise,
-              idTuteur: 0,
-              message: `${this.entrepriseName} a ajouté une nouvelle offre : ${this.titre}`,
-              destination: "Etudiant",
-              type: "offre",
-              visibility: "shown",
-              date: new Date().toISOString().split('T')[0]
-            }
-  
-            await axios.post(
-              "http://localhost:8000/api/notification",
-              notificationData,
-              {
-                headers: {
-                  Authorization: `Bearer ${localStorage.getItem("token")}`,
-                }
-              }
-            )
+            const notificationMessage = `${this.entrepriseName} a ajouté une nouvelle offre : ${this.titre}`
+            await this.sendNotification(0, this.idEntreprise, null, notificationMessage, "Etudiant", "offre", new Date(), null);
   
             toast.success("Offre publiée avec succès !")
             this.$router.push("/OffersList")

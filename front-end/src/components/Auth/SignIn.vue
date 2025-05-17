@@ -61,12 +61,15 @@
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import axios from "axios";
+import { computed } from "vue";
+// import authStore from "../../plugins/authStore";
 
 export default {
   data() {
     return {
       email: "",
       password: "",
+      isAuthenticated : false,
     };
   },
   methods: {
@@ -84,6 +87,7 @@ export default {
             
           );
           if (response.data.check === true) {
+            // authStore.logedIn();
 
             if(response.data.role === "entreprise"){
               let EntrepriseAccount = {
@@ -94,9 +98,13 @@ export default {
                 secteur:response.data.user.secteur,
                 description:response.data.user.description,
                 token:response.data.token,
+                role:response.data.role,
               }
             localStorage.setItem("EntrepriseAccountInfo",JSON.stringify(EntrepriseAccount));
-            this.$router.push('/EntrepriseDash'); // Redirection vers le tableau de bord de l'entreprise
+            sessionStorage.setItem("CurrentUser", JSON.stringify('entreprise'));
+            // this.$router.push('/EntrepriseDash'); // Redirection vers le tableau de bord de l'entreprise
+            // window.location.pathname = "/EntrepriseDash";
+            window.location.href = "/EntrepriseDash";
              
             }
             else if(response.data.role === "student"){
@@ -110,10 +118,13 @@ export default {
                 typeStage:response.data.user.typeStage,
                 etablissement:response.data.user.etablissement,
                 token:response.data.token,
+                role:response.data.role,
                 
               }
             localStorage.setItem("StudentAccountInfo",JSON.stringify(StudentAccount));
-            this.$router.push('/StudentDash');
+            sessionStorage.setItem("CurrentUser", JSON.stringify('etudiant'));
+            // this.$router.push('/StudentDash');
+            window.location.href = "/StudentDash";
             }
         else if(response.data.role === "tuteur"){
           let TuteurAccount = {
@@ -124,14 +135,18 @@ export default {
             specialite:response.data.user.specialite,
             experience:response.data.user.experience,
             token:response.data.token,
+            role:response.data.role,
 
           }
           localStorage.setItem("TuteurAccountInfo", JSON.stringify(TuteurAccount));
-          this.$router.push('/TuteurDashboard');
+          sessionStorage.setItem("CurrentUser", JSON.stringify('tuteur'));
+          // this.$router.push('/TuteurDashboard');
+          window.location.href = "/TuteurDashboard";
         }
 
            else if(response.data.role === "admin"){
-              this.$router.push('/Admin');
+              // this.$router.push('/Admin');
+              window.location.href = "/Admin";
               toast.success("Admin Account Exist !", {
               autoClose: 2000, 
             });

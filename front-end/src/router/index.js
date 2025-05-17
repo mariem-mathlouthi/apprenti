@@ -111,11 +111,18 @@ import UpdateTypeStage from "../components/EntrepriseDash/UpdateTypeStage.vue";
 
 import Payment from "../components/StudentDash/Payment.vue";
 import videoCall from "../components/video-call.vue";
+
+import notif2 from "../components/StudentDash/Consulternotif-old.vue"
 const routes = [
   {
     path: "/",
     name: "landingPage",
     component: LandingPage,
+  },
+  {
+    path: "/notif2",
+    name: "notif2",
+    component: notif2,
   },
   {
     path: "/teams",

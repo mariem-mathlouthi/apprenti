@@ -14,7 +14,7 @@ class CoursController extends Controller
      */
     public function getAllCourses()
     {
-        $cours = Cours::with(['category', 'tuteur', 'apprenant', 'createur'])->get();
+        $cours = Cours::with(['category', 'tuteur', 'apprenant', 'createur', 'subscriptions'])->get();
         return response()->json([
             'success' => true,
             'cours' => $cours
