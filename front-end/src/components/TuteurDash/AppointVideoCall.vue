@@ -217,6 +217,8 @@
                           type="checkbox"
                           :id="`student-${student.etudiant.id}`"
                           :value="student.etudiant.id"
+                          :id="`student-${student.etudiant.id}`"
+                          :value="student.etudiant.id"
                           v-model="appointmentForm.selectedStudents"
                         />
                         <label :for="`student-${student.etudiant.id}`">{{  

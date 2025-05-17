@@ -135,6 +135,7 @@ Cancel
               type:"demande",
               visibility:"shown",
               date:formattedDate,
+              appointmentId: null
             }
             console.log(myObj);
             const response5= await axios.post("http://localhost:8000/api/notification",myObj);
@@ -151,6 +152,7 @@ Cancel
               type:"demande",
               visibility:"shown",
               date:formattedDate,
+              appointmentId: null
             }
             console.log(myObj);
             const response5= await axios.post("http://localhost:8000/api/notification",myObj);
@@ -166,6 +168,7 @@ Cancel
               type:"demande",
               visibility:"shown",
               date:formattedDate,
+              appointmentId: null
             }
             console.log(myObj);
             const response5= await axios.post("http://localhost:8000/api/notification",myObj);
