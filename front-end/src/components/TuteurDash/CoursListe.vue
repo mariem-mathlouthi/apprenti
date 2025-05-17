@@ -1,110 +1,118 @@
 <template>
   <div id="app" class="flex flex-col h-screen">
-    <!-- Navbar & Sidebar -->
+    <!-- Navbar -->
     <NavbarTuteur />
+
+    <!-- Sidebar -->
     <SidebarTuteur />
 
     <!-- Main Content -->
-    <section id="content" class="flex-1 flex justify-center items-center py-6">
-      <div class="container mx-auto p-6">
-        <h1 class="text-3xl font-bold text-gray-800 text-center mb-6">
+    <main class="flex-1 pt-20 ml-64 p-6">
+      <div class="max-w-7xl mx-auto">
+        <!-- Titre Centré -->
+        <h1 class="text-3xl font-bold text-gray-800 text-center mb-8">
           Liste des Cours
         </h1>
 
-        <!-- Add Course Button -->
-        <div class="text-right mb-6">
-          <router-link to="/ajouter-cours" class="btn-submit">
-            Ajouter un Cours
+        <!-- Section Recherche & Ajout -->
+        <div class="flex flex-col sm:flex-row justify-between gap-4 mb-8">
+          <!-- Barre de Recherche Améliorée -->
+          <div class="flex-1 max-w-xl relative group">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-100 to-blue-50 rounded-xl blur opacity-60 transition-opacity duration-300"></div>
+            <div class="relative flex items-center bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+              <div class="pl-4 pr-2">
+                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              </div>
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder=" Rechercher par titre ou description..."
+                class="w-full py-3 pr-6 bg-transparent outline-none text-gray-700 placeholder-blue-400 font-medium"
+              />
+              <button 
+                v-if="searchQuery"
+                @click="searchQuery = ''"
+                class="mr-4 p-1 rounded-full hover:bg-blue-50 transition-colors"
+              >
+                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Bouton Ajout -->
+          <router-link 
+            to="/ajouter-cours" 
+            class="btn-submit self-start flex items-center gap-2 hover:translate-y-[-2px] transition-transform"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            Nouveau Cours
           </router-link>
         </div>
 
-        <!-- Course Cards Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <!-- Course Card -->
-          <div
-            v-for="cours in coursListe"
+        <!-- Grille des Cours -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Carte de Cours -->
+          <div 
+            v-for="cours in filteredCourses"
             :key="cours.id"
-            class="card"
+            class="bg-blue-50 border border-blue-100 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
           >
-            <!-- Course Image -->
-            <div class="relative h-32 overflow-hidden">
+            <!-- Image du Cours -->
+            <div class="h-48 bg-gray-200 relative overflow-hidden">
               <img
                 :src="getImageUrl(cours.file)"
-                alt="Image du cours"
+                alt="Couverture du cours"
                 class="w-full h-full object-cover"
                 @error="handleImageError"
-              />
+              >
             </div>
 
-            <!-- Course Content -->
-            <div class="text">
-              <!-- Course Title -->
-              <h2 class="title">{{ cours.titre }}</h2>
-              <!-- Course Subtitle -->
-              <p class="subtitle">{{ cours.description || "No description available." }}</p>
+            <!-- Détails du Cours -->
+            <div class="p-4">
+              <h2 class="text-xl font-semibold text-gray-800 mb-2">{{ cours.titre }}</h2>
+              <p class="text-gray-600 text-sm">{{ cours.description || "Aucune description disponible" }}</p>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="icons">
-              <!-- Details Button -->
+            <!-- Actions -->
+            <div class="px-4 pb-4 flex justify-end space-x-3 border-t border-blue-100 pt-3">
               <router-link
                 :to="`/cours/${cours.id}`"
-                class="btn"
+                class="p-2 hover:bg-blue-100 rounded-lg transition-colors"
               >
-                <svg
-                  class="svg-icon"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M10 12a2 2 0 100-4 2 2 0 000 4z"
-                  />
-                  <path
-                    fill-rule="evenodd"
-                    d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                    clip-rule="evenodd"
-                  />
+                <svg class="w-5 h-5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                  <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
                 </svg>
               </router-link>
 
-              <!-- Edit Button -->
               <router-link
                 :to="`/modifier-cours/${cours.id}`"
-                class="btn"
+                class="p-2 hover:bg-blue-100 rounded-lg transition-colors"
               >
-                <svg
-                  class="svg-icon"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
-                  />
+                <svg class="w-5 h-5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
                 </svg>
               </router-link>
 
-              <!-- Delete Button -->
-              <button
+              <button 
                 @click="deleteCours(cours.id)"
-                class="btn"
+                class="p-2 hover:bg-red-100 rounded-lg transition-colors"
               >
-                <svg
-                  class="svg-icon"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                    clip-rule="evenodd"
-                  />
+                <svg class="w-5 h-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
                 </svg>
               </button>
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </main>
   </div>
 </template>
 
@@ -123,162 +131,103 @@ export default {
   },
   data() {
     return {
-      coursListe: [], // List of courses
-      defaultImage: "/placeholder-course.jpg", // Default image
+      coursListe: [],
+      defaultImage: "/placeholder-course.jpg",
+      searchQuery: "",
     };
   },
+  computed: {
+    filteredCourses() {
+      const query = this.searchQuery.toLowerCase();
+      return this.coursListe.filter(cours => {
+        const title = cours.titre?.toLowerCase() || '';
+        const description = cours.description?.toLowerCase() || '';
+        return title.includes(query) || description.includes(query);
+      });
+    }
+  },
   methods: {
-    // Fetch courses for the tutor
     async fetchCours() {
       try {
         const tuteurId = JSON.parse(localStorage.getItem("TuteurAccountInfo")).id;
         const response = await axios.get(
           `http://localhost:8000/api/cours-by-tuteur?tuteurId=${tuteurId}`
         );
-        this.coursListe = response.data.cours.map((cours) => ({
+        this.coursListe = response.data.cours.map(cours => ({
           ...cours,
-          file: cours.file || this.defaultImage, // Use default image if file is missing
+          file: cours.file || this.defaultImage,
         }));
       } catch (error) {
-        console.error("Erreur lors de la récupération des cours :", error);
+        console.error("Erreur récupération cours :", error);
         toast.error("Impossible de récupérer les cours.");
       }
     },
 
-    // Delete a course
     async deleteCours(id) {
       try {
         await axios.delete(`http://localhost:8000/api/cours/${id}`);
         toast.success("Cours supprimé avec succès !");
-        this.fetchCours(); // Refresh the list
+        this.fetchCours();
       } catch (error) {
-        console.error("Erreur lors de la suppression du cours :", error);
-        toast.error("Erreur lors de la suppression du cours.");
+        console.error("Erreur suppression cours :", error);
+        toast.error("Erreur lors de la suppression.");
       }
     },
 
-    // Handle image errors
     handleImageError(event) {
-      event.target.src = this.defaultImage; // Replace with default image
+      event.target.src = this.defaultImage;
     },
 
-    // Build image URL
     getImageUrl(filePath) {
       if (!filePath || filePath === this.defaultImage) {
-        return this.defaultImage; // Return default image if path is empty or already default
+        return this.defaultImage;
       }
-      return `http://localhost:8000${filePath}`; // Return full image URL
+      return `http://localhost:8000${filePath}`;
     },
   },
   mounted() {
-    this.fetchCours(); // Load courses on component mount
+    this.fetchCours();
   },
 };
 </script>
 
 <style scoped>
-/* Card Styles */
-.card {
-  width: 250px;
-  height: 300px; /* Increased height to accommodate image */
-  border-radius: 15px;
-  background: rgba(105, 13, 197, 0.103);
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-}
-
-.card::before {
-  content: "";
-  height: 100px;
-  width: 100px;
-  position: absolute;
-  top: -40%;
-  left: -20%;
-  border-radius: 50%;
-  border: 35px solid rgba(255, 255, 255, 0.102);
-  transition: all 0.8s ease;
-  filter: blur(0.5rem);
-}
-
-.card:hover::before {
-  width: 140px;
-  height: 140px;
-  top: -30%;
-  left: 50%;
-  filter: blur(0rem);
-}
-
-/* Image Section */
-.relative {
-  position: relative;
-}
-
-.h-32 {
-  height: 8rem; /* Adjust image height */
-}
-
-/* Text Section */
-.text {
-  flex-grow: 1;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  color: aliceblue;
-  font-weight: 900;
-  font-size: 1.2em;
-}
-
-.subtitle {
-  font-size: 0.6em;
-  font-weight: 300;
-  color: rgba(240, 248, 255, 0.691);
-}
-
-/* Action Buttons */
-.icons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 250px;
-  border-radius: 0px 0px 15px 15px;
-  overflow: hidden;
-}
-
-.btn {
-  border: none;
-  width: 84px;
-  height: 35px;
-  background-color: rgba(247, 234, 234, 0.589);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.svg-icon {
-  width: 25px;
-  height: 25px;
-  stroke: rgb(38, 59, 126);
-}
-
-.btn:hover {
-  background-color: rgb(247, 234, 234);
-}
-
-/* Add Course Button */
+/* Styles Spécifiques */
 .btn-submit {
-  background-color: #4f46e5;
+  background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
   color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 14px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);
+  transition: all 0.3s ease;
 }
 
 .btn-submit:hover {
-  background-color: #4338ca;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.2);
+}
+
+/* Adaptations Responsive */
+main {
+  margin-left: 250px;
+  transition: margin-left 0.3s;
+}
+
+@media (max-width: 768px) {
+  main {
+    margin-left: 0;
+    padding-top: 6rem;
+  }
+}
+
+/* Effets de Carte */
+.card {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-0.25rem);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
 }
 </style>
