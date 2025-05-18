@@ -39,7 +39,6 @@ export default {
     
     // Create instance object from Kit Token.
     const zp = ZegoUIKitPrebuilt.create(kitToken);
-
     // start the call
     zp.joinRoom({
         container: this.$refs.root,
@@ -56,6 +55,7 @@ export default {
         scenario: {
          mode: ZegoUIKitPrebuilt.VideoConference,
         },
+        showRecordingButton: true, 
     });
   },
 };

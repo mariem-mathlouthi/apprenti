@@ -130,7 +130,7 @@ export default {
       cours: {},
       isPaid: false,
       studentInfo: null,
-      tuteurInfo: null,
+      tuteurId: null,
     };
   },
   methods: {
@@ -155,12 +155,12 @@ export default {
     async checkPaymentStatus() {
       try {
         this.studentInfo = JSON.parse(localStorage.getItem("StudentAccountInfo"));
-        this.tuteurInfo = JSON.parse(localStorage.getItem("TuteurAccountInfo"));
+        this.tuteurId = JSON.parse(localStorage.getItem("coursDetails")).idTuteur;
         if (!this.studentInfo && !this.tuteurInfo) return;
         
         const coursId = this.$route.params.id;
         const studentId = this.studentInfo.id;
-        const tuteurId = this.tuteurInfo.id;
+        const tuteurId = this.tuteurId;
         
         // Vérifier si l'étudiant a déjà payé pour ce cours
         const response = await axios.get(`http://localhost:8000/api/subscribtions/cours/${coursId}`, 
