@@ -22,6 +22,7 @@ use App\Http\Controllers\SpecialiteController;
 use App\Http\Controllers\DomaineController;
 use App\Http\Controllers\NiveauController;
 use App\Http\Controllers\Notifications2Controller;
+use App\Http\Controllers\ReponseFeedbackController;
 use App\Http\Controllers\SecteurController;
 use App\Http\Controllers\TypeStageController;
 
@@ -46,11 +47,13 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::put('/appointsCall/{id}', [AppointmentController::class, 'updateAppointment']);
     Route::delete('/appointsCall/{id}', [AppointmentController::class, 'deleteAppointment']);
 });
-Route::get('/etudiants', [CoursSubscriptionsController::class, 'getAllStudentsSubscripted']);
+Route::get('/etudiants', [CoursSubscriptionsController::class, 'getAllStudentsSubscriptedCours']);
 Route::get('/appointByStudent/{id}', [AppointmentController::class, 'getAppointmentsByStudentId']);
 Route::get('/appointByTuteur/{id}', [AppointmentController::class, 'getAppointmentsByTuteurId']);
 Route::post('/subscribeToCourse', [CoursController::class, 'subscribeToCourse']);
 Route::get('subscribtions/cours/{id}', [CoursSubscriptionsController::class, 'getIsStudentSubscribedToCourse']);
+Route::get('/subcsriptWithTueur', [CoursSubscriptionsController::class, 'getAllTutorsSubscripted']);
+Route::get('/subcsriptionEtudiant', [CoursSubscriptionsController::class, 'getAllStudentsSubscripted']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -155,6 +158,8 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get('/quizz-by-tuteur', [QuizzController::class, 'getQuizzByTuteur']);
     Route::get('/quizz/{idCours}/{titre}', [QuizzController::class, 'getByCourseAndTitle']);
 
+    Route::post('feedbacks/{id}/reponse', [ReponseFeedbackController::class, 'reponseFeedback']);
+    Route::get('feedback/{id}/reponses', [ReponseFeedbackController::class, 'getReponsesByFeedback']);
 
     Route::get('/feedbacks/{id}', [FeedbackController::class, 'getFeedback']);
    // Route::get('/quizz/{idCours}/{titre}', [QuizzController::class, 'getByCourseAndTitle']);

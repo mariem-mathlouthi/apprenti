@@ -2,17 +2,25 @@ import Pusher from 'pusher-js'
 
 export default {
   install(app, options) {
-    // Only initialize Pusher for tuteur accounts
-    if (true) { // Replace with your actual check
+    // Initialiser Pusher pour tous les utilisateurs connectés
+    const userInfo = JSON.parse(localStorage.getItem('userInfo')) || {}
+    if (userInfo.id) {
       const pusher = new Pusher(options.key, {
         cluster: options.cluster,
         encrypted: true,
+        authEndpoint: 'http://localhost:8000/api/pusher/auth',
+        auth: {
+          headers: {
+            'X-User-ID': userInfo.id,
+            'X-User-Role': userInfo.role || 'guest'
+          }
+        }
       })
       
-      // Make pusher available globally
+      // Rendre Pusher disponible globalement
       app.config.globalProperties.$pusher = pusher
       
-      // Store the channel subscriptions
+      // Stocker les abonnements aux canaux
       const channels = {}
       
       // Method to subscribe to channels

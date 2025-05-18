@@ -111,13 +111,28 @@ import UpdateTypeStage from "../components/EntrepriseDash/UpdateTypeStage.vue";
 
 import Payment from "../components/StudentDash/Payment.vue";
 import videoCall from "../components/video-call.vue";
+import ChatView from "../components/Chat/ChatView.vue";
 
 import notif2 from "../components/StudentDash/Consulternotif-old.vue"
+
+import Avis from "../components/StudentDash/Avis.vue";
+import AvisTut from "../components/TuteurDash/AvisTut.vue";
+
 const routes = [
   {
     path: "/",
-    name: "landingPage",
+    name: "LandingPage",
     component: LandingPage,
+  },
+  {
+    path: "/Avis/:id",
+    name: "Avis",
+    component: Avis,
+  },
+  {
+    path: "/AvisTut/:id",
+    name: "AvisTuteur",
+    component: AvisTut,
   },
   {
     path: "/notif2",
@@ -329,6 +344,20 @@ const routes = [
     path: "/TuteurDashboard",
     name: "TuteurDashboard",
     component: TuteurDashboard,
+  },
+  {
+    path: "/tutor-chat",
+    name: "TutorChat",
+    component: ChatView,
+    props: { userRole: 'tutor' },
+    meta: { requiresAuth: true, role: 'tutor' }
+  },
+  {
+    path: "/student-chat",
+    name: "StudentChat",
+    component: ChatView,
+    props: { userRole: 'student' },
+    meta: { requiresAuth: true, role: 'student' }
   },
   {
     path: "/CreateTuteur",

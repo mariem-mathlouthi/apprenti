@@ -45,7 +45,7 @@ class CoursSubscriptionsController extends Controller
         }
     }
 
-    public function getAllStudentsSubscripted(Request $request)
+    public function getAllStudentsSubscriptedCours(Request $request)
     {
         $request->validate([
             'tuteur_id' => 'required|exists:tuteurs,id',
@@ -64,5 +64,47 @@ class CoursSubscriptionsController extends Controller
             'message' => 'Students fetched successfully',
             'check' => true,
         ]);
+    }
+
+    public function getAllTutorsSubscripted(Request $request)
+    {
+        $request->validate([
+            'etudiant_id' => 'required|exists:etudiants,id',
+        ]);
+
+        $tutors = CoursSubscriptions::where('etudiant_id', $request->etudiant_id)
+            ->with(['tuteur' => function ($query) {
+                $query->select('tuteurs.id', 'fullname');
+            }])
+            ->get()
+            ->pluck('tuteur')
+            ->unique('id')
+            ->values();
+
+        return response()->json([
+            'tutors' => $tutors,
+            'message' => 'Tutors fetched successfully',
+            'check' => true,
+        ]);
+    }
+
+    public function getAllStudentsSubscripted(Request $request) {
+        $request->validate([
+            'tuteur_id' =>'required|exists:tuteurs,id',
+        ]);
+        $students = CoursSubscriptions::where('tuteur_id', $request->tuteur_id)
+            ->with(['etudiant' => function ($query) {
+                $query->select('etudiants.id', 'fullname');
+            }])
+            ->get()
+            ->pluck('etudiant')
+            ->unique('id')
+            ->values();
+        return response()->json([
+            'students' => $students,
+           'message' => 'Students fetched successfully',
+            'check' => true,
+        ]);
+
     }
 }

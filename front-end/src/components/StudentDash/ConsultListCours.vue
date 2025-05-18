@@ -90,15 +90,26 @@
                   {{ cours.titre }}
                 </h3>
 
-                <router-link 
-                  :to="`/DetailCour/${cours.id}`"
-                  class="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl text-sm font-semibold hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group/button"
-                >
-                  <span @click="voirPlus" >Voir plus</span>
-                  <svg class="w-4 h-4 ml-2 transform group-hover/button:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                  </svg>
-                </router-link>
+                <div class="flex space-x-3">
+                  <router-link 
+                    :to="`/DetailCour/${cours.id}`"
+                    class="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl text-sm font-semibold hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group/button"
+                  >
+                    <span @click="voirPlus" >Voir plus</span>
+                    <svg class="w-4 h-4 ml-2 transform group-hover/button:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                    </svg>
+                  </router-link>
+                  <router-link 
+                    :to="`/Avis/${cours.id}`"
+                    class="feedback-btn feedback-btn-primary hover:scale-[1.02] transition-all duration-300"
+                  > 
+                    <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"> 
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /> 
+                    </svg> 
+                    Voir les Avis 
+                  </router-link>
+                </div>
               </div>
             </article>
           </div>
@@ -121,7 +132,8 @@ export default {
       searchQuery: "",
       loading: true,
       error: null,
-      defaultImage: '/placeholder-course.jpg'
+      defaultImage: '/placeholder-course.jpg',
+      showAvis: false
     };
   },
   components: { NavBarStd, Sidebar },
@@ -155,6 +167,9 @@ export default {
     this.filteredCours = this.cours.filter(cours => 
       cours.titre.toLowerCase().includes(this.searchQuery.toLowerCase())
     )
+    },
+    toggleAvis() {
+      this.showAvis = !this.showAvis;
     }
 },
   watch: {
@@ -198,5 +213,38 @@ export default {
 .group:hover .perspective-1000 {
   transform: rotateX(2deg) rotateY(2deg);
   transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.feedback-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.3s;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.feedback-btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.feedback-btn-primary {
+  background-image: linear-gradient(to right, #6366f1, #a855f7);
+  color: white;
+}
+
+.feedback-btn-secondary {
+  background-color: white;
+  color: #6366f1;
+  border: 1px solid #6366f1;
+}
+
+.btn-icon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
 }
 </style>
