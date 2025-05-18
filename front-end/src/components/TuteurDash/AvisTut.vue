@@ -357,10 +357,10 @@ export default {
       try {
         const token = localStorage.getItem('token');
         const response = await axios.post(
-          `http://localhost:8000/api/feedback/${this.selectedFeedback.id}/reponse`,
+          `http://localhost:8000/api/feedbacks/${this.selectedFeedback.id}/reponse`,
           {
-            reponse: this.reponseText.trim(),
-            user_id: JSON.parse(localStorage.getItem('TuteurAccountInfo')).id,
+            reponse: this.reponseText,
+            user_id: 1,
             user_role: 'tuteur'
           },
         //   {
@@ -370,7 +370,7 @@ export default {
         //   }
         );
 
-        if (response.data.success) {
+        if (response.status === 200) {
           toast.success('Votre réponse a été envoyée avec succès');
           this.showReponseModal = false;
           this.fetchReponses(this.selectedFeedback.id);
