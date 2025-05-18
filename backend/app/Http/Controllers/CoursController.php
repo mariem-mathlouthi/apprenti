@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\RecuMail;
 use App\Models\Cours;
 use App\Models\CoursSubscriptions;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Mail;
 
 class CoursController extends Controller
 {
@@ -172,7 +174,17 @@ class CoursController extends Controller
         $request->validate([
             'cours_id' => 'required|exists:cours,id',
             'etudiant_id' => 'required|exists:etudiants,id',
-            'tuteur_id' => 'required|exists:tuteurs,id'
+            'tuteur_id' => 'required|exists:tuteurs,id',
+
+            'name' =>'required|string',
+            'email' => 'required|email',
+            'amount' =>'required|string',
+            'payment_method' =>'required|string',
+            'service_fee' => 'required|numeric',
+            'address' =>'required|string',
+            'postal_code' =>'required|string',
+            'country' =>'required|string',
+            'total' => 'required|string',
         ]);
 
         try {
@@ -181,7 +193,16 @@ class CoursController extends Controller
                 'etudiant_id' => $request->etudiant_id,
                 'tuteur_id' => $request->tuteur_id
             ]);
-
+            Mail::to($request->email)->send(new RecuMail(
+                $request->name,
+                $request->amount,
+                $request->payment_method, 
+                $request->service_fee, 
+                $request->total, 
+                $request->address,
+                $request->postal_code, 
+                $request->country));
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Inscription réussie',

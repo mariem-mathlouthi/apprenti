@@ -524,6 +524,7 @@
               :class="{ 'border-red-500': errors.country }"
             >
               <option value="" disabled selected>Sélectionnez un pays</option>
+              <option value="TN">Tunisie</option>
               <option value="FR">France</option>
               <option value="BE">Belgique</option>
               <option value="CH">Suisse</option>
@@ -1088,6 +1089,7 @@ export default {
     },
     getCountryName(code) {
       const countries = {
+        TN: "Tunisie",
         FR: "France",
         BE: "Belgique",
         CH: "Suisse",
@@ -1121,6 +1123,16 @@ export default {
               .id,
             tuteur_id: JSON.parse(localStorage.getItem("coursDetails"))
               .idTuteur,
+
+              name: JSON.parse(localStorage.getItem("StudentAccountInfo")).fullname,
+              email: this.billing.email,
+              amount: this.formatCurrency(this.payment.amount),
+              payment_method: this.paymentMethod,
+              service_fee: 0,
+              address: this.billing.address,
+              postal_code: this.billing.postalCode,
+              country: this.getCountryName(this.billing.country),
+              total: this.formatCurrency(this.payment.amount),
           },
           {
             headers: {
