@@ -130,8 +130,7 @@
             
             <p class="mt-4 text-gray-700">{{ feedback.commentaire }}</p>
 
-            <!-- Bouton Répondre (visible uniquement pour les tuteurs) -->
-            <div v-if="!feedback.reponse" class="mt-4">
+            <div v-if="isSubscript && !feedback.reponse" class="mt-4">
               <button
                 @click="repondreAuFeedback(feedback)"
                 class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -151,14 +150,35 @@
               </div>
 
               <!-- Liste des réponses -->
-              <div v-else-if="feedbackReponses[feedback.id] && feedbackReponses[feedback.id].length > 0" class="space-y-4">
-                <div v-for="reponse in feedbackReponses[feedback.id]" :key="reponse.id" class="ml-8 p-4 bg-gray-50 rounded-lg border-l-4 border-blue-500">
-                  <div class="flex items-center justify-between">
-                    <div>
-                      <span class="font-semibold text-blue-600">{{ reponse.user_role === 'tuteur' ? 'Réponse de l\'enseignant' : 'Réponse de l\'étudiant' }}</span>
-                      <p class="mt-2 text-gray-600">{{ reponse.contenu }}</p>
+              <div v-else-if="feedbackReponses[feedback.id] && feedbackReponses[feedback.id].length > 0" class="space-y-2">
+                <div v-for="reponse in feedbackReponses[feedback.id]" :key="reponse.id" 
+                  class="ml-6 p-3 bg-white rounded-md shadow-sm border border-gray-100 hover:shadow-sm transition-shadow duration-200"
+                >
+                  <div class="flex items-start space-x-2">
+                    <!-- Icône du rôle -->
+                    <div class="flex-shrink-0">
+                      <div class="w-8 h-8 rounded-full flex items-center justify-center" 
+                        :class="reponse.user_role === 'tuteur' ? 'bg-purple-50' : 'bg-blue-50'"
+                      >
+                        <svg v-if="reponse.user_role === 'tuteur'" class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15"/>
+                        </svg>
+                        <svg v-else class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                      </div>
                     </div>
-                    <span class="text-sm text-gray-500">{{ formatDate(reponse.created_at) }}</span>
+                    
+                    <!-- Contenu de la réponse -->
+                    <div class="flex-grow">
+                      <div class="flex items-center justify-between mb-1">
+                        <span class="text-sm font-medium" :class="reponse.user_role === 'tuteur' ? 'text-purple-700' : 'text-blue-700'">
+                          {{ reponse.user_role === 'tuteur' ? 'Réponse de l\'enseignant' : 'Réponse de l\'étudiant' }}
+                        </span>
+                        <span class="text-xs text-gray-500">{{ formatDate(reponse.created_at) }}</span>
+                      </div>
+                      <p class="text-sm text-gray-700">{{ reponse.contenu }}</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -340,6 +360,26 @@ export default {
     };
   },
   computed: {
+
+    filteredAvis() {
+      let filtered = this.listeAvis;
+      
+      if (this.selectedRating > 0) {
+        filtered = filtered.filter(avis => avis.note == this.selectedRating);
+      }
+      
+      if (this.searchQuery) {
+        const query = this.searchQuery.toLowerCase();
+        filtered = filtered.filter(avis => 
+          (avis.etudiant.fullname && avis.etudiant.fullname.toLowerCase().includes(query)) ||
+          (avis.commentaire && avis.commentaire.toLowerCase().includes(query))
+        );
+      }
+      
+      return filtered;
+    }
+  },
+  methods: {
     async checkPaymentStatus() {
       try {
         this.studentInfo = JSON.parse(localStorage.getItem("StudentAccountInfo"));
@@ -367,26 +407,6 @@ export default {
         }
       }
     },
-
-    filteredAvis() {
-      let filtered = this.listeAvis;
-      
-      if (this.selectedRating > 0) {
-        filtered = filtered.filter(avis => avis.note == this.selectedRating);
-      }
-      
-      if (this.searchQuery) {
-        const query = this.searchQuery.toLowerCase();
-        filtered = filtered.filter(avis => 
-          (avis.etudiant.fullname && avis.etudiant.fullname.toLowerCase().includes(query)) ||
-          (avis.commentaire && avis.commentaire.toLowerCase().includes(query))
-        );
-      }
-      
-      return filtered;
-    }
-  },
-  methods: {
     repondreAuFeedback(feedback) {
       // Handle reply action here
       console.log('Replying to feedback:', feedback);
@@ -589,6 +609,7 @@ export default {
     },
   },
   mounted() {
+    this.checkPaymentStatus();
     this.fetchRessources();
     this.checkUserRole();
   }

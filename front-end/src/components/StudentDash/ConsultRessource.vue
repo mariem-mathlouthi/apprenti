@@ -72,7 +72,7 @@
           </div>
 
           <!-- Boutons Avis + Feedback -->
-          <div class="mt-8 flex justify-start space-x-4">
+          <!-- <div class="mt-8 flex justify-start space-x-4">
             <button
               @click="toggleAvis"
               class="feedback-btn"
@@ -93,14 +93,14 @@
               </svg>
               Donner votre avis
             </router-link>
-          </div>
+          </div> -->
 
           <!-- Section Avis -->
-          <div v-if="showAvis" class="mt-6 bg-gray-100 rounded-lg p-6 -mx-8">
+         <!-- <div v-if="showAvis" class="mt-6 bg-gray-100 rounded-lg p-6 -mx-8">
             <div class="max-w-6xl mx-auto">
               <h1 class="text-2xl font-bold text-gray-800 mb-6">Avis des Étudiants</h1>
 
-              <!-- Barre de recherche et filtre -->
+              Barre de recherche et filtre
               <div class="flex flex-col sm:flex-row gap-4 mb-6">
                 <div class="flex-1 relative">
                   <input
@@ -160,18 +160,18 @@
                 </div>
               </div>
 
-              <!-- État de chargement -->
+              État de chargement
               <div v-if="isLoadingFeedbacks" class="text-center py-10">
                 <i class="fas fa-spinner fa-spin text-blue-500 text-2xl"></i>
                 <p class="mt-2 text-gray-600">Chargement des avis...</p>
               </div>
 
-              <!-- Message d'erreur -->
+              Message d'erreur
               <div v-else-if="feedbackError" class="text-center py-10 text-red-500">
                 {{ feedbackError }}
               </div>
 
-              <!-- Liste des avis -->
+              Liste des avis
               <div v-else class="space-y-6 bg-white rounded-lg p-6 shadow-sm">
                 <div v-for="feedback in filteredAvis" :key="feedback.id" class="border-b pb-6 last:border-b-0">
                   <div class="flex justify-between items-start">
@@ -198,20 +198,20 @@
                   
                   <div class="mt-2 flex items-center justify-between">
                     <div class="flex items-center">
-                      <!-- <img 
+                      <img // comment
                         v-if="feedback.etudiant.image" 
                         :src="'/storage/' + feedback.etudiant.image" 
                         class="w-8 h-8 rounded-full mr-2"
                         alt="Photo de profil"
-                      > -->
+                      > // comment
                       <span class="text-sm text-gray-500">
                         Posté le {{ new Date(feedback.created_at).toLocaleDateString() }}
                       </span>
                     </div>
                     
-                    <!-- Menu déroulant pour les actions -->
+                    Menu déroulant pour les actions
                     <div v-if="isMyFeedback(feedback)" class="relative">
-                      <!-- Bouton des trois points -->
+                      Bouton des trois points
                       <button 
                         @click.stop="toggleMenu(feedback.id)"
                         class="text-gray-500 hover:text-gray-700 focus:outline-none p-1 rounded-full hover:bg-gray-200"
@@ -221,14 +221,14 @@
                         </svg>
                       </button>
                       
-                      <!-- Menu déroulant -->
+                      Menu déroulant
                       <transition name="menu">
                         <div 
                           v-if="activeMenu === feedback.id"
                           class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200"
                           v-click-outside="closeMenu"
                         >
-                          <!-- Option Modifier -->
+                          Option Modifier
                           <router-link
                             :to="{ name: 'EditFeedback', params: { id: feedback.id, idCours: idCours } }"
                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center menu-option"
@@ -239,7 +239,7 @@
                             Modifier
                           </router-link>
                           
-                          <!-- Option Supprimer -->
+                          Option Supprimer
                           <button
                             @click="confirmDeleteFeedback(feedback.id)"
                             class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center menu-option"
@@ -250,7 +250,7 @@
                             Supprimer
                           </button>
                           
-                          <!-- Option Copier -->
+                          Option Copier
                           <button
                             @click="copyFeedback(feedback.commentaire)"
                             class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center menu-option"
@@ -271,7 +271,8 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div>-->
+
         </div>
       </section>
     </div>

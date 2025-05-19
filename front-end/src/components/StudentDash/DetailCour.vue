@@ -140,7 +140,7 @@ export default {
         const response = await axios.get(`http://localhost:8000/api/cours/${coursId}`);
         this.cours = response.data.cours;
         localStorage.setItem("coursDetails", JSON.stringify(this.cours));
-        this.checkPaymentStatus();
+        // this.checkPaymentStatus();
       } catch (error) {
         console.error("Erreur :", error);
         toast.error("Erreur de chargement des détails", {
@@ -181,6 +181,7 @@ export default {
     },
   },
   mounted() {
+    this.checkPaymentStatus();
     this.fetchCoursDetails();
   },
   

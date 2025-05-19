@@ -666,33 +666,49 @@
           </p>
             <div class="mt-6 space-x-4">
             <button
-              @click="goTo('consult')"
-              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              @click="goTo('home')"
+              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 relative"
+              :disabled="isLoadingHome"
             >
-              Retour à l'accueil
+              <span :class="{ 'opacity-0': isLoadingHome }">Retour à l'accueil</span>
+              <div v-if="isLoadingHome" class="absolute inset-0 flex items-center justify-center">
+                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </div>
               <svg
-              class="ml-2 h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+                v-else
+                class="ml-2 h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5l7 7-7 7"
-              />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
 
             <button
               @click="goTo('resource')" 
-              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 relative"
+              :disabled="isLoadingResource"
             >
-              Retour à la ressource
+              <span :class="{ 'opacity-0': isLoadingResource }">Retour à la ressource</span>
+              <div v-if="isLoadingResource" class="absolute inset-0 flex items-center justify-center">
+                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </div>
               <svg
-              class="ml-2 h-5 w-5"
-              fill="none" 
+                v-else
+                class="ml-2 h-5 w-5"
+                fill="none" 
               stroke="currentColor"
               viewBox="0 0 24 24"
               >
@@ -737,11 +753,18 @@
             v-if="currentStep < 3"
             @click="nextStep"
             type="button"
-            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            :disabled="currentStep === 0 && !paymentMethod"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 relative"
+            :disabled="currentStep === 0 && !paymentMethod || isLoading"
           >
-            Suivant
+            <span :class="{ 'opacity-0': isLoading }">Suivant</span>
+            <div v-if="isLoading" class="absolute inset-0 flex items-center justify-center">
+              <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
             <svg
+              v-if="!isLoading"
               class="ml-2 h-5 w-5"
               fill="none"
               stroke="currentColor"
@@ -826,6 +849,9 @@ const stripePromise = loadStripe(
 export default {
   data() {
     return {
+      isLoading: false,
+      isLoadingHome: false,
+      isLoadingResource: false,
       cardElement: null,
       cardValid: false,
       currentStep: 0,
@@ -959,18 +985,21 @@ export default {
     selectPaymentMethod(method) {
       this.paymentMethod = method;
     },
-    nextStep() {
+    async nextStep() {
       if (this.currentStep === 0 && !this.paymentMethod) {
         return;
       }
 
       if (this.validateCurrentStep()) {
+        this.isLoading = true;
+        await new Promise(resolve => setTimeout(resolve, 800));
         this.currentStep++;
 
         // Skip payment details step if not using credit card
         if (this.currentStep === 1 && this.paymentMethod !== "card") {
           this.currentStep++; // Move directly to billing information
         }
+        this.isLoading = false;
       }
     },
     prevStep() {
@@ -1145,9 +1174,11 @@ export default {
         );
         if (response.status === 201) {
           if (place === "resource") {
+            this.isLoadingResource = true;
             // this.$router.push({ name: '/DetailsCours/', params: {id: this.$route.params.id}});
             window.location.href = `/DetailsCours/${this.$route.params.id}`;
           } else if (place === "consult") {
+            this.isLoadingHome = true;
             this.$router.push({ name: "ConsultListCours" });
           }
         } else {
