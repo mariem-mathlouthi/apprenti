@@ -1,337 +1,382 @@
 <template>
-    <div id="app">
-      <!-- SIDEBAR -->
-      <SidebarMenu></SidebarMenu>
-  
-      <!-- CONTENT -->
-      <section id="content">
-        <!-- NAVBAR -->
-        <NavbarOne></NavbarOne>
-  
-        <div class="col-span-9 mt-24 mr-24">
-          <div class="container mx-auto px-4 py-8">
-            <div class="bg-white shadow-md rounded-lg overflow-hidden">
-              <!-- En-tête avec filtres -->
-              <div class="px-6 py-4 border-b flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <h2 class="text-xl font-semibold text-gray-800">Gestion des Feedbacks</h2>
-                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                  <select 
-                    v-model="filters.cours_id" 
-                    class="px-3 py-2 border rounded-md text-sm w-full md:w-48"
-                  >
-                    <option value="">Tous les cours</option>
-                    <option 
-                      v-for="cours in allCours" 
-                      :key="cours.id" 
-                      :value="cours.id"
-                    >
-                      {{ cours.titre }}
-                    </option>
-                  </select>
-                  <select 
-                    v-model="filters.note" 
-                    class="px-3 py-2 border rounded-md text-sm w-full md:w-36"
-                  >
-                    <option value="">Toutes notes</option>
-                    <option v-for="n in 5" :key="n" :value="n">
-                      {{ n }} ★
-                    </option>
-                  </select>
-                </div>
-              </div>
-  
-              <!-- Tableau des feedbacks -->
-              <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50">
-                    <tr>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Étudiant</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cours</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Note</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Commentaire</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="feedback in paginatedFeedbacks" :key="feedback.id">
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {{ feedback.id }}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                          <div class="flex-shrink-0 h-10 w-10 bg-blue-500 rounded-full flex items-center justify-center text-white">
-                            {{ feedback.etudiant?.fullname?.charAt(0) || '?' }}
-                          </div>
-                          <div class="ml-4">
-                            <div class="text-sm font-medium text-gray-900">
-                              {{ feedback.etudiant?.fullname || 'Inconnu' }}
-                            </div>
-                            <div class="text-sm text-gray-500">
-                              ID: {{ feedback.etudiant_id }}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">
-                          {{ feedback.cours?.titre || 'Cours supprimé' }}
-                        </div>
-                        <div class="text-sm text-gray-500">
-                          ID: {{ feedback.cours_id }}
-                        </div>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex">
-                          <span 
-                            v-for="i in 5" 
-                            :key="i" 
-                            :class="{
-                              'text-yellow-400': i <= feedback.note, 
-                              'text-gray-300': i > feedback.note
-                            }"
-                            class="text-lg"
-                          >
-                            ★
-                          </span>
-                        </div>
-                      </td>
-                      <td class="px-6 py-4">
-                        <div class="text-sm text-gray-500 max-w-xs truncate hover:max-w-none hover:whitespace-normal">
-                          {{ feedback.commentaire }}
-                        </div>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {{ formatDate(feedback.created_at) }}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button 
-                          @click="confirmDelete(feedback.id)" 
-                          class="text-red-600 hover:text-red-900"
-                        >
-                          Supprimer
-                        </button>
-                      </td>
-                    </tr>
-                    <tr v-if="filteredFeedbacks.length === 0">
-                      <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
-                        Aucun feedback trouvé
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-  
-              <!-- Pagination -->
-              <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-                <div class="flex-1 flex justify-between sm:hidden">
-                  <button 
-                    @click="currentPage = Math.max(1, currentPage - 1)"
-                    :disabled="currentPage === 1"
-                    class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    Précédent
-                  </button>
-                  <button 
-                    @click="currentPage = Math.min(totalPages, currentPage + 1)"
-                    :disabled="currentPage === totalPages"
-                    class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    Suivant
-                  </button>
-                </div>
-                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+  <div class="flex flex-col h-screen bg-gray-100">
+    <NavBarAdmin />
+    <SidebarAdmin class="w-64" />
+
+    <main class="flex-1 p-8 overflow-auto mt-16 ml-64">
+      <!-- Section Avis -->
+      <div class="mt-6 bg-gray-100 rounded-lg p-6 -mx-8">
+        <div class="max-w-6xl mx-auto">
+          <h1 class="text-2xl font-bold text-gray-800 mb-6">Gestion des Avis</h1>
+
+          <!-- Barre de recherche et filtre -->
+          <div class="flex flex-col sm:flex-row gap-4 mb-6">
+            <div class="flex-1 relative">
+              <input
+                type="text"
+                v-model="searchQuery"
+                placeholder="Rechercher des avis..."
+                class="w-full pl-10 pr-10 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <svg
+                class="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                ></path>
+              </svg>
+              <button
+                v-if="searchQuery"
+                @click="clearSearch"
+                class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div class="w-full sm:w-64">
+              <select
+                v-model="selectedRating"
+                class="w-full pl-3 pr-10 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="0">Toutes les notes</option>
+                <option value="1">1 étoile</option>
+                <option value="2">2 étoiles</option>
+                <option value="3">3 étoiles</option>
+                <option value="4">4 étoiles</option>
+                <option value="5">5 étoiles</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- État de chargement -->
+          <div v-if="isLoadingFeedbacks" class="text-center py-10">
+            <i class="fas fa-spinner fa-spin text-blue-500 text-2xl"></i>
+            <p class="mt-2 text-gray-600">Chargement des avis...</p>
+          </div>
+
+          <!-- Message d'erreur -->
+          <div v-else-if="feedbackError" class="text-center py-10 text-red-500">
+            {{ feedbackError }}
+          </div>
+
+          <!-- Liste des avis -->
+          <div v-else class="space-y-6 bg-white rounded-lg p-6 shadow-sm">
+            <div v-for="feedback in filteredAvis" :key="feedback.id" class="border-b pb-6 last:border-b-0">
+              <div class="flex justify-between items-start">
+                <div>
                   <div>
-                    <p class="text-sm text-gray-700">
-                      Affichage de <span class="font-medium">{{ (currentPage - 1) * perPage + 1 }}</span>
-                      à <span class="font-medium">{{ Math.min(currentPage * perPage, totalFeedbacks) }}</span>
-                      sur <span class="font-medium">{{ totalFeedbacks }}</span> résultats
+                    <h2 class="font-bold text-lg text-gray-800">
+                      {{ feedback.etudiant.fullname }}
+                    </h2>
+                    <p class="text-sm text-gray-500">
+                      {{ feedback.etudiant.specialite }} - {{ feedback.etudiant.niveau }}
+                    </p>
+                    <p class="text-sm text-blue-600 mt-1">
+                      Cours: {{ feedback.cours.titre }}
                     </p>
                   </div>
-                  <div>
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                      <button 
-                        @click="currentPage = Math.max(1, currentPage - 1)"
-                        :disabled="currentPage === 1"
-                        class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                      >
-                        <span class="sr-only">Précédent</span>
-                        &lt;
-                      </button>
-                      <button 
-                        v-for="page in visiblePages" 
-                        :key="page"
-                        @click="currentPage = page"
-                        :class="{
-                          'bg-blue-50 border-blue-500 text-blue-600 z-10': currentPage === page, 
-                          'bg-white border-gray-300 text-gray-500 hover:bg-gray-50': currentPage !== page
-                        }"
-                        class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                      >
-                        {{ page }}
-                      </button>
-                      <button 
-                        @click="currentPage = Math.min(totalPages, currentPage + 1)"
-                        :disabled="currentPage === totalPages"
-                        class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                      >
-                        <span class="sr-only">Suivant</span>
-                        &gt;
-                      </button>
-                    </nav>
+                </div>
+                <div class="flex items-center space-x-4">
+                  <div class="flex mr-2">
+                    <span v-for="i in 5" :key="i" class="text-yellow-400 text-xl">
+                      <span v-if="i <= feedback.note">★</span>
+                      <span v-else>☆</span>
+                    </span>
                   </div>
+                  <span class="text-gray-500 text-sm">{{ formatDate(feedback.created_at) }}</span>
+                  <button
+                    @click="confirmDeleteFeedback(feedback)"
+                    class="text-red-500 hover:text-red-700 focus:outline-none"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
                 </div>
               </div>
+              
+              <p class="mt-4 text-gray-700">{{ feedback.commentaire }}</p>
+
+              <!-- Section des réponses -->
+              <!-- <div class="mt-4 space-y-4"> -->
+                <!-- État de chargement des réponses -->
+                <!-- <div v-if="loadingReponses[feedback.id]" class="ml-8 text-gray-500">
+                  <i class="fas fa-spinner fa-spin"></i> Chargement des réponses...
+                </div> -->
+
+                <!-- Liste des réponses -->
+                <!-- <div v-else-if="feedbackReponses[feedback.id] && feedbackReponses[feedback.id].length > 0" class="space-y-4">
+                  <div v-for="reponse in feedbackReponses[feedback.id]" :key="reponse.id" class="ml-8 p-4 bg-gray-50 rounded-lg border-l-4 border-blue-500">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <span class="font-semibold text-blue-600">{{ reponse.user_role === 'tuteur' ? 'Réponse de l\'enseignant' : 'Réponse de l\'étudiant' }}</span>
+                        <p class="mt-2 text-gray-600">{{ reponse.contenu }}</p>
+                      </div>
+                      <span class="text-sm text-gray-500">{{ formatDate(reponse.created_at) }}</span>
+                    </div>
+                  </div>
+                </div> -->
+
+                <!-- Message si aucune réponse -->
+                <!-- <div v-else-if="!loadingReponses[feedback.id]" class="ml-8 text-gray-500">
+                  Aucune réponse pour cet avis
+                </div> -->
+              <!-- </div> -->
+            </div>
+
+            <div v-if="!isLoadingFeedbacks && filteredAvis.length === 0" class="text-center py-10">
+              <p class="text-gray-500">Aucun avis disponible.</p>
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal de confirmation de suppression -->
+  <div v-if="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-lg max-w-md w-full p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Confirmer la suppression</h3>
+      <p class="text-gray-600 mb-6">Êtes-vous sûr de vouloir supprimer cet avis ? Cette action est irréversible.</p>
+      <div class="flex justify-end space-x-3">
+        <button
+          @click="showDeleteModal = false"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+        >
+          Annuler
+        </button>
+        <button
+          @click="deleteFeedback"
+          class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+        >
+          Supprimer
+        </button>
+      </div>
     </div>
-  </template>
-  
-  <script>
-  import axios from 'axios'
-  import NavbarOne from './NavbarOne.vue'
-  import SidebarMenu from './SidebarMenu.vue'
-  
-  export default {
-    name: 'AdminFeedbacks',
-    components: {
-      NavbarOne,
-      SidebarMenu
-    },
-    data() {
-      return {
-        feedbacks: [],
-        allCours: [],
-        filters: {
-          cours_id: '',
-          note: ''
-        },
-        currentPage: 1,
-        perPage: 10,
-        totalFeedbacks: 0,
-        maxVisiblePages: 5
+  </div>
+</template>
+
+<script>
+import axios from "axios";
+import NavBarAdmin from "./NavbarOne.vue";
+import SidebarAdmin from "./SidebarMenu.vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
+
+export default {
+  name: "AdminFeedbacks",
+  components: { NavBarAdmin, SidebarAdmin },
+  data() {
+    return {
+      listeAvis: [],
+      selectedRating: 0,
+      searchQuery: "",
+      isLoadingFeedbacks: false,
+      feedbackError: null,
+      feedbackReponses: {},
+      loadingReponses: {},
+      showDeleteModal: false,
+      selectedFeedbackToDelete: null,
+      listeCours: [],
+      isLoadingCours: false,
+      coursError: null
+    };
+  },
+  computed: {
+    filteredAvis() {
+      let filtered = this.listeAvis;
+      
+      if (this.selectedRating > 0) {
+        filtered = filtered.filter(avis => avis.note == this.selectedRating);
       }
-    },
-    computed: {
-      filteredFeedbacks() {
-        return this.feedbacks.filter(feedback => {
-          const matchesCourse = !this.filters.cours_id || feedback.cours_id == this.filters.cours_id
-          const matchesRating = !this.filters.note || feedback.note == this.filters.note
-          return matchesCourse && matchesRating
-        })
-      },
-      totalPages() {
-        return Math.ceil(this.filteredFeedbacks.length / this.perPage)
-      },
-      paginatedFeedbacks() {
-        const start = (this.currentPage - 1) * this.perPage
-        const end = start + this.perPage
-        return this.filteredFeedbacks.slice(start, end)
-      },
-      visiblePages() {
-        const range = []
-        const half = Math.floor(this.maxVisiblePages / 2)
-        let start = Math.max(1, this.currentPage - half)
-        let end = Math.min(this.totalPages, start + this.maxVisiblePages - 1)
-        
-        if (end - start < this.maxVisiblePages - 1) {
-          start = Math.max(1, end - this.maxVisiblePages + 1)
-        }
-        
-        for (let i = start; i <= end; i++) {
-          range.push(i)
-        }
-        
-        return range
+      
+      if (this.searchQuery) {
+        const query = this.searchQuery.toLowerCase();
+        filtered = filtered.filter(avis => 
+          (avis.etudiant.fullname && avis.etudiant.fullname.toLowerCase().includes(query)) ||
+          (avis.commentaire && avis.commentaire.toLowerCase().includes(query))
+        );
       }
-    },
-    async created() {
-      await this.fetchFeedbacks()
-      await this.fetchAllCours()
-    },
-    methods: {
-      async fetchFeedbacks() {
-        try {
-          const response = await axios.get('/api/admin/feedbacks', {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-          })
-          this.feedbacks = response.data
-          this.totalFeedbacks = this.feedbacks.length
-        } catch (error) {
-          console.error('Erreur lors de la récupération des feedbacks:', error)
-        }
-      },
-      async fetchAllCours() {
-        try {
-          const response = await axios.get('/api/cours')
-          this.allCours = response.data
-        } catch (error) {
-          console.error('Erreur lors de la récupération des cours:', error)
-        }
-      },
-      formatDate(dateString) {
-        if (!dateString) return ''
-        const options = { 
-          year: 'numeric', 
-          month: 'short', 
-          day: 'numeric', 
-          hour: '2-digit', 
-          minute: '2-digit' 
-        }
-        return new Date(dateString).toLocaleDateString('fr-FR', options)
-      },
-      confirmDelete(id) {
-        if (confirm('Êtes-vous sûr de vouloir supprimer ce feedback ?')) {
-          this.deleteFeedback(id)
-        }
-      },
-      async deleteFeedback(id) {
-        try {
-          await axios.delete(`/api/feedbacks/${id}`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-          })
-          this.feedbacks = this.feedbacks.filter(f => f.id !== id)
-          this.totalFeedbacks = this.feedbacks.length
-        } catch (error) {
-          console.error('Erreur lors de la suppression:', error)
-          alert('Une erreur est survenue lors de la suppression')
-        }
-      }
-    },
-    watch: {
-      filters: {
-        deep: true,
-        handler() {
-          this.currentPage = 1
-        }
-      }
+      
+      return filtered;
     }
+  },
+  methods: {
+    async fetchCours() {
+      this.isLoadingCours = true;
+      this.coursError = null;
+      
+      try {
+        const response = await axios.get('http://localhost:8000/api/cours');
+        if (response.data.success) {
+          this.listeCours = response.data.cours;
+          // After getting courses, fetch feedbacks for each course
+          this.fetchAllAvis();
+        } else {
+          throw new Error(response.data.message || 'Erreur lors du chargement des cours');
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement des cours :", error);
+        this.coursError = error.response?.data?.message || "Impossible de charger les cours";
+        toast.error(this.coursError);
+      } finally {
+        this.isLoadingCours = false;
+      }
+    },
+
+    async fetchAllAvis() {
+      this.isLoadingFeedbacks = true;
+      this.feedbackError = null;
+      this.listeAvis = [];
+      
+      try {
+        const feedbackPromises = this.listeCours.map(cours =>
+          axios.get(`http://localhost:8000/api/feedbacks/course/${cours.id}`)
+        );
+        
+        const responses = await Promise.all(feedbackPromises);
+        
+        responses.forEach((response, index) => {
+          if (response.data.success) {
+            const coursInfo = this.listeCours[index];
+            const feedbacks = response.data.feedbacks.map(feedback => ({
+              ...feedback,
+              cours: {
+                id: coursInfo.id,
+                titre: coursInfo.titre || 'Cours sans titre',
+                description: coursInfo.description
+              },
+              etudiant: {
+                ...feedback.etudiant,
+                fullname: feedback.etudiant.fullname || 'Étudiant'
+              }
+            }));
+            this.listeAvis.push(...feedbacks);
+          }
+        });
+        
+        // Sort all feedbacks by date
+        this.listeAvis.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+        // Fetch responses for all feedbacks
+        // this.listeAvis.forEach(feedback => {
+        //   this.fetchReponses(feedback.id);
+        // });
+      } catch (error) {
+        console.error("Erreur lors du chargement des avis :", error);
+        this.feedbackError = error.response?.data?.message || "Impossible de charger les avis";
+        toast.error(this.feedbackError);
+      } finally {
+        this.isLoadingFeedbacks = false;
+      }
+    },
+
+    confirmDeleteFeedback(feedback) {
+      this.selectedFeedbackToDelete = feedback;
+      this.showDeleteModal = true;
+    },
+
+    async deleteFeedback() {
+      if (!this.selectedFeedbackToDelete) return;
+
+      try {
+        const response = await axios.delete(
+          `http://localhost:8000/api/feedbacks/${this.selectedFeedbackToDelete.id}`
+        );
+
+        if (response.data.success) {
+          this.listeAvis = this.listeAvis.filter(
+            avis => avis.id !== this.selectedFeedbackToDelete.id
+          );
+          toast.success('Avis supprimé avec succès');
+        } else {
+          throw new Error(response.data.message || 'Erreur lors de la suppression');
+        }
+      } catch (error) {
+        console.error("Erreur lors de la suppression de l'avis:", error);
+        toast.error(error.response?.data?.message || "Impossible de supprimer l'avis");
+      } finally {
+        this.showDeleteModal = false;
+        this.selectedFeedbackToDelete = null;
+      }
+    },
+
+    formatDate(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diff = now - date;
+      
+      const seconds = Math.floor(diff / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+      const months = Math.floor(days / 30);
+      const years = Math.floor(months / 12);
+      
+      if (years > 0) return `${years} an${years > 1 ? 's' : ''}`;
+      if (months > 0) return `${months} mois`;
+      if (days > 0) return `${days} jour${days > 1 ? 's' : ''}`;
+      if (hours > 0) return `${hours} heure${hours > 1 ? 's' : ''}`;
+      if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''}`;
+      return `${seconds} seconde${seconds > 1 ? 's' : ''}`;
+    },
+
+    clearSearch() {
+      this.searchQuery = "";
+    }
+  },
+  mounted() {
+    this.fetchCours();
   }
-  </script>
-  
-  <style scoped>
-  .truncate {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  .hover\:max-w-none:hover {
-    max-width: none;
-    white-space: normal;
-    word-break: break-word;
-  }
-  
-  /* Style pour les flèches de pagination */
-  button:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-  </style>
+};
+</script>
+
+<style scoped>
+.feedback-btn {
+  @apply inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.feedback-btn-primary {
+  @apply text-white bg-blue-600 hover:bg-blue-700 focus:ring-blue-500;
+}
+
+.feedback-btn-secondary {
+  @apply text-blue-700 bg-blue-100 hover:bg-blue-200 focus:ring-blue-500;
+}
+
+.btn-icon {
+  @apply h-5 w-5 mr-2;
+}
+
+.menu-enter-active,
+.menu-leave-active {
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.menu-enter-from,
+.menu-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+</style>

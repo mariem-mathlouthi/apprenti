@@ -143,7 +143,7 @@ export default {
         if ([200, 201].includes(response.status)) {
           toast.success("Merci pour votre feedback!");
           this.$router.push({
-            name: 'ConsultRessource',
+            name: 'Avis',
             params: { id: this.idCours }
           });
         }

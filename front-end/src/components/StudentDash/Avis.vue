@@ -4,9 +4,20 @@
     <Sidebar class="w-64" />
 
     <main class="flex-1 p-8 overflow-auto mt-16 ml-64">
+      <!-- Bouton de retour -->
+      <router-link
+        :to="`/ConsultListCours`"
+        class="inline-flex items-center px-4 py-2 mb-4 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      >
+        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Retour à la liste des cours
+      </router-link>
+
       <!-- Boutons Avis + Feedback -->
       <div class="flex justify-start space-x-4">
-    <button
+    <!-- <button
         @click="toggleAvis"
         class="feedback-btn"
         :class="{ 'feedback-btn-primary': !showAvis, 'feedback-btn-secondary': showAvis }"
@@ -15,7 +26,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
         </svg>
         {{ showAvis ? 'Masquer les Avis' : 'Afficher les Avis' }}
-    </button>
+    </button> -->
     
     <router-link
         v-if="isSubscript"
@@ -30,7 +41,7 @@
     </div>
 
     <!-- Section Avis -->
-    <div v-if="showAvis" class="mt-6 bg-gray-100 rounded-lg p-6 -mx-8">
+    <div class="mt-6 bg-gray-100 rounded-lg p-6 -mx-8">
     <div class="max-w-6xl mx-auto">
         <h1 class="text-2xl font-bold text-gray-800 mb-6">Avis des Étudiants</h1>
 
@@ -476,12 +487,12 @@ export default {
       }
     },
 
-    toggleAvis() {
-      this.showAvis = !this.showAvis;
-      if (this.showAvis && this.listeAvis.length === 0) {
-        this.fetchAvis();
-      }
-    },
+    // toggleAvis() {
+    //   this.showAvis = !this.showAvis;
+    //   if (this.showAvis && this.listeAvis.length === 0) {
+    //     this.fetchAvis();
+    //   }
+    // },
 
     formatDate(dateString) {
       const date = new Date(dateString);
@@ -610,7 +621,7 @@ export default {
   },
   mounted() {
     this.checkPaymentStatus();
-    this.fetchRessources();
+    this.fetchAvis();
     this.checkUserRole();
   }
 };

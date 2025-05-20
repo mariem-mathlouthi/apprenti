@@ -4,8 +4,19 @@
     <SidebarTuteur class="w-64" />
 
     <main class="flex-1 p-8 overflow-auto mt-16 ml-64">
+      <!-- Bouton de retour -->
+      <router-link
+        :to="`/cours`"
+        class="inline-flex items-center px-4 py-2 mb-4 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      >
+        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Retour à la liste des cours
+      </router-link>
+
       <!-- Boutons Avis -->
-      <div class="flex justify-start space-x-4">
+      <!-- <div class="flex justify-start space-x-4">
         <button
           @click="toggleAvis"
           class="feedback-btn"
@@ -16,10 +27,10 @@
           </svg>
           {{ showAvis ? 'Masquer les Avis' : 'Afficher les Avis' }}
         </button>
-      </div>
+      </div> -->
 
       <!-- Section Avis -->
-      <div v-if="showAvis" class="mt-6 bg-gray-100 rounded-lg p-6 -mx-8">
+      <div class="mt-6 bg-gray-100 rounded-lg p-6 -mx-8">
         <div class="max-w-6xl mx-auto">
           <h1 class="text-2xl font-bold text-gray-800 mb-6">Avis des Étudiants</h1>
 
@@ -134,12 +145,57 @@
 
               <!-- Section des réponses -->
               <div class="mt-4 space-y-4">
-                <!-- État de chargement des réponses -->
+              <!-- État de chargement des réponses -->
+              <div v-if="loadingReponses[feedback.id]" class="ml-8 text-gray-500">
+                <i class="fas fa-spinner fa-spin"></i> Chargement des réponses...
+              </div>
+
+              <!-- Liste des réponses -->
+              <div v-else-if="feedbackReponses[feedback.id] && feedbackReponses[feedback.id].length > 0" class="space-y-2">
+                <div v-for="reponse in feedbackReponses[feedback.id]" :key="reponse.id" 
+                  class="ml-6 p-3 bg-white rounded-md shadow-sm border border-gray-100 hover:shadow-sm transition-shadow duration-200"
+                >
+                  <div class="flex items-start space-x-2">
+                    <!-- Icône du rôle -->
+                    <div class="flex-shrink-0">
+                      <div class="w-8 h-8 rounded-full flex items-center justify-center" 
+                        :class="reponse.user_role === 'tuteur' ? 'bg-purple-50' : 'bg-blue-50'"
+                      >
+                        <svg v-if="reponse.user_role === 'tuteur'" class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15"/>
+                        </svg>
+                        <svg v-else class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                      </div>
+                    </div>
+                    
+                    <!-- Contenu de la réponse -->
+                    <div class="flex-grow">
+                      <div class="flex items-center justify-between mb-1">
+                        <span class="text-sm font-medium" :class="reponse.user_role === 'tuteur' ? 'text-purple-700' : 'text-blue-700'">
+                          {{ reponse.user_role === 'tuteur' ? 'Réponse de l\'enseignant' : 'Réponse de l\'étudiant' }}
+                        </span>
+                        <span class="text-xs text-gray-500">{{ formatDate(reponse.created_at) }}</span>
+                      </div>
+                      <p class="text-sm text-gray-700">{{ reponse.contenu }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Message si aucune réponse -->
+              <div v-else-if="!loadingReponses[feedback.id]" class="ml-8 text-gray-500">
+                Aucune réponse pour cet avis
+              </div>
+            </div>
+              <!-- <div class="mt-4 space-y-4">
+                État de chargement des réponses
                 <div v-if="loadingReponses[feedback.id]" class="ml-8 text-gray-500">
                   <i class="fas fa-spinner fa-spin"></i> Chargement des réponses...
                 </div>
 
-                <!-- Liste des réponses -->
+                Liste des réponses
                 <div v-else-if="feedbackReponses[feedback.id] && feedbackReponses[feedback.id].length > 0" class="space-y-4">
                   <div v-for="reponse in feedbackReponses[feedback.id]" :key="reponse.id" class="ml-8 p-4 bg-gray-50 rounded-lg border-l-4 border-blue-500">
                     <div class="flex items-center justify-between">
@@ -152,16 +208,17 @@
                   </div>
                 </div>
 
-                <!-- Message si aucune réponse -->
+                Message si aucune réponse
                 <div v-else-if="!loadingReponses[feedback.id]" class="ml-8 text-gray-500">
                   Aucune réponse pour cet avis
                 </div>
-              </div>
+              </div> -->
             </div>
 
-            <div v-if="!isLoadingFeedbacks && filteredAvis.length === 0" class="text-center py-10">
+
+            <!-- <div v-if="!isLoadingFeedbacks && filteredAvis.length === 0" class="text-center py-10">
               <p class="text-gray-500">Aucun avis disponible pour ce cours.</p>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -311,12 +368,12 @@ export default {
       }
     },
 
-    toggleAvis() {
-      this.showAvis = !this.showAvis;
-      if (this.showAvis && this.listeAvis.length === 0) {
-        this.fetchAvis();
-      }
-    },
+    // toggleAvis() {
+    //   this.showAvis = !this.showAvis;
+    //   if (this.showAvis && this.listeAvis.length === 0) {
+    //     this.fetchAvis();
+    //   }
+    // },
 
     formatDate(dateString) {
       const date = new Date(dateString);
@@ -382,6 +439,9 @@ export default {
         toast.error(error.response?.data?.message || 'Erreur lors de l\'envoi de la réponse');
       }
     }
+  },
+  mounted() {
+    this.fetchAvis();
   }
 };
 </script>
