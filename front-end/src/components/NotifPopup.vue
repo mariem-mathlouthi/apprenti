@@ -75,15 +75,14 @@ export default {
             if (this.currentUser === 'etudiant') {
                 this.EtudiantId = JSON.parse(localStorage.getItem("StudentAccountInfo")).id;
                 this.channelUser = `etudiant.${this.EtudiantId}`;
-                console.log("etudiant channel::::",this.channelUser);
             } else if (this.currentUser === 'tuteur') {
                 this.TuteurId = JSON.parse(localStorage.getItem("TuteurAccountInfo")).id;
                 this.channelUser = `tuteur.${this.TuteurId}`;
-                console.log("tuteur channel::::",this.channelUser);
             } else if (this.currentUser === 'entreprise') {
                 this.EntrepriseId = JSON.parse(localStorage.getItem("EntrepriseAccountInfo")).id;
                 this.channelUser = `entreprise.${this.EntrepriseId}`;
-                console.log("entreprise channel::::",this.channelUser);
+            } else if (this.currentUser === 'admin') {
+                this.channelUser = `admin`;
             }
 
             Pusher.logToConsole = true;

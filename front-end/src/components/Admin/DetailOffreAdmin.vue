@@ -126,6 +126,7 @@ export default {
           toast.success("Offer status updated successfully", {
             autoClose: 2000,
           });
+          await this.sendNotification(null, this.offerDetails.idEntreprise, null, "Admin modified your offer status to " + status, "Entreprise", "offre", new Date(), null);
         } else {
           console.error('Error updating offer status:', response.data.message);
         }
@@ -149,6 +150,27 @@ export default {
         }
       }
     },
+
+    async sendNotification (idEtudiant, idEntreprise, idTuteur ,message, destination, type, date, appointmentId) {
+      const notificationData = {
+        idEtudiant: idEtudiant,
+        idEntreprise: idEntreprise,
+        idTuteur: idTuteur,
+        message: message,
+        destination: destination,
+        type: type,
+        visibility: "shown",
+        date: date,
+        appointmentId: appointmentId,
+      }
+
+      await axios.post(
+        "http://localhost:8000/api/notification",
+        notificationData
+      )
+
+    },
+
   }
 };
 </script>

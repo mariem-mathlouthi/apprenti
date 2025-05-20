@@ -146,6 +146,7 @@ export default {
 
            else if(response.data.role === "admin"){
               // this.$router.push('/Admin');
+              sessionStorage.setItem("CurrentUser", JSON.stringify('admin'));
               window.location.href = "/Admin";
               toast.success("Admin Account Exist !", {
               autoClose: 2000, 
