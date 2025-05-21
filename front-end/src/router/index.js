@@ -117,6 +117,7 @@ import notif2 from "../components/StudentDash/Consulternotif-old.vue"
 
 import Avis from "../components/StudentDash/Avis.vue";
 import AvisTut from "../components/TuteurDash/AvisTut.vue";
+import TuteurRequests from "../components/Admin/TuteurRequests.vue";
 
 const routes = [
   {
@@ -203,6 +204,11 @@ const routes = [
     path: "/AddOffer",
     name: "AddOffer",
     component: AddOffer,
+  },
+  {
+    path: "/TuteursRequests",
+    name: "TuteurRequests",
+    component: TuteurRequests,
   },
   {
     path: "/EntrepriseDash",

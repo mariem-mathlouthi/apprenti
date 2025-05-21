@@ -129,26 +129,30 @@ export default {
   },
   methods: {
     initializePusher() {
-      const { pusher, channel } = chatApiService.initializePusher(this.channelName, (message) => {
-        // Only add the message if it's not from the current user
-        // This prevents duplicate messages since we already add them optimistically
-        if (message.senderId !== this.currentUserId) {
-          this.messages.push({
-            content: message.content,
-            senderId: message.senderId,
-            timestamp: new Date(message.timestamp)
-          });
-          
-          // Emit notification event if the chat is not currently focused
-          if (!document.hasFocus()) {
-            this.$emit('new-message', {
-              title: `Nouveau message de ${this.chatPartner.name}`,
-              message: message.content,
-              timestamp: message.timestamp
+      const { pusher, channel } = chatApiService.initializePusher(
+        this.currentUserId, 
+        this.currentUserRole, 
+        (message) => {
+          // Only add the message if it's not from the current user
+          // This prevents duplicate messages since we already add them optimistically
+          if (message.senderId !== this.currentUserId) {
+            this.messages.push({
+              content: message.content,
+              senderId: message.senderId,
+              timestamp: new Date(message.timestamp)
             });
+            
+            // Emit notification event if the chat is not currently focused
+            if (!document.hasFocus()) {
+              this.$emit('new-message', {
+                title: `Nouveau message de ${this.chatPartner.name}`,
+                message: message.content,
+                timestamp: message.timestamp
+              });
+            }
           }
         }
-      });
+      );
       
       this.pusher = pusher;
       this.channel = channel;
@@ -191,7 +195,6 @@ export default {
         senderRole: this.currentUserRole,
         receiverId: this.chatPartner.id,
         receiverRole: this.chatPartner.role,
-        channelName: this.channelName,
         timestamp: new Date()
       };
       
@@ -202,18 +205,26 @@ export default {
         timestamp: new Date()
       });
       
+      // Clear input field
       this.newMessage = '';
       
       try {
-        await chatApiService.sendMessage(messageData);
+        // Send message to server using our improved API service
+        const response = await chatApiService.sendMessage(messageData);
+        
+        if (!response.data.success) {
+          console.error('Failed to send message:', response.data.message);
+          this.$emit('error', 'Erreur lors de l\'envoi du message.');
+          
+          // Remove the optimistically added message if sending failed
+          this.messages.pop();
+        }
       } catch (error) {
         console.error('Error sending message:', error);
-        // Remove the optimistically added message on error
-        this.messages = this.messages.filter(msg => 
-          !(msg.content === messageContent && msg.senderId === this.currentUserId)
-        );
-        // Show error notification
         this.$emit('error', 'Erreur lors de l\'envoi du message. Veuillez réessayer.');
+        
+        // Remove the optimistically added message if sending failed
+        this.messages.pop();
       } finally {
         this.sending = false;
       }

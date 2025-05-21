@@ -64,104 +64,101 @@ class authController extends Controller
         }
     }
 
-
-
-
     public function signUpEntreprise(Request $request)
-{
-    $requestData = $request->all();
+    {
+        $requestData = $request->all();
 
-    $validator = Validator::make($requestData, [
-        'numeroSIRET' => 'required|string|unique:entreprises,numeroSIRET',
-        'email' => 'required|email|unique:entreprises,email',
-        'password' => 'required|min:6',
-        'name' => 'required|string|max:255',
-        'secteur_id' => 'required|integer|exists:secteurs,id', 
-        'logo' => 'sometimes|nullable|string',
-        'description' => 'required|string',
-        'link' => 'required|string'
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'message' => $validator->errors()->first(),
-            'check' => false
-        ], 422);
-    }
-
-    try {
-        $newUser = Entreprise::create([
-            'numeroSIRET' => $requestData['numeroSIRET'],
-            'email' => $requestData['email'],
-            'password' => Hash::make($requestData['password']),
-            'name' => $requestData['name'],
-            'secteur_id' => $requestData['secteur_id'], 
-            'logo' => $requestData['logo'] ?? null,
-            'description' => $requestData['description'],
-            'link' => $requestData['link']
+        $validator = Validator::make($requestData, [
+            'numeroSIRET' => 'required|string|unique:entreprises,numeroSIRET',
+            'email' => 'required|email|unique:entreprises,email',
+            'password' => 'required|min:6',
+            'name' => 'required|string|max:255',
+            'secteur_id' => 'required|integer|exists:secteurs,id', 
+            'logo' => 'sometimes|nullable|string',
+            'description' => 'required|string',
+            'link' => 'required|string'
         ]);
 
-        return response()->json([
-            'message' => 'Account created successfully',
-            'check' => true,
-            'entreprise' => $newUser
-        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors()->first(),
+                'check' => false
+            ], 422);
+        }
 
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'Server error: ' . $e->getMessage(),
-            'check' => false
-        ], 500);
+        try {
+            $newUser = Entreprise::create([
+                'numeroSIRET' => $requestData['numeroSIRET'],
+                'email' => $requestData['email'],
+                'password' => Hash::make($requestData['password']),
+                'name' => $requestData['name'],
+                'secteur_id' => $requestData['secteur_id'], 
+                'logo' => $requestData['logo'] ?? null,
+                'description' => $requestData['description'],
+                'link' => $requestData['link']
+            ]);
+
+            return response()->json([
+                'message' => 'Account created successfully',
+                'check' => true,
+                'entreprise' => $newUser
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Server error: ' . $e->getMessage(),
+                'check' => false
+            ], 500);
+        }
     }
-}
 
     public function signUpTuteur(Request $request)
-{
-    $requestData = $request->all();
+    {
+        $requestData = $request->all();
 
-    // Validation avec règles Laravel
-    $validator = Validator::make($requestData, [
-        'fullname' => 'required|string|max:255',
-        'email' => 'required|email|unique:tuteurs,email',
-        'password' => 'required|min:6',
-        'specialite_id' => 'required|integer|exists:specialites,id',
-        'experience' => 'required|integer|min:0',
-        'phone' => 'required|unique:tuteurs,phone',
-        'image' => 'sometimes|nullable|string'
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'message' => $validator->errors()->first(),
-            'check' => false
-        ], 422);
-    }
-
-    try {
-        $newTuteur = Tuteur::create([
-            'fullname' => $requestData['fullname'],
-            'email' => $requestData['email'],
-            'password' => Hash::make($requestData['password']),
-            'specialite_id' => $requestData['specialite_id'],
-            'experience' => $requestData['experience'],
-            'phone' => $requestData['phone'],
-            'image' => $requestData['image'] ?? null,
-            'status' => 'en attente' // Valeur par défaut
+        // Validation avec règles Laravel
+        $validator = Validator::make($requestData, [
+            'fullname' => 'required|string|max:255',
+            'email' => 'required|email|unique:tuteurs,email',
+            'password' => 'required|min:6',
+            'specialite_id' => 'required|integer|exists:specialites,id',
+            'experience' => 'required|integer|min:0',
+            'phone' => 'required|unique:tuteurs,phone',
+            'image' => 'sometimes|nullable|string'
         ]);
 
-        return response()->json([
-            'message' => 'Compte créé avec succès',
-            'check' => true,
-            'tuteur' => $newTuteur
-        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors()->first(),
+                'check' => false
+            ], 422);
+        }
 
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'Erreur de création : ' . $e->getMessage(),
-            'check' => false
-        ], 500);
+        try {
+            $newTuteur = Tuteur::create([
+                'fullname' => $requestData['fullname'],
+                'email' => $requestData['email'],
+                'password' => Hash::make($requestData['password']),
+                'specialite_id' => $requestData['specialite_id'],
+                'experience' => $requestData['experience'],
+                'phone' => $requestData['phone'],
+                'image' => $requestData['image'] ?? null,
+                'status' => 'en attente' // Valeur par défaut
+            ]);
+
+            return response()->json([
+                'message' => 'Compte créé avec succès',
+                'check' => true,
+                'tuteur' => $newTuteur
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erreur de création : ' . $e->getMessage(),
+                'check' => false
+            ], 500);
+        }
     }
-}
 
 
     public function LoginUser(Request $request)
@@ -211,6 +208,12 @@ class authController extends Controller
 
         $tuteur = Tuteur::where('email', $email)->first();
         if ($tuteur && Hash::check($password, $tuteur->password)) {
+            if ($tuteur->status === 'en attente') {
+                return response()->json([
+                   'message' => 'Votre compte est en attente de validation',
+                    'check' => false,
+                ]);
+            }
             $token = $tuteur->createToken('auth_token')->plainTextToken;
             return response()->json([
                 'message' => 'Tuteur login successful',

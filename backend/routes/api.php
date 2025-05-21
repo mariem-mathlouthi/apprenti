@@ -25,6 +25,7 @@ use App\Http\Controllers\Notifications2Controller;
 use App\Http\Controllers\ReponseFeedbackController;
 use App\Http\Controllers\SecteurController;
 use App\Http\Controllers\TypeStageController;
+use App\Http\Controllers\ChatController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,10 +43,30 @@ Route::get('/notifications', [Notifications2Controller::class, 'getNotifications
 
 
 Route::middleware('auth:sanctum')->group(function() {
+    // Chat routes
+    Route::prefix('chat')->group(function () {
+        // Student to Tutor messaging
+        Route::post('/student/send', [ChatController::class, 'sendMessageToTuteur']);
+        Route::get('/student/messages/{tutor_id}', [ChatController::class, 'getStudentMessages']);
+        
+        // Tutor to Student messaging
+        Route::post('/tutor/send', [ChatController::class, 'sendMessageToEtudiant']);
+        Route::get('/tutor/messages/{student_id}', [ChatController::class, 'getTutorMessages']);
+        
+        // Common chat functionalities
+        Route::post('/mark-read', [ChatController::class, 'markAsRead']);
+        Route::get('/unread-count', [ChatController::class, 'getUnreadCount']);
+
+        Route::get('/contacts/{role}', [ChatController::class, 'getContacts']);
+    });
+
     Route::post('/appointCall', [AppointmentController::class, 'create']);
     Route::get('/appointsCall', [AppointmentController::class, 'getAllAppointments']);
     Route::put('/appointsCall/{id}', [AppointmentController::class, 'updateAppointment']);
     Route::delete('/appointsCall/{id}', [AppointmentController::class, 'deleteAppointment']);
+
+    Route::put('reponse/{id}', [ReponseFeedbackController::class, 'updateReponse']);
+    Route::delete('reponse/{id}', [ReponseFeedbackController::class, 'deleteReponse']);
 });
 Route::get('/etudiants', [CoursSubscriptionsController::class, 'getAllStudentsSubscriptedCours']);
 Route::get('/appointByStudent/{id}', [AppointmentController::class, 'getAppointmentsByStudentId']);
@@ -96,6 +117,7 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get('/getTuteurDetail/{id}', [TuteurController::class, 'getTuteurDetail']); 
 
 
+
 });
 
 
@@ -118,7 +140,8 @@ Route::group(['middleware' => 'cors'], function () {
     Route::get('/enterprisesAdmin', [adminController::class, 'getAllEnterprises']);
     Route::delete('/enterprisesAdmin/{id}', [adminController::class, 'deleteEntreprise']);
     Route::get('/studentsAdmin', [adminController::class, 'getAllStudents']);
-    Route::delete('/deleteStudentAdmin/{id}', [adminController::class, 'deleteStudent']);
+    Route::get('/pending-tuteurs', [adminController::class, 'getPendingTuteurs']);
+    Route::put('/tuteur/{id}/status', [adminController::class, 'updateTuteurStatus']);
     Route::post('/admin/tuteur', [AdminController::class, 'addTuteur']);
    
     Route::get('/categories', [CategoryController::class, 'getAllCategories']);
@@ -160,6 +183,7 @@ Route::group(['middleware' => 'cors'], function () {
 
     Route::post('feedbacks/{id}/reponse', [ReponseFeedbackController::class, 'reponseFeedback']);
     Route::get('feedback/{id}/reponses', [ReponseFeedbackController::class, 'getReponsesByFeedback']);
+
 
     Route::get('/feedbacks/{id}', [FeedbackController::class, 'getFeedback']);
    // Route::get('/quizz/{idCours}/{titre}', [QuizzController::class, 'getByCourseAndTitle']);

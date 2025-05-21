@@ -23,6 +23,12 @@
 			  <li>
 				  <a href="#">
 					  <i class='bx bxs-shopping-bag-alt'></i>
+					  <router-link to="/TuteursRequests"><span class="text">Demande Tuteurs</span></router-link>
+				  </a>
+			  </li>
+			  <li>
+				  <a href="#">
+					  <i class='bx bxs-shopping-bag-alt'></i>
 					  <router-link to="/CategoryList"><span class="text">Category</span></router-link>
 				  </a>
 			  </li>

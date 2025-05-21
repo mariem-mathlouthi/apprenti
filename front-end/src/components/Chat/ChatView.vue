@@ -66,6 +66,7 @@ import Sidebar from '../StudentDash/Sidebar.vue';
 import SidebarTut from '../TuteurDash/SidebarTut.vue';
 import NavBarStd from '../StudentDash/NavBarStd.vue';
 import NavBarTut from '../TuteurDash/NavBarTut.vue';
+import chatApiService from './chatApiService';
 
 export default {
   name: 'ChatView',
@@ -99,6 +100,7 @@ export default {
   },
   created() {
     this.initializeUserData();
+    this.initializePusher();
   },
   methods: {
     initializeUserData() {
@@ -112,6 +114,29 @@ export default {
         this.currentUserId = tuteurInfo.id;
         this.currentUserRole = 'tutor';
       }
+    },
+
+    initializePusher() {
+      // Import the chatApiService at the top of the script
+      const { pusher, channel } = chatApiService.initializePusher(
+        this.currentUserId,
+        this.currentUserRole,
+        (message) => {
+          // Handle global notifications here if needed
+          console.log('Global chat notification received:', message);
+          
+          // Show notification if the chat is not with the current selected contact
+          if (!this.selectedContact || message.senderId !== this.selectedContact.id) {
+            this.showNotification = true;
+            this.notificationTitle = 'Nouveau message';
+            this.notificationMessage = message.content;
+            this.notificationTimestamp = new Date(message.timestamp);
+          }
+        }
+      );
+      
+      this.pusher = pusher;
+      this.chatChannel = channel;
     },
     
     selectContact(contact) {

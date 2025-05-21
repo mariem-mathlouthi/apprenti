@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Mail\DemandeTuteurMail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\Admin;
@@ -8,8 +10,50 @@ use App\Models\Etudiant;
 use App\Models\Entreprise;
 use App\Models\Offre;
 use App\Models\Tuteur;
+use Illuminate\Support\Facades\Mail;
+
 class adminController extends Controller
 {
+    public function getPendingTuteurs()
+    {
+        $pendingTuteurs = Tuteur::where('status', 'en attente')->get();
+        
+        if ($pendingTuteurs->isEmpty()) {
+            return response()->json([
+                'message' => 'No pending tuteur accounts found',
+                'tuteurs' => [],
+            ], 404);
+        }
+        
+        return response()->json([
+            'tuteurs' => $pendingTuteurs,
+            'message' => 'Pending tuteurs retrieved successfully',
+        ]);
+    }
+
+    public function updateTuteurStatus(Request $request, $id)
+    {
+        $tuteur = Tuteur::findOrFail($id);
+        $request->validate([
+           'status' =>'required|string|in:accepté,refusé' // Corriger les valeurs autorisées
+        ]);
+        $newStatus = $request->status;
+
+        if ($newStatus === 'accepté') {
+            $tuteur->status = $newStatus;
+            $tuteur->save();
+            Mail::to($tuteur->email)->send(new DemandeTuteurMail($tuteur, true));
+        } elseif ($newStatus === 'refusé') {
+            Mail::to($tuteur->email)->send(new DemandeTuteurMail($tuteur, false));
+            $tuteur->delete();
+        }
+
+        return response()->json([
+            'message' => 'Tuteur status updated successfully',
+            'tuteur' => $tuteur
+        ]);
+    }
+
     //
     public function signUpAdmin(Request $request){
         $requestData = $request->all();
@@ -212,26 +256,6 @@ public function getAllTuteurs()
     ]);
 }
 
-public function updateTuteurStatus(Request $request, $id)
-{
-    $tuteur = Tuteur::find($id);
-
-    if (!$tuteur) {
-        return response()->json(['message' => 'Tuteur non trouvé'], 404);
-    }
-
-    $request->validate([
-        'status' => 'required|string|in:accepté,en attente,refusé' // Corriger les valeurs autorisées
-    ]);
-
-    $tuteur->status = $request->status;
-    $tuteur->save();
-
-    return response()->json([
-        'message' => 'Statut du tuteur mis à jour avec succès',
-        'tuteur' => $tuteur
-    ]);
-}
 
 public function deleteTuteur($id)
 {

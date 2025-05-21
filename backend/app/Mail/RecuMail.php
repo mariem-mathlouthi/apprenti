@@ -65,7 +65,7 @@ class RecuMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mails.RecuMail',
+            view: 'emails.RecuMail',
         );
     }
 

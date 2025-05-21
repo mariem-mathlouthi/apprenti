@@ -20,3 +20,7 @@ use Illuminate\Support\Facades\Broadcast;
 Broadcast::channel('notifications', function () {
     return 1 === 1;
 });
+
+Broadcast::channel('chat', function () {
+    return 1 === 1;
+});

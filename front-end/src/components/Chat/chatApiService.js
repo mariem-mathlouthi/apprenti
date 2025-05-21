@@ -99,69 +99,99 @@ const chatApiService = {
   /**
    * Get chat contacts for the current user
    */
-  getContacts: async (userId, userRole) => {
+  getContacts: async (userId, userRole, token) => {
     try {
-      let response;
-      
-      if (userRole === 'student') {
-        // For students, fetch their tutors
-        response = await axios.get('/subcsriptWithTueur', {
-          params: { etudiant_id: userId }
-        });
-        
-        if (response.data.check) {
-          // Transform the response to match our component's expected format
-          return {
-            data: {
-              success: true,
-              contacts: response.data.tutors.map(tutor => ({
-                id: tutor.id,
-                name: tutor.fullname,
-                role: 'tutor',
-                lastMessage: null,
-                unreadCount: 0
-              }))
-            }
-          };
-        }
-      } else if (userRole === 'tutor') {
-        // For tutors, fetch their students
-        response = await axios.get('/getAllStudentsSubscripted', {
-          params: { tuteur_id: userId }
-        });
-        
-        if (response.data.check) {
-          // Transform the response to match our component's expected format
-          return {
-            data: {
-              success: true,
-              contacts: response.data.students.map(student => ({
-                id: student.id,
-                name: student.fullname,
-                role: 'student',
-                lastMessage: null,
-                unreadCount: 0
-              }))
-            }
-          };
+      // const token = localStorage.getItem('token');
+      // const token = null;
+      // if (userRole === 'etudiant') {
+      //   token = JSON.parse(localStorage.getItem('StudentAccountInfo')).token
+      // } else if (userRole === 'tuteur') {
+      //   token = JSON.parse(localStorage.getItem('TuteurAccountInfo')).token
+      // }
+
+      // if (!token) {
+      //   console.error('Authentication token not found.');
+      //   return {
+      //     data: {
+      //       success: false,
+      //       contacts: [],
+      //       message: 'Authentication token not found.'
+      //     }
+      //   };
+      // }
+      console.log('Requesting contacts for role:', userRole);
+      console.log('Using token:', token);
+
+      // Ensure a token is available
+      // The calling component should ideally pass the token.
+      // This is a fallback, but relying on the passed `token` argument is preferred.
+      let authToken = token;
+      if (!authToken) {
+        console.warn('Token not passed to getContacts, attempting to retrieve from localStorage.');
+        if (userRole === 'etudiant') {
+          const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
+          authToken = studentInfo ? studentInfo.token : null;
+        } else if (userRole === 'tuteur') {
+          const tuteurInfo = JSON.parse(localStorage.getItem('TuteurAccountInfo'));
+          authToken = tuteurInfo ? tuteurInfo.token : null;
         }
       }
-      
-      // If we get here, something went wrong
-      return {
-        data: {
-          success: false,
-          contacts: [],
-          message: 'Failed to fetch contacts'
+
+      if (!authToken) {
+        console.error('Authentication token not found.');
+        return {
+          data: {
+            success: false,
+            contacts: [],
+            message: 'Authentication token not found.'
+          }
+        };
+      }
+
+      const response = await axios.get(`http://localhost:8000/api/chat/contacts/${userRole}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          },
         }
-      };
+      );
+
+      console.log(response)
+      if (response.data && response.data.success) {
+        // Transform the response to match our component's expected format
+        // The new API response already provides 'fullname' as 'name' and 'id'
+        // It also seems to provide 'image', which we can add if needed.
+        // The 'role' for contacts will be the opposite of currentUserRole, or determined by API if provided.
+        return {
+          data: {
+            success: true,
+            contacts: response.data.contacts.map(contact => ({
+              id: contact.id,
+              name: contact.fullname, // API provides fullname
+              role: userRole === 'etudiant' ? 'tuteur' : 'etudiant', // Assuming contacts are the other role
+              image: contact.image || null, // Use image if provided
+              lastMessage: null, // This might need to be fetched or updated separately
+              unreadCount: 0 // This might need to be fetched or updated separately
+            }))
+          }
+        };
+      } else {
+        console.error('Failed to fetch contacts:', response.data.message || 'Unknown error');
+        return {
+          data: {
+            success: false,
+            contacts: [],
+            message: response.data.message || 'Failed to fetch contacts'
+          }
+        };
+      }
     } catch (error) {
-      console.error('Error fetching contacts:', error);
+      console.error('Error fetching contacts:', error.response ? error.response.data : error.message);
       return {
         data: {
           success: false,
           contacts: [],
-          message: 'Error fetching contacts'
+          message: error.response ? error.response.data.message : 'Error fetching contacts'
         }
       };
     }
@@ -171,92 +201,168 @@ const chatApiService = {
    * Get chat history between two users
    */
   getChatHistory: async (currentUserId, currentUserRole, partnerId, partnerRole) => {
-    // Create channel name using the same logic as in the frontend
-    const participants = [
-      { id: currentUserId, role: currentUserRole },
-      { id: partnerId, role: partnerRole }
-    ];
-    
-    participants.sort((a, b) => {
-      if (a.id !== b.id) return a.id - b.id;
-      return a.role.localeCompare(b.role);
-    });
-    
-    const channelName = `chat.${participants[0].id}_${participants[0].role}.${participants[1].id}_${participants[1].role}`;
-    
-    // In a real implementation, this would be an API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
+    try {
+      let authToken;
+      if (currentUserRole === 'tuteur') {
+        const tuteurInfo = JSON.parse(localStorage.getItem('TuteurAccountInfo'));
+        authToken = tuteurInfo ? tuteurInfo.token : null;
+      } else {
+        const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
+        authToken = studentInfo ? studentInfo.token : null;
+      }
+
+      if (!authToken) {
+        console.error('Authentication token not found.');
+        return {
+          data: {
+            success: false,
+            messages: [],
+            message: 'Authentication token not found.'
+          }
+        };
+      }
+
+      const response = await axios.get(
+        `http://127.0.0.1:8000/api/chat/tutor/messages/${partnerId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          }
+        }
+      );
+
+      if (response.data.success) {
+        return {
           data: {
             success: true,
-            messages: MOCK_MESSAGES[channelName] || []
+            messages: response.data.data.map(msg => ({
+              id: msg.id,
+              content: msg.message,
+              sender_id: msg.sender_type === 'tuteur' ? msg.tuteur_id : msg.etudiant_id,
+              receiver_id: msg.sender_type === 'tuteur' ? msg.etudiant_id : msg.tuteur_id,
+              created_at: msg.created_at
+            }))
           }
-        });
-      }, 500); // Simulate network delay
-    });
-  },
+        };
+      } else {
+        return {
+          data: {
+            success: false,
+            messages: [],
+            message: 'Failed to fetch messages'
+          }
+        };
+      }
+    } catch (error) {
+      console.error('Error fetching chat history:', error);
+      return {
+        data: {
+          success: false,
+          messages: [],
+          message: error.response ? error.response.data.message : 'Error fetching chat history'
+        }
+      };
+    }
+  }
+  };
 
   /**
    * Send a new message
    */
-  sendMessage: async (messageData) => {
-    // In a real implementation, this would be an API call that saves the message
-    // and triggers a Pusher event
-    
-    // Simulate sending the message to the server
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // Simulate Pusher event broadcast
-        // In a real implementation, this would be done by the server
-        const pusher = new Pusher('edc2943b2a2068f8b38c', {
-          cluster: 'eu'
-        });
-        
-        // Get a reference to the channel
-        const channel = pusher.channel(messageData.channelName);
-        
-        // If the channel exists, trigger an event on it
-        if (channel) {
-          // In a real implementation, the server would trigger this event
-          // This is just for demonstration purposes
-          channel.trigger('chat-message', {
-            message: {
-              content: messageData.content,
-              senderId: messageData.senderId,
-              timestamp: messageData.timestamp
-            }
-          });
-        }
-        
-        resolve({
-          data: {
-            success: true,
-            message: 'Message sent successfully'
-          }
-        });
-      }, 300); // Simulate network delay
-    });
-  },
+  // sendMessage: async (messageData) => {
+  //   try {
+  //     // Get the appropriate token based on user role
+  //     let authToken;
+  //     if (messageData.senderRole === 'tuteur') {
+  //       const tuteurInfo = JSON.parse(localStorage.getItem('TuteurAccountInfo'));
+  //       authToken = tuteurInfo ? tuteurInfo.token : null;
+  //     } else {
+  //       const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
+  //       authToken = studentInfo ? studentInfo.token : null;
+  //     }
+
+  //     if (!authToken) {
+  //       console.error('Authentication token not found.');
+  //       return {
+  //         data: {
+  //           success: false,
+  //           message: 'Authentication token not found.'
+  //         }
+  //       };
+  //     }
+
+  //     // Prepare the message data for the API
+  //     const apiMessageData = {
+  //       message: messageData.content,
+  //       receiver_id: messageData.receiverId,
+  //       sender_type: messageData.senderRole === 'tuteur' ? 'tuteur' : 'etudiant'
+  //     };
+
+  //     // Send the message to the server
+  //     const response = await axios.post(
+  //       'http://localhost:8000/api/chat/send',
+  //       apiMessageData,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${authToken}`,
+  //           'Content-Type': 'application/json'
+  //         }
+  //       }
+  //     );
+
+  //     if (response.data && response.data.success) {
+  //       return {
+  //         data: {
+  //           success: true,
+  //           message: 'Message sent successfully',
+  //           messageData: response.data.message
+  //         }
+  //       };
+  //     } else {
+  //       console.error('Failed to send message:', response.data.message || 'Unknown error');
+  //       return {
+  //         data: {
+  //           success: false,
+  //           message: response.data.message || 'Failed to send message'
+  //         }
+  //       };
+  //     }
+  //   } catch (error) {
+  //     console.error('Error sending message:', error.response ? error.response.data : error.message);
+  //     return {
+  //       data: {
+  //         success: false,
+  //         message: error.response ? error.response.data.message : 'Error sending message'
+  //       }
+  //     };
+  //   }
+  // },
 
   /**
    * Initialize Pusher for real-time messaging
    */
-  initializePusher: (channelName, onMessageReceived) => {
-    const pusher = new Pusher('edc2943b2a2068f8b38c', {
-      cluster: 'eu'
-    });
+  // initializePusher: (userId, userRole, onMessageReceived) => {
+  //   // Initialize Pusher with your app key
+  //   const pusher = new Pusher('edc2943b2a2068f8b38c', {
+  //     cluster: 'eu'
+  //   });
     
-    const channel = pusher.subscribe(channelName);
+  //   // Create a channel name based on the user's role and ID
+  //   const channelName = `chat.${userId}_${userRole}`;
+  //   const channel = pusher.subscribe(channelName);
     
-    channel.bind('chat-message', (data) => {
-      if (data && data.message) {
-        onMessageReceived(data.message);
-      }
-    });
+  //   // Bind to the new message event
+  //   channel.bind('new.message', (data) => {
+  //     if (data && data.message) {
+  //       console.log('Received message:', data.message);
+  //       if (typeof onMessageReceived === 'function') {
+  //         onMessageReceived(data.message);
+  //       }
+  //     }
+  //   });
     
-    return { pusher, channel };
-  }
-};
+  //   return { pusher, channel };
+  // }
+
 
 export default chatApiService;

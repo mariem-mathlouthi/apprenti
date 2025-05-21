@@ -102,6 +102,8 @@ export default {
               }
             localStorage.setItem("EntrepriseAccountInfo",JSON.stringify(EntrepriseAccount));
             sessionStorage.setItem("CurrentUser", JSON.stringify('entreprise'));
+            sessionStorage.setItem('entreprise_token', JSON.stringify(response.data.token));
+
             // this.$router.push('/EntrepriseDash'); // Redirection vers le tableau de bord de l'entreprise
             // window.location.pathname = "/EntrepriseDash";
             window.location.href = "/EntrepriseDash";
@@ -123,6 +125,8 @@ export default {
               }
             localStorage.setItem("StudentAccountInfo",JSON.stringify(StudentAccount));
             sessionStorage.setItem("CurrentUser", JSON.stringify('etudiant'));
+            sessionStorage.setItem('etudiant_token', JSON.stringify(response.data.token));
+
             // this.$router.push('/StudentDash');
             window.location.href = "/StudentDash";
             }
@@ -140,6 +144,7 @@ export default {
           }
           localStorage.setItem("TuteurAccountInfo", JSON.stringify(TuteurAccount));
           sessionStorage.setItem("CurrentUser", JSON.stringify('tuteur'));
+          sessionStorage.setItem('tuteur_token', JSON.stringify(response.data.token));
           // this.$router.push('/TuteurDashboard');
           window.location.href = "/TuteurDashboard";
         }

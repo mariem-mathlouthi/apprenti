@@ -186,7 +186,52 @@
                         <span class="text-sm font-medium" :class="reponse.user_role === 'tuteur' ? 'text-purple-700' : 'text-blue-700'">
                           {{ reponse.user_role === 'tuteur' ? 'Réponse de l\'enseignant' : 'Réponse de l\'étudiant' }}
                         </span>
-                        <span class="text-xs text-gray-500">{{ formatDate(reponse.created_at) }}</span>
+                        <div class="flex items-center">
+                          <span class="text-xs text-gray-500 mr-2">{{ formatDate(reponse.created_at) }}</span>
+                          
+                          <!-- Menu pour les actions (modifier/supprimer) -->
+                          <div v-if="isMyReponse(reponse)" class="relative">
+                            <button 
+                              @click.stop="toggleReponseMenu(reponse.id)"
+                              class="text-gray-500 hover:text-gray-700 focus:outline-none p-1 rounded-full hover:bg-gray-200"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+                              </svg>
+                            </button>
+                            
+                            <!-- Menu déroulant pour les réponses -->
+                            <transition name="menu">
+                              <div 
+                                v-if="activeReponseMenu === reponse.id"
+                                class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200"
+                                v-click-outside="closeReponseMenu"
+                              >
+                                <!-- Option Modifier -->
+                                <button
+                                  @click="editReponse(reponse, feedback.id)"
+                                  class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center menu-option"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                  </svg>
+                                  Modifier
+                                </button>
+                                
+                                <!-- Option Supprimer -->
+                                <button
+                                  @click="confirmDeleteReponse(reponse.id, feedback.id)"
+                                  class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center menu-option"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                  </svg>
+                                  Supprimer
+                                </button>
+                              </div>
+                            </transition>
+                          </div>
+                        </div>
                       </div>
                       <p class="text-sm text-gray-700">{{ reponse.contenu }}</p>
                     </div>
@@ -335,6 +380,46 @@
       </div>
     </div>
   </div>
+  
+  <!-- Modal de modification de réponse -->
+  <div v-if="showEditReponseModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-lg max-w-lg w-full p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">Modifier votre réponse</h3>
+        <button @click="showEditReponseModal = false" class="text-gray-400 hover:text-gray-500">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="mb-4">
+        <label for="edit-reponse" class="block text-sm font-medium text-gray-700 mb-2">Votre réponse</label>
+        <textarea
+          id="edit-reponse"
+          v-model="editReponseText"
+          rows="4"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Modifiez votre réponse ici..."
+        ></textarea>
+      </div>
+
+      <div class="flex justify-end space-x-3">
+        <button
+          @click="showEditReponseModal = false"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+        >
+          Annuler
+        </button>
+        <button
+          @click="updateReponse"
+          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          Mettre à jour
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -363,11 +448,18 @@ export default {
       isLoadingFeedbacks: false,
       feedbackError: null,
       activeMenu: null,
+      activeReponseMenu: null,
       showReponseModal: false,
+      showEditReponseModal: false,
       selectedFeedback: null,
+      selectedReponse: null,
+      selectedFeedbackId: null,
       reponseText: "",
+      editReponseText: "",
       feedbackReponses: {},
       loadingReponses: {},
+      studentInfo: null,
+      tuteurInfo: null,
     };
   },
   computed: {
@@ -528,6 +620,90 @@ export default {
       const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
       return studentInfo && studentInfo.id === feedback.etudiant_id;
     },
+    
+    isMyReponse(reponse) {
+      const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
+      const tuteurInfo = JSON.parse(localStorage.getItem('TuteurAccountInfo'));
+      
+      if (reponse.user_role === 'etudiant' && studentInfo) {
+        return studentInfo.id === reponse.user_id;
+      } else if (reponse.user_role === 'tuteur' && tuteurInfo) {
+        return tuteurInfo.id === reponse.user_id;
+      }
+      return false;
+    },
+    
+    toggleReponseMenu(reponseId) {
+      this.activeReponseMenu = this.activeReponseMenu === reponseId ? null : reponseId;
+    },
+    
+    closeReponseMenu() {
+      this.activeReponseMenu = null;
+    },
+    
+    editReponse(reponse, feedbackId) {
+      this.selectedReponse = reponse;
+      this.selectedFeedbackId = feedbackId;
+      this.editReponseText = reponse.contenu;
+      this.showEditReponseModal = true;
+      this.activeReponseMenu = null;
+    },
+    
+    async updateReponse() {
+      if (!this.editReponseText.trim()) {
+        toast.error('Veuillez entrer une réponse');
+        return;
+      }
+      
+      try {
+        const token = JSON.parse(localStorage.getItem('StudentAccountInfo')).token;
+        const userRole = this.selectedReponse.user_role;
+        const response = await axios.put(
+          `http://localhost:8000/api/reponse/${this.selectedReponse.id}`,
+          { 
+            reponse: this.editReponseText,
+            user_role: userRole
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+        
+        if (response.status === 200) {
+          toast.success('Réponse modifiée avec succès');
+          this.showEditReponseModal = false;
+          this.fetchReponses(this.selectedFeedbackId);
+        }
+      } catch (error) {
+        console.error('Erreur lors de la modification de la réponse:', error);
+        toast.error(error.response?.data?.message || 'Erreur lors de la modification de la réponse');
+      }
+    },
+    
+    async confirmDeleteReponse(reponseId, feedbackId) {
+      if (confirm('Êtes-vous sûr de vouloir supprimer cette réponse ? Cette action est irréversible.')) {
+        try {
+          const userRole = this.feedbackReponses[feedbackId].find(r => r.id === reponseId).user_role;
+          await axios.delete(
+            `http://localhost:8000/api/reponse/${reponseId}`,
+            {
+              data: { user_role: userRole }
+            }
+          );
+          
+          toast.success('Réponse supprimée avec succès');
+          this.activeReponseMenu = null;
+          this.fetchReponses(feedbackId);
+        } catch (error) {
+          console.error("Erreur lors de la suppression de la réponse:", error);
+          const errorMessage = error.response?.data?.message || 
+            'Une erreur est survenue lors de la suppression';
+          toast.error(errorMessage);
+        }
+      }
+    },
 
     async confirmDeleteFeedback(feedbackId) {
       if (confirm('Êtes-vous sûr de vouloir supprimer votre avis ? Cette action est irréversible.')) {
@@ -623,6 +799,8 @@ export default {
     this.checkPaymentStatus();
     this.fetchAvis();
     this.checkUserRole();
+    this.studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
+    this.tuteurInfo = JSON.parse(localStorage.getItem('TuteurAccountInfo'));
   }
 };
 </script>

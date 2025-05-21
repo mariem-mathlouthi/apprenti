@@ -99,9 +99,20 @@ export default {
     async loadContacts() {
       this.loading = true;
       try {
+        // Get the appropriate token based on user role
+        let authToken;
+        if (this.currentUserRole === 'tuteur') {
+          const tuteurInfo = JSON.parse(localStorage.getItem('TuteurAccountInfo'));
+          authToken = tuteurInfo ? tuteurInfo.token : null;
+        } else {
+          const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
+          authToken = studentInfo ? studentInfo.token : null;
+        }
+
         const response = await chatApiService.getContacts(
           this.currentUserId,
-          this.currentUserRole
+          this.currentUserRole,
+          authToken
         );
         
         if (response.data.success) {
