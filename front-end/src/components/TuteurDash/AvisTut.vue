@@ -467,23 +467,29 @@ export default {
     },
 
     isMyReponse(reponse) {
-      // Utiliser this.studentInfo et this.tuteurInfo initialisés dans created()
-      // const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
-      // const tuteurInfo = JSON.parse(localStorage.getItem('TuteurAccountInfo'));
-
-      console.log("Vérification de la réponse pour le menu:", reponse);
-      console.log("Info Tuteur (this.tuteurInfo):", this.tuteurInfo);
-      console.log("Info Étudiant (this.studentInfo):", this.studentInfo);
+      const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
+      const tuteurInfo = JSON.parse(localStorage.getItem('TuteurAccountInfo'));
       
-      if (reponse.user_role === 'etudiant' && this.studentInfo) {
-        console.log(`Comparaison étudiant: ID stored = ${this.studentInfo.id} (type: ${typeof this.studentInfo.id}), ID reponse = ${reponse.user_id} (type: ${typeof reponse.user_id})`);
-        return String(this.studentInfo.id) === String(reponse.user_id);
-      } else if (reponse.user_role === 'tuteur' && this.tuteurInfo) {
-        console.log(`Comparaison tuteur: ID stored = ${this.tuteurInfo.id} (type: ${typeof this.tuteurInfo.id}), ID reponse = ${reponse.user_id} (type: ${typeof reponse.user_id})`);
-        return String(this.tuteurInfo.id) === String(reponse.user_id);
-      }
-      console.log("Aucune condition remplie pour isMyReponse ou informations utilisateur manquantes.");
-      return false;
+      const currentUser = JSON.parse(sessionStorage.getItem('CurrentUser'));
+
+      return reponse.user_role === currentUser && (
+        (currentUser === 'etudiant' && studentInfo && studentInfo.id === reponse.user_id) ||
+        (currentUser === 'tuteur' && tuteurInfo && tuteurInfo.id === reponse.user_id)
+      );
+      // if (reponse.user_role === currentUser && studentInfo) {
+      //   return studentInfo.id === reponse.user_id;
+      // } else if (reponse.user_role === currentUser && tuteurInfo) {
+      //   return tuteurInfo.id === reponse.user_id;
+      // }
+      // return false;
+    },
+
+    toggleReponseMenu(reponseId) {
+      this.activeReponseMenu = this.activeReponseMenu === reponseId ? null : reponseId;
+    },
+
+    closeReponseMenu() {
+      this.activeReponseMenu = null;
     },
 
     async fetchReponses(feedbackId) {
@@ -530,16 +536,22 @@ export default {
       }
 
       try {
+        const token = JSON.parse(localStorage.getItem('TuteurAccountInfo')).token;
+        const userRole = this.selectedReponse.user_role;
         const response = await axios.put(
           `http://localhost:8000/api/reponse/${this.selectedReponse.id}`,
+          { 
+            reponse: this.editReponseText,
+            user_role: userRole
+          },
           {
-            contenu: this.editReponseText,
-            user_role: "tuteur",
-            user_id: tuteurInfo.id 
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
           }
         );
 
-        if (response.data.success) {
+        if (response.status === 200) {
           const updatedReponseFromServer = {
              ...response.data.reponse, 
              contenu: response.data.reponse.reponse || this.editReponseText, // Ensure 'contenu' is correctly mapped
@@ -576,24 +588,22 @@ export default {
     },
 
     async deleteReponse(reponseId, feedbackId) {
-      const tuteurInfo = JSON.parse(localStorage.getItem("TuteurAccountInfo"));
-      if (!tuteurInfo) {
-        toast.error("Erreur : Informations utilisateur non trouvées.");
-        return;
-      }
+      const token = JSON.parse(localStorage.getItem("TuteurAccountInfo")).token;
 
       try {
         const response = await axios.delete(
           `http://localhost:8000/api/reponse/${reponseId}`,
           {
+            headers: {
+              Authorization: `Bearer ${token}`
+            },
             data: { 
-              user_role: "tuteur",
-              user_id: tuteurInfo.id
-            } 
+              user_role: 'tuteur' 
+            }
           }
         );
 
-        if (response.data.success) {
+        if (response.status === 200) {
           if (this.feedbackReponses[feedbackId]) {
             this.feedbackReponses[feedbackId] = this.feedbackReponses[feedbackId].filter(r => r.id !== reponseId);
             await nextTick(); // Ensure DOM updates

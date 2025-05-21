@@ -63,13 +63,9 @@
             <li>Envisager de postuler à nouveau dans le futur</li>
         </ul>
 
-        <center>
-            <a href="{{ url('/contact') }}" class="button">Contacter le Support</a>
-        </center>
-
         <p>Nous apprécions votre intérêt pour notre plateforme et vous souhaitons le meilleur pour vos projets futurs.</p>
 
-        <p>Cordialement,<br>L'équipe E-Learning</p>
+        <p>Cordialement,<br>L'équipe e-Learning</p>
     </div>
 
     <div class="footer">

@@ -625,12 +625,18 @@ export default {
       const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
       const tuteurInfo = JSON.parse(localStorage.getItem('TuteurAccountInfo'));
       
-      if (reponse.user_role === 'etudiant' && studentInfo) {
-        return studentInfo.id === reponse.user_id;
-      } else if (reponse.user_role === 'tuteur' && tuteurInfo) {
-        return tuteurInfo.id === reponse.user_id;
-      }
-      return false;
+      const currentUser = JSON.parse(sessionStorage.getItem('CurrentUser'));
+
+      return reponse.user_role === currentUser && (
+        (currentUser === 'etudiant' && studentInfo && studentInfo.id === reponse.user_id) ||
+        (currentUser === 'tuteur' && tuteurInfo && tuteurInfo.id === reponse.user_id)
+      );
+      // if (reponse.user_role === currentUser && studentInfo) {
+      //   return studentInfo.id === reponse.user_id;
+      // } else if (reponse.user_role === currentUser && tuteurInfo) {
+      //   return tuteurInfo.id === reponse.user_id;
+      // }
+      // return false;
     },
     
     toggleReponseMenu(reponseId) {
@@ -685,10 +691,14 @@ export default {
     async confirmDeleteReponse(reponseId, feedbackId) {
       if (confirm('Êtes-vous sûr de vouloir supprimer cette réponse ? Cette action est irréversible.')) {
         try {
+          const token = JSON.parse(localStorage.getItem('StudentAccountInfo')).token;
           const userRole = this.feedbackReponses[feedbackId].find(r => r.id === reponseId).user_role;
           await axios.delete(
             `http://localhost:8000/api/reponse/${reponseId}`,
             {
+              headers: {
+                Authorization: `Bearer ${token}`
+              },
               data: { user_role: userRole }
             }
           );
@@ -769,11 +779,12 @@ export default {
 
       try {
         const token = localStorage.getItem('token');
+        const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
         const response = await axios.post(
           `http://localhost:8000/api/feedbacks/${this.selectedFeedback.id}/reponse`,
           { 
             reponse: this.reponseText,
-            user_id: this.selectedFeedback.etudiant_id,
+            user_id: studentInfo.id,
             user_role: 'etudiant'
            },
           // {

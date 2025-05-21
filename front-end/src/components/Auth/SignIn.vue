@@ -160,7 +160,7 @@ export default {
             }
         
           } else {
-            toast.error("Invalid email or password !", {
+            toast.error(response.data.message, {
               autoClose: 2000, 
             });
           }

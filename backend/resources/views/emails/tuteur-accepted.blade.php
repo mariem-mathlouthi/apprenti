@@ -65,7 +65,7 @@
         </ul>
 
         <center>
-            <a href="{{ http://localhost:5173/signin }}" class="button">Accéder à Votre Tableau de Bord</a>
+            <a href="http://localhost:5173/signin" class="button">Accéder à Votre Tableau de Bord</a>
         </center>
 
         <p>Si vous avez des questions ou besoin d'aide, n'hésitez pas à contacter notre équipe de support.</p>

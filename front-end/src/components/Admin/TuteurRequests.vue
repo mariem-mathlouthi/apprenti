@@ -143,11 +143,9 @@ export default {
       if (this.processing) return;
       this.processing = true;
       try {
-        await axios.post(`http://localhost:8000/api/tuteur/${requestId}/status`, {
-         params: {
-            status: 'accepté'
-         }
-        });
+        await axios.put(`http://localhost:8000/api/tuteur/${requestId}/status`, 
+            { status: 'accepté' }
+        );
         toast.success('Demande de tuteur acceptée avec succès');
         this.tuteurRequests = this.tuteurRequests.filter(request => request.id !== requestId);
       } catch (error) {
@@ -162,11 +160,9 @@ export default {
       if (this.processing) return;
       this.processing = true;
       try {
-        await axios.post(`http://localhost:8000/api/tuteur/${requestId}/status`, {
-            params: {
-                status: 'refusé'
-            }
-        });
+        await axios.put(`http://localhost:8000/api/tuteur/${requestId}/status`, 
+            { status: 'refusé' }
+        );
         toast.success('Demande de tuteur rejetée');
         this.tuteurRequests = this.tuteurRequests.filter(request => request.id !== requestId);
       } catch (error) {
