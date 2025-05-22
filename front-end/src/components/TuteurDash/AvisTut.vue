@@ -261,9 +261,9 @@
             </div>
 
 
-            <!-- <div v-if="!isLoadingFeedbacks && filteredAvis.length === 0" class="text-center py-10">
+            <div v-if="!isLoadingFeedbacks && filteredAvis.length === 0" class="text-center py-10">
               <p class="text-gray-500">Aucun avis disponible pour ce cours.</p>
-            </div> -->
+            </div>
           </div>
         </div>
       </div>
@@ -656,11 +656,12 @@ export default {
 
       try {
         const token = localStorage.getItem('token');
+        const tuteurId = JSON.parse(localStorage.getItem('TuteurAccountInfo')).id;
         const response = await axios.post(
           `http://localhost:8000/api/feedbacks/${this.selectedFeedback.id}/reponse`,
           {
             reponse: this.reponseText,
-            user_id: 1,
+            user_id: tuteurId,
             user_role: 'tuteur'
           },
         //   {

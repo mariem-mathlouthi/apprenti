@@ -746,7 +746,29 @@
             </svg>
             Précédent
           </button>
-          <div v-else></div>
+
+          <button
+            v-else
+            @click="this.$router.push(`/DetailCour/${$route.params.id}`)"
+            type="button"
+            class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <svg
+              class="mr-2 h-5 w-5 text-gray-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Retour au detail du cours
+          </button>
+          <!-- <div v-else></div> -->
           <!-- Empty div to maintain space -->
 
           <button
@@ -1144,6 +1166,7 @@ export default {
     },
     async goTo(place) {
       try {
+        this.isLoadingResource = true;
         const response = await axios.post(
           "http://localhost:8000/api/subscribeToCourse",
           {
@@ -1172,14 +1195,11 @@ export default {
             },
           }
         );
-        if (response.status === 201) {
+        if (response.data.success) {
           if (place === "resource") {
-            this.isLoadingResource = true;
-            // this.$router.push({ name: '/DetailsCours/', params: {id: this.$route.params.id}});
             window.location.href = `/DetailsCours/${this.$route.params.id}`;
           } else if (place === "consult") {
-            this.isLoadingHome = true;
-            this.$router.push({ name: "ConsultListCours" });
+            this.$router.push({ name: "ConsultListCours",  });
           }
         } else {
           console.error(
