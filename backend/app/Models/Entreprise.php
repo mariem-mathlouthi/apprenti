@@ -20,7 +20,9 @@ class Entreprise extends Model
         'secteur_id', 
         'logo', 
         'description', 
-        'link'
+        'link',
+        'password_token',
+    'password_token_send_at'
     ];
 
     public function secteur()

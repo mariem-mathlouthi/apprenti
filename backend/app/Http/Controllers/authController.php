@@ -7,6 +7,8 @@ use App\Models\Etudiant;
 use App\Models\Admin;
 use App\Models\Tuteur;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ResetPassword;
 use Illuminate\Support\Facades\Validator;
 
 class authController extends Controller
@@ -229,7 +231,120 @@ class authController extends Controller
             'check' => false,
         ]);
     }
+public function forgot_password(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email'
+            ]);
 
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' => $validator->errors()->first(),
+                    'check' => false
+                ], 422);
+            }
+
+            $user = null;
+            $models = [Etudiant::class, Entreprise::class, Tuteur::class, Admin::class];
+            
+            foreach ($models as $model) {
+                $user = $model::where('email', $request->email)->first();
+                if ($user) break;
+            }
+
+            if (!$user) {
+                return response()->json([
+                    'message' => 'Aucun compte trouvé avec cet email',
+                    'check' => false
+                ], 404);
+            }
+
+            $token = mt_rand(100000, 999999);
+            $user->update([
+                'password_token' => $token,
+                'password_token_send_at' => now()
+            ]);
+
+            Mail::to($request->email)->send(new ResetPassword($token, $request->email));
+
+            return response()->json([
+                'message' => 'Code de réinitialisation envoyé',
+                'check' => true
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erreur lors de l\'envoi du code',
+                'check' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function changer_password(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'code' => 'required|digits:6',
+            'password' => 'required|min:6|confirmed'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->errors()->first(),
+                'check' => false
+            ], 422);
+        }
+
+        try {
+            $user = null;
+            $models = [Etudiant::class, Entreprise::class, Tuteur::class, Admin::class];
+            
+            foreach ($models as $model) {
+                $user = $model::where('email', $request->email)->first();
+                if ($user) break;
+            }
+
+            if (!$user) {
+                return response()->json([
+                    'message' => 'Aucun compte trouvé avec cet email',
+                    'check' => false
+                ], 404);
+            }
+
+            if ($user->password_token !== $request->code) {
+                return response()->json([
+                    'message' => 'Code de vérification invalide',
+                    'check' => false
+                ], 400);
+            }
+
+            if (now()->diffInMinutes($user->password_token_send_at) > 30) {
+                return response()->json([
+                    'message' => 'Code expiré (30 minutes max)',
+                    'check' => false
+                ], 400);
+            }
+
+            $user->update([
+                'password' => Hash::make($request->password),
+                'password_token' => null,
+                'password_token_send_at' => null
+            ]);
+
+            return response()->json([
+                'message' => 'Mot de passe mis à jour avec succès',
+                'check' => true
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erreur : ' . $e->getMessage(),
+                'check' => false
+            ], 500);
+        }
+    }
 
 
 }

@@ -238,6 +238,12 @@ Route::group(['middleware' => 'cors'], function () {
     Route::put('/type-stages/{id}', [TypeStageController::class, 'updateTypeStage']);
     Route::delete('/type-stages/{id}', [TypeStageController::class, 'deleteTypeStage']);
 
+
+   Route::post('/forgot-password', [authController::class, 'forgot_password']);
+   Route::post('/reset-password', [authController::class, 'changer_password']);
+
+
+
     
 });
 

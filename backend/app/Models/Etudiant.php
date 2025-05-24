@@ -22,7 +22,9 @@ class Etudiant extends Authenticatable
         'domaine_id',
         'specialite_id',
         'etablissement',
-        'image'
+        'image',
+        'password_token',
+    'password_token_send_at'
     ];
     
     public function specialite()
