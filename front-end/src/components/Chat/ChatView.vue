@@ -108,11 +108,11 @@ export default {
       if (this.userRole === 'student') {
         const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
         this.currentUserId = studentInfo.id;
-        this.currentUserRole = 'student';
+        this.currentUserRole = 'etudiant';
       } else if (this.userRole === 'tutor') {
         const tuteurInfo = JSON.parse(localStorage.getItem('TuteurAccountInfo'));
         this.currentUserId = tuteurInfo.id;
-        this.currentUserRole = 'tutor';
+        this.currentUserRole = 'tuteur';
       }
     },
 

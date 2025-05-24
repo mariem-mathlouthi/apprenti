@@ -31,8 +31,8 @@
       </div>
       <template v-else>
         <div v-for="(message, index) in messages" :key="index" 
-             :class="[message.senderId === currentUserId ? 'sender' : 'receiver', 'message-bubble mb-4']">
-          <div :class="[message.senderId === currentUserId ? 'bg-purple-600 text-white ml-auto' : 'bg-gray-200 text-gray-800', 'rounded-lg p-3 max-w-xs md:max-w-md inline-block']">
+             :class="[message.sender_type === currentUserRole ? 'receiver' : 'sender', 'message-bubble mb-4']">
+          <div :class="[message.sender_type === currentUserRole  ? 'bg-gray-200 text-gray-800' : 'bg-purple-600 text-white', 'rounded-lg p-3 max-w-xs md:max-w-md inline-block']">
             <p>{{ message.content }}</p>
             <span class="text-xs block mt-1 opacity-75">{{ formatTime(message.timestamp) }}</span>
           </div>
@@ -131,13 +131,13 @@ export default {
     initializePusher() {
       const { pusher, channel } = chatApiService.initializePusher(
         this.currentUserId, 
-        this.currentUserRole, 
+        this.currentUserRole,
         (message) => {
           // Only add the message if it's not from the current user
           // This prevents duplicate messages since we already add them optimistically
-          if (message.senderId !== this.currentUserId) {
+          if (message.sender_type !== this.currentUserId) {
             this.messages.push({
-              content: message.content,
+              content: message.message,
               senderId: message.senderId,
               timestamp: new Date(message.timestamp)
             });
@@ -146,7 +146,7 @@ export default {
             if (!document.hasFocus()) {
               this.$emit('new-message', {
                 title: `Nouveau message de ${this.chatPartner.name}`,
-                message: message.content,
+                message: message.message,
                 timestamp: message.timestamp
               });
             }
@@ -170,10 +170,12 @@ export default {
         
         if (response.data.success) {
           this.messages = response.data.messages.map(msg => ({
-            content: msg.content,
+            content: msg.message,
             senderId: msg.sender_id,
+            sender_type: msg.sender_type,
             timestamp: new Date(msg.created_at)
           }));
+          console.log("sender::", this.messages)
         }
       } catch (error) {
         console.error('Error loading chat history:', error);
