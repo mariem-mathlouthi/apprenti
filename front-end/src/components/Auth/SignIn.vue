@@ -48,7 +48,9 @@
                     Sign in
                 </button>
                 <div class="text-center">
-                    <a href="javascript:void(0)" class="hover:text-indigo-600">Forgot password?</a>
+                   <router-link to="/forgot-password" class="text-indigo-600 hover:text-indigo-500">
+                        Mot de passe oublié ?
+                    </router-link>
                 </div>
             </form>
         </div>

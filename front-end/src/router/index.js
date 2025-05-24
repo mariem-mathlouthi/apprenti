@@ -119,6 +119,9 @@ import Avis from "../components/StudentDash/Avis.vue";
 import AvisTut from "../components/TuteurDash/AvisTut.vue";
 import TuteurRequests from "../components/Admin/TuteurRequests.vue";
 
+import ForgotPassword from "../components/Auth/ForgotPassword.vue";
+import ChangePassword from "../components/Auth/ChangePassword.vue";
+
 const routes = [
   {
     path: "/",
@@ -615,7 +618,20 @@ const routes = [
     name: 'UpdateTypeStage',
     component:UpdateTypeStage,
     props: true
-  }
+  },
+   {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component:ForgotPassword,
+    props: true
+  },
+  {
+    path: '/change-password',
+    name: '/ChangePassword',
+    component:ChangePassword,
+    props: true
+  },
+  
 ];
 
 const router = createRouter({
