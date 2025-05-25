@@ -71,9 +71,6 @@
               </svg>
               <span>Chat avec tuteurs</span>
             </div>
-            <span v-if="totalUnreadCount > 0" class="bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
-              {{ totalUnreadCount > 99 ? '99+' : totalUnreadCount }}
-            </span>
           </router-link>
         </li>  
 
@@ -110,14 +107,8 @@ export default {
       isSidebarOpen: false,
       state: false,
       imageUrl: 'https://i.postimg.cc/mDWkzGDv/istockphoto-1200064810-170667a.jpg',
-      totalUnreadCount: 0,
       pollingInterval: null,
     };
-  },
-  created() {
-    this.fetchTotalUnreadCount();
-    // Poll for new unread counts every 30 seconds (adjust as needed)
-    this.pollingInterval = setInterval(this.fetchTotalUnreadCount, 30000);
   },
   beforeUnmount() {
     clearInterval(this.pollingInterval);
@@ -125,29 +116,6 @@ export default {
   methods: {
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
-    },
-    async fetchTotalUnreadCount() {
-      try {
-        const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
-        const token = studentInfo ? studentInfo.token : null;
-        const userRole = 'student'; // Assuming this sidebar is for students
-
-        if (!token) {
-          console.warn('Token not found for fetching total unread count in Sidebar.');
-          return;
-        }
-
-        const response = await chatApiService.getUnreadCount(token, userRole);
-        if (response.data && response.data.success) {
-          this.totalUnreadCount = response.data.total_unread_count;
-        } else {
-          console.error('Failed to fetch total unread count:', response.data.message);
-          this.totalUnreadCount = 0; // Reset on error
-        }
-      } catch (error) {
-        console.error('Error fetching total unread count:', error);
-        this.totalUnreadCount = 0; // Reset on error
-      }
     },
   },
   mounted() {}
