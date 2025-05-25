@@ -195,6 +195,7 @@ class authController extends Controller
                 'check' => true,
             ]);
         }
+        
         $admin = Admin::where('email', $email)->first();
         if ($admin && Hash::check($password, $admin->password)) {
             $token = $admin->createToken('auth_token')->plainTextToken;
@@ -231,7 +232,8 @@ class authController extends Controller
             'check' => false,
         ]);
     }
-public function forgot_password(Request $request)
+
+    public function forgot_password(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [

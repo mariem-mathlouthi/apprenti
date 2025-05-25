@@ -104,7 +104,7 @@ export default {
               }
             localStorage.setItem("EntrepriseAccountInfo",JSON.stringify(EntrepriseAccount));
             sessionStorage.setItem("CurrentUser", JSON.stringify('entreprise'));
-            sessionStorage.setItem('entreprise_token', JSON.stringify(response.data.token));
+            sessionStorage.setItem('token', JSON.stringify(response.data.token));
 
             // this.$router.push('/EntrepriseDash'); // Redirection vers le tableau de bord de l'entreprise
             // window.location.pathname = "/EntrepriseDash";
@@ -127,33 +127,34 @@ export default {
               }
             localStorage.setItem("StudentAccountInfo",JSON.stringify(StudentAccount));
             sessionStorage.setItem("CurrentUser", JSON.stringify('etudiant'));
-            sessionStorage.setItem('etudiant_token', JSON.stringify(response.data.token));
+            sessionStorage.setItem('token', JSON.stringify(response.data.token));
 
             // this.$router.push('/StudentDash');
             window.location.href = "/StudentDash";
             }
-        else if(response.data.role === "tuteur"){
-          let TuteurAccount = {
-            id:response.data.user.id,
-            fullname:response.data.user.fullname,
-            email:response.data.user.email,
-            domaine:response.data.user.domaine,
-            specialite:response.data.user.specialite,
-            experience:response.data.user.experience,
-            token:response.data.token,
-            role:response.data.role,
+            else if(response.data.role === "tuteur"){
+              let TuteurAccount = {
+                id:response.data.user.id,
+                fullname:response.data.user.fullname,
+                email:response.data.user.email,
+                domaine:response.data.user.domaine,
+                specialite:response.data.user.specialite,
+                experience:response.data.user.experience,
+                token:response.data.token,
+                role:response.data.role,
 
+              }
+              localStorage.setItem("TuteurAccountInfo", JSON.stringify(TuteurAccount));
+              sessionStorage.setItem("CurrentUser", JSON.stringify('tuteur'));
+              sessionStorage.setItem('token', JSON.stringify(response.data.token));
+              // this.$router.push('/TuteurDashboard');
+              window.location.href = "/TuteurDashboard";
           }
-          localStorage.setItem("TuteurAccountInfo", JSON.stringify(TuteurAccount));
-          sessionStorage.setItem("CurrentUser", JSON.stringify('tuteur'));
-          sessionStorage.setItem('tuteur_token', JSON.stringify(response.data.token));
-          // this.$router.push('/TuteurDashboard');
-          window.location.href = "/TuteurDashboard";
-        }
-
            else if(response.data.role === "admin"){
               // this.$router.push('/Admin');
               sessionStorage.setItem("CurrentUser", JSON.stringify('admin'));
+              sessionStorage.setItem('token', JSON.stringify(response.data.token));
+              
               window.location.href = "/Admin";
               toast.success("Admin Account Exist !", {
               autoClose: 2000, 
