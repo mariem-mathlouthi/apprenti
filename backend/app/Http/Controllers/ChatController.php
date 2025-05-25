@@ -157,7 +157,7 @@ class ChatController extends Controller
         $message = Chat::findOrFail($request->message_id);
         
         if ($message->sender_type === 'tuteur') {
-            if ($message->tuteur_id !== Auth::id()) {
+            if ($message->etudiant_id !== Auth::id()) {
                 return response()->json([
                    'success' => false,
                    'message' => 'You are not authorized to mark this message as read'
@@ -165,7 +165,7 @@ class ChatController extends Controller
             }
             $message->update(['read_at' => now()]);
         } else if ($message->sender_type === 'etudiant') {
-            if ($message->etudiant_id!== Auth::id()) {
+            if ($message->tuteur_id !== Auth::id()) {
                 return response()->json([
                   'success' => false,
                   'message' => 'You are not authorized to mark this message as read'
@@ -186,7 +186,7 @@ class ChatController extends Controller
         //    'role' =>'required|in:tuteur,etudiant'
         // ]);
 
-        if ($role === 'tutor') {
+        if ($role === 'tutor' || $role === 'tuteur') {
             // Get total unread count
             $totalCount = Chat::where('tuteur_id', Auth::id())
                          ->where('sender_type', 'etudiant')
