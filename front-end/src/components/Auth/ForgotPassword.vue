@@ -25,7 +25,7 @@
         </button>
 
         <router-link 
-          to="/login" 
+          to="/signin" 
           class="text-indigo-600 hover:text-indigo-800 block text-center"
         >
           Retour à la connexion
