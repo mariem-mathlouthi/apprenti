@@ -162,7 +162,13 @@ export default {
   methods: {
     async fetchCourses() {
       try {
-        const response = await axios.get("http://localhost:8000/api/cours");
+        const response = await axios.get("http://localhost:8000/api/cours",
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        );
         if (response.data.success) {
           this.cours = response.data.cours.map(c => ({
             id: c.id,
@@ -174,7 +180,13 @@ export default {
           // Fetch average feedback for each course
           await Promise.all(this.cours.map(async (course) => {
             try {
-              const feedbackResponse = await axios.get(`http://127.0.0.1:8000/api/average-feedback/${course.id}`);
+              const feedbackResponse = await axios.get(`http://127.0.0.1:8000/api/average-feedback/${course.id}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+                  }
+                }
+              );
               if (feedbackResponse.data.success) {
                 this.averageFeedbacks[course.id] = feedbackResponse.data.average_feedback || 0;
               }

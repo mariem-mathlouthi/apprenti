@@ -58,7 +58,10 @@ class CoursSubscriptionsController extends Controller
             ->with(['etudiant' => function ($query) {
                 $query->select('etudiants.id', 'fullname');
             }])
-            ->get();
+            ->get()
+            ->pluck('etudiant')
+            ->unique('id')
+            ->values();
         return response()->json([
             'students' => $students,
             'message' => 'Students fetched successfully',

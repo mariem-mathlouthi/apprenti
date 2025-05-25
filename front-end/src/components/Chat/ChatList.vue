@@ -179,7 +179,28 @@ export default {
     
     selectContact(contact) {
       this.selectedContactId = contact.id;
-      this.$emit('select-contact', contact);
+      
+      // Hide the unread count when contact is selected
+      const contactIndex = this.contacts.findIndex(c => c.id === contact.id);
+      if (contactIndex !== -1) {
+        // Create a new contact object with unreadCount set to 0
+        const updatedContact = {
+          ...contact,
+          unreadCount: 0
+        };
+        
+        // Update the contacts array
+        this.contacts.splice(contactIndex, 1, updatedContact);
+        
+        // Emit the updated contact
+        this.$emit('select-contact', updatedContact);
+        
+        // Recalculate total unread count and emit it
+        const totalUnreadCount = this.contacts.reduce((total, c) => total + (c.unreadCount || 0), 0);
+        this.$emit('total-unread-count', totalUnreadCount);
+      } else {
+        this.$emit('select-contact', contact);
+      }
     },
     
     getInitials(name) {

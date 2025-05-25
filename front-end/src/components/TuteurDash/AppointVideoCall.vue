@@ -210,17 +210,17 @@
                       <div
                         v-if="availableStudents.length > 0"
                         v-for="student in availableStudents"
-                        :key="student.etudiant.id"
+                        :key="student.id"
                         class="student-checkbox"
                       >
                         <input
                           type="checkbox"
-                          :id="`student-${student.etudiant.id}`"
-                          :value="student.etudiant.id"
+                          :id="`student-${student.id}`"
+                          :value="student.id"
                           v-model="appointmentForm.selectedStudents"
                         />
-                        <label :for="`student-${student.etudiant.id}`">{{  
-                          student.etudiant.fullname
+                        <label :for="`student-${student.id}`">{{  
+                          student.fullname
                         }}</label>
                       </div>
                     </div>
@@ -313,7 +313,6 @@ export default {
         const Tut_token = JSON.parse(
           localStorage.getItem("TuteurAccountInfo")
         ).token;
-        console.log(`tutuer token ${Tut_token}`);
         try {
           const response = await axios.get(`${API_BASE_URL}/api/etudiants`, {
             params: {
@@ -328,7 +327,7 @@ export default {
           });
           // create for each student a new object with the courseId
           availableStudents.value = response.data.students;
-          console.log(availableStudents.value);
+          console.log('stuudd:: ',availableStudents.value[0].id);
           updateSelectAllState(); // Update the selectAll state when students are loaded
         } catch (error) {
           console.error("Error fetching students:", error);
@@ -402,7 +401,12 @@ export default {
           localStorage.getItem("TuteurAccountInfo")
         ).id;
         const response = await axios.get(
-          `${API_BASE_URL}/api/cours-by-tuteur?tuteurId=${tuteurId}`
+          `${API_BASE_URL}/api/cours-by-tuteur?tuteurId=${tuteurId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            },
+          }
         );
         if (response.data.success) {
           courses.value = response.data.cours;
@@ -428,7 +432,12 @@ export default {
 
       await axios.post(
         "http://localhost:8000/api/notification",
-        notificationData
+        notificationData,
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+          },
+        }
       )
 
     };
@@ -447,7 +456,7 @@ export default {
           appointmentData,
           {
             headers: {
-              Authorization: `Bearer ${tuteur.token}`,
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
               "Content-Type": "application/json",
             },
           }
@@ -484,7 +493,7 @@ export default {
           appointmentData,
           {
             headers: {
-              Authorization: `Bearer ${tuteur.token}`,
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
               "Content-Type": "application/json",
             },
           }
@@ -501,7 +510,7 @@ export default {
       try {
         await axios.delete(`${API_BASE_URL}/api/appointsCall/${id}`, {
           headers: {
-            Authorization: `Bearer ${tuteur.token}`,
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
           },
         });
         window.location.reload();

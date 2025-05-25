@@ -106,7 +106,13 @@ export default {
   methods: {
     async fetchOfferDetails(id) {
       try {
-        const response = await axios.get(`http://localhost:8000/api/offreDetail2/${id}`);
+        const response = await axios.get(`http://localhost:8000/api/offreDetail2/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            },
+          }
+        );
         if (response.data.check === true) {
           this.offerDetails = response.data.offre;
         } else {
@@ -119,7 +125,11 @@ export default {
     async updateOfferStatus(status) {
       try {
         const response = await axios.post(`http://localhost:8000/api/updateOfferStatus/${this.offerId}`, {
-          status: status
+          status: status,
+        }, {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+          },
         });
         if (response.data.offer) {
           this.offerDetails = response.data.offer;
@@ -137,7 +147,13 @@ export default {
     async deleteOffre() {
       if (window.confirm('Are you sure you want to delete this offer?')) {
         try {
-          const response = await axios.post("http://localhost:8000/api/deleteOffre", { id: this.offerId });
+          const response = await axios.post("http://localhost:8000/api/deleteOffre", { id: this.offerId },
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+              },
+            }
+          );
           if (response.data.delete === true) {
             this.$router.push('/OffresListAdmin');
           } else {
@@ -166,7 +182,12 @@ export default {
 
       await axios.post(
         "http://localhost:8000/api/notification",
-        notificationData
+        notificationData,
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+          },
+        }
       )
 
     },

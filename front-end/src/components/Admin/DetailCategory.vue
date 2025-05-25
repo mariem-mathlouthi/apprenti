@@ -84,7 +84,13 @@ export default {
   methods: {
     async fetchCategoryDetails() {
       try {
-        const response = await axios.get(`http://localhost:8000/api/categories/${this.categoryId}`);
+        const response = await axios.get(`http://localhost:8000/api/categories/${this.categoryId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        );
         if (response.data) {
           this.categoryDetails = response.data;
         } else {
@@ -103,7 +109,13 @@ export default {
     async deleteCategory() {
       this.loading = true;
       try {
-        const response = await axios.delete(`http://localhost:8000/api/categories/${this.categoryId}`);
+        const response = await axios.delete(`http://localhost:8000/api/categories/${this.categoryId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        );
         if (response.data.success) {
           toast.success("Catégorie supprimée avec succès !", { autoClose: 2000 });
           this.$router.push("/CategoriesList");

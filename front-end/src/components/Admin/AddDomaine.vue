@@ -67,7 +67,13 @@
       async addDomaine() {
         this.loading = true;
         try {
-          await axios.post("http://127.0.0.1:8000/api/domaines", this.domaine);
+          await axios.post("http://127.0.0.1:8000/api/domaines", this.domaine,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+              },
+            }
+          );
           this.message = "Domaine ajouté avec succès !";
           toast.success(this.message, { autoClose: 2000 });
           this.domaine.description = "";

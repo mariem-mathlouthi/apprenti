@@ -91,7 +91,13 @@ export default {
   methods: {
     async fetchCategoryDetails() {
       try {
-        const response = await axios.get(`http://localhost:8000/api/categories/${this.categoryId}`);
+        const response = await axios.get(`http://localhost:8000/api/categories/${this.categoryId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        );
         
         if (response.data && response.data.category) {
           this.description = response.data.category.description;
@@ -116,7 +122,13 @@ export default {
       try {
         const response = await axios.put(`http://localhost:8000/api/categories/${this.categoryId}`, {
           description: this.description
-        });
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+          }
+        }
+      );
 
         if (response.data && response.data.data) {
           this.description = response.data.data.description;
@@ -148,7 +160,13 @@ export default {
       this.loading = true;
 
       try {
-        await axios.delete(`http://localhost:8000/api/categories/${this.categoryId}`);
+        await axios.delete(`http://localhost:8000/api/categories/${this.categoryId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        );
         toast.success("Catégorie supprimée avec succès !", { autoClose: 2000 });
 
         setTimeout(() => {

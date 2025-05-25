@@ -9,90 +9,6 @@
 import axios from 'axios';
 import Pusher from 'pusher-js';
 
-// Mock data for demonstration
-const MOCK_CONTACTS = {
-  student: [
-    {
-      id: 1,
-      name: 'Prof. Ahmed',
-      role: 'tutor',
-      lastMessage: 'Bonjour, comment puis-je vous aider avec le cours?',
-      unreadCount: 2
-    },
-    {
-      id: 2,
-      name: 'Prof. Marie',
-      role: 'tutor',
-      lastMessage: 'N\'oubliez pas de soumettre votre devoir avant vendredi',
-      unreadCount: 0
-    }
-  ],
-  tutor: [
-    {
-      id: 101,
-      name: 'Étudiant Mohamed',
-      role: 'student',
-      lastMessage: 'Merci pour votre aide avec le projet',
-      unreadCount: 0
-    },
-    {
-      id: 102,
-      name: 'Étudiant Sara',
-      role: 'student',
-      lastMessage: 'J\'ai une question sur le chapitre 3',
-      unreadCount: 1
-    },
-    {
-      id: 103,
-      name: 'Étudiant Karim',
-      role: 'student',
-      lastMessage: null,
-      unreadCount: 0
-    }
-  ]
-};
-
-const MOCK_MESSAGES = {
-  'chat.1_student.1_tutor': [
-    {
-      id: 1,
-      content: 'Bonjour, j\'ai une question sur le cours',
-      sender_id: 1,
-      receiver_id: 1,
-      created_at: '2023-05-01T10:00:00Z'
-    },
-    {
-      id: 2,
-      content: 'Bonjour, comment puis-je vous aider avec le cours?',
-      sender_id: 1,
-      receiver_id: 1,
-      created_at: '2023-05-01T10:05:00Z'
-    }
-  ],
-  'chat.101_student.2_tutor': [
-    {
-      id: 3,
-      content: 'Bonjour professeur, j\'ai besoin d\'aide avec mon projet',
-      sender_id: 101,
-      receiver_id: 2,
-      created_at: '2023-05-02T14:30:00Z'
-    },
-    {
-      id: 4,
-      content: 'Bien sûr, dites-moi ce qui vous pose problème',
-      sender_id: 2,
-      receiver_id: 101,
-      created_at: '2023-05-02T14:35:00Z'
-    },
-    {
-      id: 5,
-      content: 'Merci pour votre aide avec le projet',
-      sender_id: 101,
-      receiver_id: 2,
-      created_at: '2023-05-02T15:00:00Z'
-    }
-  ]
-};
 
 // Mock API service
 const chatApiService = {
@@ -219,12 +135,6 @@ const chatApiService = {
         };
       }
 
-      // Determine the correct API endpoint based on the current user's role
-      // The original code always used the tutor messages endpoint, which might be incorrect if a student is fetching.
-      // Assuming the backend has distinct endpoints or handles role differentiation based on the token.
-      // For this example, I'll assume the endpoint needs to be dynamic or the backend handles it.
-      // If there are separate endpoints like /api/chat/student/messages/{partnerId}, that should be used.
-      // For now, keeping the original endpoint but noting this potential issue.
       const response = await axios.get(
         `http://127.0.0.1:8000/api/chat/${currentUserRole}/messages/${partnerId}`,
         {
@@ -271,13 +181,6 @@ const chatApiService = {
     }
   },
 
-  /**
-   * Get unread messages count for the current user.
-   * This will return total unread count and unread count per user.
-   * @param {string} token - Authentication token.
-   * @param {string} currentUserRole - Role of the current user ('student' or 'tutor').
-   * @returns {Promise<Object>} - Promise resolving to the API response.
-   */
   getUnreadCount: async (token, currentUserRole) => {
     if (!token) {
       console.error('Authentication token not found for getUnreadCount.');
@@ -356,38 +259,51 @@ const chatApiService = {
           }
         };
       }
-      // Removed duplicate authToken check
 
+      // Determine if we're sending a file or regular message
+      const isFormData = messageData instanceof FormData;
+      
       // Prepare the message data and endpoint based on sender role
       let apiEndpoint;
       let apiMessageData;
+      let headers = {
+        Authorization: `Bearer ${authToken}`
+      };
 
-      if (messageData.senderRole === 'tuteur') {
-        apiEndpoint = 'http://127.0.0.1:8000/api/chat/tutor/send';
-        apiMessageData = {
-          etudiant_id: messageData.receiverId,
-          message: messageData.content,
-        };
-      } else { // Assuming senderRole is 'etudiant' or similar for the student
-        apiEndpoint = 'http://127.0.0.1:8000/api/chat/student/send';
-        apiMessageData = {
-          tuteur_id: messageData.receiverId,
-          message: messageData.content,
-        };
+      if (isFormData) {
+        // For file uploads, use FormData and don't set Content-Type (browser will set it automatically)
+        apiMessageData = messageData;
+      } else {
+        // For regular messages, use JSON
+        headers['Content-Type'] = 'application/json';
+        if (messageData.senderRole === 'tuteur') {
+          apiEndpoint = 'http://127.0.0.1:8000/api/chat/tutor/send';
+          apiMessageData = {
+            etudiant_id: messageData.receiverId,
+            message: messageData.content,
+          };
+        } else {
+          apiEndpoint = 'http://127.0.0.1:8000/api/chat/student/send';
+          apiMessageData = {
+            tuteur_id: messageData.receiverId,
+            message: messageData.content,
+          };
+        }
+      }
+
+      // Set the appropriate endpoint for file uploads
+      if (isFormData) {
+        apiEndpoint = messageData.senderRole === 'tuteur' 
+          ? 'http://127.0.0.1:8000/api/chat/tutor/send-file'
+          : 'http://127.0.0.1:8000/api/chat/student/send-file';
       }
 
       // Send the message to the server
       const response = await axios.post(
         apiEndpoint,
         apiMessageData,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            'Content-Type': 'application/json'
-          }
-        }
+        { headers }
       );
-      // Removed duplicate logic for apiEndpoint, apiMessageData, and axios.post
 
       if (response.data && response.data.success) {
         return {
@@ -426,27 +342,18 @@ const chatApiService = {
   },
 
   initializePusher: (userId, userRole, onMessageReceived) => {
-    // Initialize Pusher with your app key
-    const pusher = new Pusher('edc2943b2a2068f8b38c', { // Ensure this is your correct Pusher App Key
-      cluster: 'eu' // Ensure this is your correct Pusher cluster
+    const pusher = new Pusher('edc2943b2a2068f8b38c', { 
+      cluster: 'eu' 
     });
     
-    // Create a channel name based on the user's role and ID
-    // Example: chat.1_student or chat.5_tutor
-    // The backend should publish to a channel name that matches this format for the specific recipient.
     const channelName = `chat.${userId}_${userRole}`; 
     console.log(`Subscribing to Pusher channel: ${channelName}`);
     const channel = pusher.subscribe(channelName);
     
-    // Bind to the new message event (e.g., 'new.message' or your specific event name from backend)
-    channel.bind('new.message', (data) => { // Ensure 'new.message' is the event name your backend triggers
+    channel.bind('new.message', (data) => { 
       if (data && data.message) {
         console.log('Received message via Pusher:', data.message);
         if (typeof onMessageReceived === 'function') {
-          // The received message should ideally have a structure consistent with other messages
-          // e.g., { id, sender_id, receiver_id, content, created_at, sender_type }
-          // The current 'data.message' might be just the content or the full message object.
-          // Adjust based on what the backend sends.
           onMessageReceived(data); 
         }
       } else {
@@ -466,12 +373,12 @@ const chatApiService = {
   },
 
   /**
-   * Mark messages as read
+   * Mark a message as read
    * @param {string} token - Authentication token
-   * @param {Array|number} messageIds - Single message ID or array of message IDs to mark as read
+   * @param {number} messageId - Single message ID to mark as read
    * @returns {Promise} - Promise resolving to the API response
    */
-  markMessagesAsRead: async (token, messageIds) => {
+  markMessagesAsRead: async (token, messageId) => {
     try {
       if (!token) {
         console.error('Authentication token not found for markMessagesAsRead.');
@@ -482,16 +389,12 @@ const chatApiService = {
           } 
         };
       }
-
-      // Convert single ID to array if needed
-      const ids = Array.isArray(messageIds) ? messageIds : [messageIds];
       
       const response = await axios.post('http://127.0.0.1:8000/api/chat/mark-read',
-        { message_ids: ids },
+        { message_id: messageId },
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
           }
         }
       );

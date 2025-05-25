@@ -80,7 +80,13 @@ export default {
     async getAllCategories() {
       this.loading = true;
       try {
-        const response = await axios.get("http://localhost:8000/api/categories");
+        const response = await axios.get("http://localhost:8000/api/categories",
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        );
         this.categories = response.data; // Suppression de `check`
       } catch (error) {
         console.error("Erreur:", error);

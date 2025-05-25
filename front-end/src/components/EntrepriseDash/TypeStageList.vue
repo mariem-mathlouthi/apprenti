@@ -80,7 +80,13 @@
       async getAllTypeStages() {
         this.loading = true;
         try {
-          const response = await axios.get("http://localhost:8000/api/type-stages");
+          const response = await axios.get("http://localhost:8000/api/type-stages",
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          );
           this.typeStages = response.data;
         } catch (error) {
           console.error("Erreur:", error);

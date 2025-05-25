@@ -95,7 +95,13 @@ export default {
   methods: {
     async fetchCategories() {
       try {
-        const response = await axios.get("http://localhost:8000/api/categories");
+        const response = await axios.get("http://localhost:8000/api/categories",
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            },
+          }
+        );
         this.categories = response.data || [];
       } catch (error) {
         console.error("Erreur lors de la récupération des catégories :", error);
@@ -153,7 +159,12 @@ export default {
 
       await axios.post(
         "http://localhost:8000/api/notification",
-        notificationData
+        notificationData,
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+          },
+        }
       )
 
     },
@@ -183,7 +194,7 @@ export default {
         const response = await axios.post("http://localhost:8000/api/cours", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
           },
         });
 

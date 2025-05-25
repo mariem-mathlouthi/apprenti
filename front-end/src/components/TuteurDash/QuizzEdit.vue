@@ -182,7 +182,7 @@ export default {
           `http://localhost:8000/api/quizz/${quizzId}`,
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
             }
           }
         );
@@ -211,7 +211,12 @@ export default {
     async fetchCoursTuteur() {
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/cours-by-tuteur?tuteurId=${this.tuteurId}`
+          `http://localhost:8000/api/cours-by-tuteur?tuteurId=${this.tuteurId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
         );
         this.coursListe = response.data.cours || [];
       } catch (error) {
@@ -263,7 +268,12 @@ export default {
 
         await axios.put(
           `http://localhost:8000/api/quizz/${this.$route.params.id}`,
-          payload
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
         );
         
         toast.success("Quizz mis à jour avec succès !");

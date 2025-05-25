@@ -164,7 +164,13 @@ export default {
   methods: {
     async fetchNiveaux() {
       try {
-        const response = await axios.get("http://localhost:8000/api/niveaux")
+        const response = await axios.get("http://localhost:8000/api/niveaux",
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        )
         this.niveaux = response.data
       } catch (error) {
         toast.error("Erreur de chargement des niveaux", { autoClose: 2000 })
@@ -173,7 +179,13 @@ export default {
 
     async fetchDomaines() {
       try {
-        const response = await axios.get("http://localhost:8000/api/domaines")
+        const response = await axios.get("http://localhost:8000/api/domaines",
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        )
         this.domaines = response.data
       } catch (error) {
         toast.error("Erreur de chargement des domaines", { autoClose: 2000 })
@@ -182,7 +194,13 @@ export default {
 
     async fetchSpecialites() {
       try {
-        const response = await axios.get("http://localhost:8000/api/specialites")
+        const response = await axios.get("http://localhost:8000/api/specialites",
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        )
         this.specialites = response.data
       } catch (error) {
         toast.error("Erreur de chargement des spécialités", { autoClose: 2000 })
@@ -193,7 +211,13 @@ export default {
       try {
         const storedData = JSON.parse(localStorage.getItem('StudentAccountInfo'))
         if (storedData?.id) {
-          const response = await axios.get(`http://localhost:8000/api/getStudentDetail/${storedData.id}`)
+          const response = await axios.get(`http://localhost:8000/api/getStudentDetail/${storedData.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          )
           const student = response.data.student
           
           this.form = {
@@ -234,7 +258,10 @@ export default {
 
       try {
         const { data } = await axios.post('http://localhost:8000/api/modifyStudent', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+          }
         })
 
         if (data.update) {

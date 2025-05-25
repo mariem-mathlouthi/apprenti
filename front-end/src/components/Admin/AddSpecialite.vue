@@ -77,7 +77,13 @@ export default {
     async addSpecialite() {
       this.loading = true;
       try {
-        const response = await axios.post("http://127.0.0.1:8000/api/specialites", this.specialite);
+        const response = await axios.post("http://127.0.0.1:8000/api/specialites", this.specialite,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        );
         
         this.message = "Spécialité créée avec succès!";
         toast.success(this.message, { autoClose: 2000 });

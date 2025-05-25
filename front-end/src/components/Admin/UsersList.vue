@@ -58,7 +58,13 @@ export default {
   },
   methods: {
     fetchEnterprises() {
-      axios.get('http://localhost:8000/api/enterprisesAdmin')
+      axios.get('http://localhost:8000/api/enterprisesAdmin',
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+          }
+        }
+      )
         .then(response => {
           this.enterprises = response.data.enterprises;
           console.table(this.enterprises);
@@ -68,7 +74,13 @@ export default {
         });
     },
      deleteEnterprise(id) {
-      axios.delete(`http://localhost:8000/api/enterprisesAdmin/${id}`)
+      axios.delete(`http://localhost:8000/api/enterprisesAdmin/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+          }
+        }
+      )
         .then(response => {
           console.log(response.data.message); // Afficher un message de confirmation
           this.fetchEnterprises(); // Recharger la liste des entreprises après la suppression

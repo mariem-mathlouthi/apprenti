@@ -486,7 +486,13 @@ export default {
   methods: {
 
     async fetchCoursDetails() {
-      const coure = await axios.get(`http://localhost:8000/api/cours/${this.idCours}`)
+      const coure = await axios.get(`http://localhost:8000/api/cours/${this.idCours}`,
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+          },
+        }
+      )
         .then(response => {
           this.tutuerId = response.data.cours.idTuteur;
         })
@@ -510,7 +516,12 @@ export default {
 
       await axios.post(
         "http://localhost:8000/api/notification",
-        notificationData
+        notificationData,
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+          },
+        }
       )
 
     },
@@ -531,6 +542,9 @@ export default {
           params: {
             etudiant_id: studentId,
             tuteur_id: tuteurId
+          },
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
           }
         });
         this.isSubscript = response.data.isSubscribed;
@@ -551,7 +565,13 @@ export default {
 
     async fetchRessources() {
       try {
-        const response = await axios.get("http://localhost:8000/api/ressources");
+        const response = await axios.get("http://localhost:8000/api/ressources",
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            },
+          }
+        );
         this.ressources = response.data.filter(
           ressource => ressource.idCours === parseInt(this.idCours)
         );
@@ -567,7 +587,12 @@ export default {
       
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/feedbacks/course/${this.idCours}`
+          `http://localhost:8000/api/feedbacks/course/${this.idCours}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            },
+          }
         );
         
         if (response.data.success) {
@@ -600,7 +625,13 @@ export default {
     async fetchReponses(feedbackId) {
       this.loadingReponses[feedbackId] = true;
       try {
-        const response = await axios.get(`http://localhost:8000/api/feedback/${feedbackId}/reponses`);
+        const response = await axios.get(`http://localhost:8000/api/feedback/${feedbackId}/reponses`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            },
+          }
+        );
         this.feedbackReponses[feedbackId] = response.data.reponses.map(reponse => ({
           ...reponse,
           contenu: reponse.reponse
@@ -812,7 +843,6 @@ export default {
       }
 
       try {
-        const token = localStorage.getItem('token');
         const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
         const response = await axios.post(
           `http://localhost:8000/api/feedbacks/${this.selectedFeedback.id}/reponse`,
@@ -821,11 +851,11 @@ export default {
             user_id: studentInfo.id,
             user_role: 'etudiant'
            },
-          // {
-          //   headers: {
-          //     'Authorization': `Bearer ${token}`
-          //   }
-          // }
+          {
+            headers: {
+              'Authorization': `Bearer ${studentInfo.token}`
+            }
+          }
         );
            console.log(response)
         if (response.status === 200) {

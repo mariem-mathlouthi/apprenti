@@ -1193,8 +1193,7 @@ export default {
           {
             headers: {
               Authorization:
-                "Bearer " +
-                JSON.parse(localStorage.getItem("StudentAccountInfo")).token,
+                "Bearer " + JSON.parse(localStorage.getItem("StudentAccountInfo")).token,
               "Content-Type": "application/json",
             },
           }

@@ -135,7 +135,13 @@
     methods: {
       async fetchSpecialites() {
         try {
-          const response = await axios.get('http://localhost:8000/api/specialites')
+          const response = await axios.get('http://localhost:8000/api/specialites',
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          )
           this.specialites = response.data
         } catch (error) {
           toast.error('Erreur de chargement des spécialités', { autoClose: 2000 })
@@ -146,7 +152,13 @@
         try {
           const storedData = JSON.parse(localStorage.getItem('TuteurAccountInfo'))
           if (storedData?.id) {
-            const response = await axios.get(`http://localhost:8000/api/getTuteurDetail/${storedData.id}`)
+            const response = await axios.get(`http://localhost:8000/api/getTuteurDetail/${storedData.id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+                }
+              }
+            )
             const tuteur = response.data.tuteur
             
             this.form = {
@@ -184,7 +196,7 @@
   
         try {
           const { data } = await axios.post('http://localhost:8000/api/modifyTuteur', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
+            headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}` }
           })
   
           if (data.update) {

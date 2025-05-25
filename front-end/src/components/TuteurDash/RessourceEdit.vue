@@ -86,7 +86,13 @@
       // Charger les détails de la ressource
       async fetchRessource() {
         try {
-          const response = await axios.get(`http://localhost:8000/api/ressources/${this.$route.params.id}`);
+          const response = await axios.get(`http://localhost:8000/api/ressources/${this.$route.params.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+              }
+            }
+          );
           this.form = response.data; // Remplir le formulaire avec les données existantes
         } catch (error) {
           console.error("Erreur lors du chargement de la ressource :", error);
@@ -108,7 +114,10 @@
   
         try {
           const response = await axios.post("http://localhost:8000/api/upload", formData, {
-            headers: { "Content-Type": "multipart/form-data" },
+            headers: { 
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+             },
           });
           return response.data.filePath; // Supposons que l'API renvoie le chemin du fichier
         } catch (error) {
@@ -132,7 +141,13 @@
         };
   
         try {
-          const response = await axios.put(`http://localhost:8000/api/ressources/${this.$route.params.id}`, requestData);
+          const response = await axios.put(`http://localhost:8000/api/ressources/${this.$route.params.id}`, requestData,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+              }
+            }
+          );
           toast.success("Ressource mise à jour avec succès !");
   
           // Rediriger vers la liste des ressources

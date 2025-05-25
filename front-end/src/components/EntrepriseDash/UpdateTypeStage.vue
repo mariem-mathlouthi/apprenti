@@ -92,7 +92,12 @@ export default {
       try {
         this.loading = true;
         const response = await axios.get(
-          `http://localhost:8000/api/type-stages/${this.typeStageId}`
+          `http://localhost:8000/api/type-stages/${this.typeStageId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
         );
 
         if (response.data?.type_stage?.description) {
@@ -141,7 +146,12 @@ export default {
       try {
         const response = await axios.put(
           `http://localhost:8000/api/type-stages/${this.typeStageId}`,
-          { description: this.description }
+          { description: this.description },
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
         );
 
         toast.success(response.data?.message || "Modification réussie !", {
@@ -173,7 +183,12 @@ export default {
       this.loading = true;
       try {
         await axios.delete(
-          `http://localhost:8000/api/type-stages/${this.typeStageId}`
+          `http://localhost:8000/api/type-stages/${this.typeStageId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
         );
 
         toast.success("Suppression réussie !", {

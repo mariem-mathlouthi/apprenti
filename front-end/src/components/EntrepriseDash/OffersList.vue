@@ -87,7 +87,12 @@ export default {
     console.log(this.idEntreprise);
     try {
         const response = await axios.get(
-            `http://localhost:8000/api/getOffres/${this.idEntreprise}`
+            `http://localhost:8000/api/getOffres/${this.idEntreprise}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+                },
+            }
         );
         
         if (response.data.check === true) {

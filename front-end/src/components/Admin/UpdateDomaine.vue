@@ -92,7 +92,12 @@ export default {
       try {
         this.loading = true;
         const response = await axios.get(
-          `http://localhost:8000/api/domaines/${this.domaineId}`
+          `http://localhost:8000/api/domaines/${this.domaineId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            },
+          }
         );
 
         console.log("Réponse API:", response.data);
@@ -136,7 +141,8 @@ export default {
           {
             headers: {
               'Content-Type': 'application/json',
-              'Accept': 'application/json'
+              'Accept': 'application/json',
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
             },
             validateStatus: (status) => status >= 200 && status < 500
           }
@@ -176,6 +182,11 @@ export default {
           `http://localhost:8000/api/domaines/${this.domaineId}`,
           {
             validateStatus: (status) => status === 200 || status === 404
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
           }
         );
 

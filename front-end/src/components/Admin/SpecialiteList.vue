@@ -80,7 +80,13 @@ export default {
     async getAllSpecialites() {
       this.loading = true;
       try {
-        const response = await axios.get("http://localhost:8000/api/specialites");
+        const response = await axios.get("http://localhost:8000/api/specialites",
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        );
         this.specialites = response.data;
       } catch (error) {
         console.error("Erreur:", error);

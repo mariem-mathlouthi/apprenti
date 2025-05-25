@@ -64,7 +64,8 @@ export default {
           `http://localhost:8000/api/getAllOffreAdmin`, 
           { 
             headers: { 
-              'Cache-Control': 'no-cache' // Ensure no caching 
+              'Cache-Control': 'no-cache', // Ensure no caching 
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
             } 
           }
         );

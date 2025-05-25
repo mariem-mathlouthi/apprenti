@@ -67,7 +67,9 @@
       async getAllTuteurs() {
         try {
           const response = await axios.get(`http://localhost:8000/api/tuteurs`, {
-            headers: { 'Cache-Control': 'no-cache' }
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            }
           });
           if (response.data.tuteurs) {
             this.tuteurs = response.data.tuteurs;

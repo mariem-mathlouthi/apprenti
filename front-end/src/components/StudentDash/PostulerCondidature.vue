@@ -103,10 +103,22 @@
         console.log(this.cv);
         
         try {
-        const response= await axios.get(`http://localhost:8000/api/offreDetail2/${this.idOffreDeStage}`);
+        const response= await axios.get(`http://localhost:8000/api/offreDetail2/${this.idOffreDeStage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            }
+          }
+        );
         console.log(response.data.offre)
         this.idEntreprise=response.data.offre.idEntreprise;
-        const response2= await axios.get(`http://localhost:8000/api/getEntreprise/${this.idEntreprise}`);
+        const response2= await axios.get(`http://localhost:8000/api/getEntreprise/${this.idEntreprise}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            }
+          }
+        );
         this.entrepriseName=response2.data.entreprise.name;
         console.log(this.entrepriseName);
 
@@ -142,7 +154,12 @@
 
           
             const response4 = await axios.post(
-                "http://localhost:8000/api/addDemande",formData
+                "http://localhost:8000/api/addDemande",formData,
+                {
+                  headers: {
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+                  },
+                }
             );
 
             if (response4.data.check === true) {

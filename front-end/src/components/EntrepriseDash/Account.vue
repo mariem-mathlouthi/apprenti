@@ -91,7 +91,13 @@ export default {
   methods: {
     async fetchSecteurs() {
       try {
-        const response = await axios.get("http://localhost:8000/api/secteurs");
+        const response = await axios.get("http://localhost:8000/api/secteurs",
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            },
+          }
+        );
         this.secteurs = response.data;
       } catch (error) {
         console.error("Error fetching secteurs:", error);
@@ -131,7 +137,8 @@ export default {
           formData,
           {
             headers: {
-              'Content-Type': 'multipart/form-data'
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
             }
           }
         );

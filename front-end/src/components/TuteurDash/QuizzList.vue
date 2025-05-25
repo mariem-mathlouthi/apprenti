@@ -116,7 +116,12 @@ export default {
         
         const response = await axios.get(
           "http://localhost:8000/api/quizz-by-tuteur",
-          { params: { tuteurId } }
+          { 
+            params: { tuteurId },
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
         );
 
         // Grouper par titre et cours
@@ -168,7 +173,13 @@ export default {
         // CORRECTION APPLIQUÉE ICI
         await Promise.all(
           idsToDelete.map(id => 
-            axios.delete(`http://localhost:8000/api/quizz/${id}`)
+            axios.delete(`http://localhost:8000/api/quizz/${id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+                }
+              }
+            )
           )
         );
 

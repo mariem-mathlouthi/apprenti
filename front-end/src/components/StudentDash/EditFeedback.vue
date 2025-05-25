@@ -122,7 +122,13 @@ export default {
   methods: {
 
     async fetchCoursDetails() {
-      const coure = await axios.get(`http://localhost:8000/api/cours/${this.idCours}`)
+      const coure = await axios.get(`http://localhost:8000/api/cours/${this.idCours}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+          }
+        }
+      )
         .then(response => {
           this.tutuerId = response.data.cours.idTuteur;
         })
@@ -133,7 +139,7 @@ export default {
 
     async fetchFeedback() {
       try {
-        const token = localStorage.getItem('token');
+        const token = JSON.parse(sessionStorage.getItem("token"));
         const response = await axios.get(
           `http://localhost:8000/api/feedbacks/${this.id}`,
           {
@@ -171,7 +177,12 @@ export default {
 
       await axios.post(
         "http://localhost:8000/api/notification",
-        notificationData
+        notificationData,
+        {
+          headers: {
+            'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+          }
+        }
       )
 
     },
@@ -192,7 +203,7 @@ export default {
 
       try {
         const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
-        const token = localStorage.getItem('token');
+        const token = JSON.parse(sessionStorage.getItem("token"));
         
         // Update the feedback
         const response = await axios.put(

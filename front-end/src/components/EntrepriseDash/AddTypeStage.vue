@@ -70,7 +70,13 @@
         this.errorMessage = "";
         
         try {
-          const response = await axios.post("http://localhost:8000/api/type-stages", this.typeStage);
+          const response = await axios.post("http://localhost:8000/api/type-stages", this.typeStage,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          );
           
           this.message = "Type de stage ajouté avec succès !";
           toast.success(this.message, { autoClose: 2000 });

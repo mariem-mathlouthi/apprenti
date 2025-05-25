@@ -83,7 +83,13 @@ export default {
     async fetchCoursDetails() {
       try {
         const coursId = this.$route.params.id;
-        const response = await axios.get(`http://localhost:8000/api/cours/${coursId}`);
+        const response = await axios.get(`http://localhost:8000/api/cours/${coursId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            }
+          }
+        );
         this.cours = response.data.cours;
       } catch (error) {
         console.error("Erreur lors de la récupération des détails du cours :", error);

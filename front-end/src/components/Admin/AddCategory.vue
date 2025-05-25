@@ -55,7 +55,13 @@ export default {
       this.errorMessage = "";
 
       try {
-        const response = await axios.post("http://127.0.0.1:8000/api/categories", this.category);
+        const response = await axios.post("http://127.0.0.1:8000/api/categories", this.category,
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+          }
+        }
+        );
         
         this.message = "Catégorie ajoutée avec succès !";
         toast.success(this.message, { autoClose: 2000 });

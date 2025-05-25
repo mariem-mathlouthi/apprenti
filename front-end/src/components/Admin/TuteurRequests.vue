@@ -126,9 +126,9 @@ export default {
     async fetchTuteurRequests() {
       try {
         const response = await axios.get('http://localhost:8000/api/pending-tuteurs', {
-        //   headers: {
-        //     Authorization: `Bearer ${JSON.parse(localStorage.getItem('admin_token'))}`
-        //   }
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+          }
         });
         this.tuteurRequests = response.data.tuteurs;
       } catch (error) {
@@ -144,7 +144,12 @@ export default {
       this.processing = true;
       try {
         await axios.put(`http://localhost:8000/api/tuteur/${requestId}/status`, 
-            { status: 'accepté' }
+            { status: 'accepté' },
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
         );
         toast.success('Demande de tuteur acceptée avec succès');
         this.tuteurRequests = this.tuteurRequests.filter(request => request.id !== requestId);
@@ -161,7 +166,12 @@ export default {
       this.processing = true;
       try {
         await axios.put(`http://localhost:8000/api/tuteur/${requestId}/status`, 
-            { status: 'refusé' }
+            { status: 'refusé' },
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
         );
         toast.success('Demande de tuteur rejetée');
         this.tuteurRequests = this.tuteurRequests.filter(request => request.id !== requestId);

@@ -66,7 +66,14 @@
     methods: {
       async fetchNiveauDetails() {
         try {
-          const response = await axios.get(`http://localhost:8000/api/niveaux/${this.niveauId}`);
+          const response = await axios.get(`http://localhost:8000/api/niveaux/${this.niveauId}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          );
           this.niveauDetails = response.data;
         } catch (error) {
           toast.error("Erreur de chargement", { autoClose: 2000 });
@@ -75,7 +82,14 @@
       async confirmDelete() {
         if (confirm("Confirmer la suppression ?")) {
           try {
-            await axios.delete(`http://localhost:8000/api/niveaux/${this.niveauId}`);
+            await axios.delete(`http://localhost:8000/api/niveaux/${this.niveauId}`,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+                }
+              }
+            );
             this.$router.push("/NiveauList");
           } catch (error) {
             toast.error("Erreur de suppression", { autoClose: 2000 });

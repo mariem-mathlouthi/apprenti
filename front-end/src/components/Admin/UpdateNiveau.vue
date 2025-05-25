@@ -92,7 +92,14 @@
         try {
           this.loading = true;
           const response = await axios.get(
-            `http://localhost:8000/api/niveaux/${this.niveauId}`
+            `http://localhost:8000/api/niveaux/${this.niveauId}`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              },
+            }
           );
   
           console.log("Réponse API:", response.data);
@@ -136,7 +143,8 @@
             {
               headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
               },
               validateStatus: (status) => status >= 200 && status < 500
             }
@@ -176,6 +184,11 @@
             `http://localhost:8000/api/niveaux/${this.niveauId}`,
             {
               validateStatus: (status) => status === 200 || status === 404
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              },
             }
           );
   

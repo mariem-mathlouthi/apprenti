@@ -80,7 +80,13 @@
       async getAllDomaines() {
         this.loading = true;
         try {
-          const response = await axios.get("http://localhost:8000/api/domaines");
+          const response = await axios.get("http://localhost:8000/api/domaines",
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          );
           this.domaines = response.data;
         } catch (error) {
           console.error("Erreur:", error);

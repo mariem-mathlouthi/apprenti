@@ -133,6 +133,7 @@ export default {
         const response = await axios.post("http://localhost:8000/api/upload", formData, {
           headers: {
             "Content-Type": "multipart/form-data", // Définir le bon type de contenu
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
           },
         });
         return response.data.filePath; // Supposons que l'API renvoie le chemin du fichier
@@ -158,7 +159,12 @@ export default {
 
       await axios.post(
         "http://localhost:8000/api/notification",
-        notificationData
+        notificationData,
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+          }
+        }
       )
 
     },
@@ -182,7 +188,13 @@ export default {
       };
 
       try {
-        const response = await axios.post("http://localhost:8000/api/ressources", requestData);
+        const response = await axios.post("http://localhost:8000/api/ressources", requestData,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            }
+          }
+        );
         toast.success("Ressource ajoutée avec succès !");
 
         // Envoyer une notification
@@ -196,7 +208,7 @@ export default {
           {
             headers: {
               "Content-Type": "application/json",
-              "Authorization": "Bearer " + JSON.parse(localStorage.getItem('TuteurAccountInfo')).token
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
             }
           }
         );

@@ -24,6 +24,7 @@
         <!-- Chat List Section -->
         <div class="col-span-12 md:col-span-4 lg:col-span-3">
           <ChatList 
+            ref="chatList"
             :currentUserId="currentUserId" 
             :currentUserRole="currentUserRole"
             @select-contact="selectContact"
@@ -41,6 +42,7 @@
               @close="closeChat"
               @new-message="handleNewMessage"
               @error="handleError"
+              @messages-read="handleMessagesRead"
             />
           </div>
           <div v-else class="h-full flex items-center justify-center bg-white rounded-2xl shadow-2xl border border-gray-100 p-12">
@@ -207,6 +209,35 @@ export default {
     closeNotification() {
       this.showNotification = false;
       this.errorMessage = '';
+    },
+
+    handleMessagesRead(contactId) {
+      // When messages are read, refresh the chat list to update unread counts
+      if (this.$refs.chatList) {
+        // Update the unread count for this contact to zero
+        const contactIndex = this.$refs.chatList.contacts.findIndex(c => c.id === contactId);
+        if (contactIndex !== -1) {
+          this.$refs.chatList.contacts[contactIndex].unreadCount = 0;
+        }
+        
+        // Refresh the contacts list to update sidebar counts
+        this.$refs.chatList.loadContacts();
+        
+        // Also update the sidebar unread count by refreshing it
+        if (this.userRole === 'student') {
+          // Find the Sidebar component and refresh its unread count
+          const sidebarComponent = document.querySelector('sidebar');
+          if (sidebarComponent && sidebarComponent.__vue__) {
+            sidebarComponent.__vue__.fetchTotalUnreadCount();
+          }
+        } else if (this.userRole === 'tutor') {
+          // Find the SidebarTut component and refresh its unread count
+          const sidebarTutComponent = document.querySelector('sidebartut');
+          if (sidebarTutComponent && sidebarTutComponent.__vue__) {
+            sidebarTutComponent.__vue__.fetchTotalUnreadCount();
+          }
+        }
+      }
     }
   }
 };

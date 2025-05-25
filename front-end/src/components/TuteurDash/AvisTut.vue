@@ -422,7 +422,12 @@ export default {
       
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/feedbacks/course/${this.idCours}`
+          `http://localhost:8000/api/feedbacks/course/${this.idCours}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
         );
         
         if (response.data.success) {
@@ -495,7 +500,13 @@ export default {
     async fetchReponses(feedbackId) {
       this.loadingReponses[feedbackId] = true;
       try {
-        const response = await axios.get(`http://localhost:8000/api/feedback/${feedbackId}/reponses`);
+        const response = await axios.get(`http://localhost:8000/api/feedback/${feedbackId}/reponses`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        );
         this.feedbackReponses[feedbackId] = response.data.reponses.map(reponse => ({
           ...reponse,
           contenu: reponse.reponse, // Ensure 'contenu' is used consistently
@@ -655,7 +666,7 @@ export default {
       }
 
       try {
-        const token = localStorage.getItem('token');
+        const token = JSON.parse(sessionStorage.getItem("token"));
         const tuteurId = JSON.parse(localStorage.getItem('TuteurAccountInfo')).id;
         const response = await axios.post(
           `http://localhost:8000/api/feedbacks/${this.selectedFeedback.id}/reponse`,
@@ -664,11 +675,11 @@ export default {
             user_id: tuteurId,
             user_role: 'tuteur'
           },
-        //   {
-        //     headers: {
-        //       'Authorization': `Bearer ${token}`
-        //     }
-        //   }
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          }
         );
 
         if (response.status === 200) {

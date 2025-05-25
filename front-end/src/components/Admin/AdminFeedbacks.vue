@@ -228,7 +228,13 @@ export default {
       this.coursError = null;
       
       try {
-        const response = await axios.get('http://localhost:8000/api/cours');
+        const response = await axios.get('http://localhost:8000/api/cours',
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        );
         if (response.data.success) {
           this.listeCours = response.data.cours;
           // After getting courses, fetch feedbacks for each course
@@ -252,7 +258,13 @@ export default {
       
       try {
         const feedbackPromises = this.listeCours.map(cours =>
-          axios.get(`http://localhost:8000/api/feedbacks/course/${cours.id}`)
+          axios.get(`http://localhost:8000/api/feedbacks/course/${cours.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          )
         );
         
         const responses = await Promise.all(feedbackPromises);
@@ -302,7 +314,12 @@ export default {
 
       try {
         const response = await axios.delete(
-          `http://localhost:8000/api/feedbacks/${this.selectedFeedbackToDelete.id}`
+          `http://localhost:8000/api/feedbacks/${this.selectedFeedbackToDelete.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
         );
 
         if (response.data.success) {

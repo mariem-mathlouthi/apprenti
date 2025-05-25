@@ -105,10 +105,15 @@ Cancel
         }
         console.log(myObject);
           try {
-          const response = await axios.post(`http://localhost:8000/api/updateSatutDemande/${this.demandeId}`,myObject);
-          const response2 = await axios.get(`http://localhost:8000/api/getDemandeById/${this.demandeId}`);
-          const response3 = await axios.get(`http://localhost:8000/api/getStudentDetail/${response2.data.demande[0].idEtudiant}`);
-          const response4 = await axios.get(`http://localhost:8000/api/offreDetail2/${response2.data.demande[0].offre_id}`);
+            const headers = {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            };
+          const response = await axios.post(`http://localhost:8000/api/updateSatutDemande/${this.demandeId}`,myObject,
+            { headers }
+          );
+          const response2 = await axios.get(`http://localhost:8000/api/getDemandeById/${this.demandeId}`, { headers });
+          const response3 = await axios.get(`http://localhost:8000/api/getStudentDetail/${response2.data.demande[0].idEtudiant}`, { headers });
+          const response4 = await axios.get(`http://localhost:8000/api/offreDetail2/${response2.data.demande[0].offre_id}`, { headers });
           console.log(response3.data);
           console.log(response4.data);
         
@@ -138,7 +143,7 @@ Cancel
               appointmentId: null
             }
             console.log(myObj);
-            const response5= await axios.post("http://localhost:8000/api/notification",myObj);
+            const response5= await axios.post("http://localhost:8000/api/notification",myObj, { headers });
             console.log(response5.data);
 
             }
@@ -155,7 +160,7 @@ Cancel
               appointmentId: null
             }
             console.log(myObj);
-            const response5= await axios.post("http://localhost:8000/api/notification",myObj);
+            const response5= await axios.post("http://localhost:8000/api/notification",myObj, { headers });
             console.log(response5.data);
             }
             else if(this.statut=="en execution"){
@@ -171,7 +176,7 @@ Cancel
               appointmentId: null
             }
             console.log(myObj);
-            const response5= await axios.post("http://localhost:8000/api/notification",myObj);
+            const response5= await axios.post("http://localhost:8000/api/notification",myObj, { headers });
             console.log(response5.data);
             }
 

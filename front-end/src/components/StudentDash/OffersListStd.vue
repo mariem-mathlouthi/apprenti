@@ -85,14 +85,25 @@ export default {
   methods: {
     async getAllOffre() {
       try {
-        const response = await axios.get("http://localhost:8000/api/allOffres");
+        const response = await axios.get("http://localhost:8000/api/allOffres",
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            },
+          }
+        );
         if (response.data.check === true) {
           console.log(response.data.offres);
           
           for (let i = 0; i < response.data.offres.length; i++) {
             if (response.data.offres[i].status === 'accepté') {
               const response2 = await axios.get(
-                `http://localhost:8000/api/getEntreprise/${response.data.offres[i].idEntreprise}`
+                `http://localhost:8000/api/getEntreprise/${response.data.offres[i].idEntreprise}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+                  },
+                }
               );
               let myObject = {
                 id: response.data.offres[i].id,

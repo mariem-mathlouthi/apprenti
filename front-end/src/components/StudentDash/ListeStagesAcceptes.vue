@@ -79,7 +79,13 @@ export default {
             statut:"en execution",
         }
       console.log(myObject);
-      const response = await axios.post(`http://localhost:8000/api/updateSatutDemande/${id}`,myObject);
+      const response = await axios.post(`http://localhost:8000/api/updateSatutDemande/${id}`,myObject,
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+          }
+        }
+      );
       if (response.data.update === true) {
             toast.success("Statut updated succesfully !", {
             autoClose: 2000, 
@@ -109,12 +115,30 @@ export default {
         let storedData = localStorage.getItem("StudentAccountInfo"); 
         this.idEtudiant = JSON.parse(storedData).id;
         console.log(this.idEtudiant);
-        const response = await axios.get(`http://localhost:8000/api/getDemandes/${this.idEtudiant}`);
+        const response = await axios.get(`http://localhost:8000/api/getDemandes/${this.idEtudiant}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            }
+          }
+        );
         if (response.data.check === true) {
           this.demandes = response.data.demandes;
           for (const demande of this.demandes) {
-            const response2 = await axios.get(`http://localhost:8000/api/offreDetail2/${demande.offre_id}`);
-            const response3 = await axios.get(`http://localhost:8000/api/getEntreprise/${response2.data.offre.idEntreprise}`);
+            const response2 = await axios.get(`http://localhost:8000/api/offreDetail2/${demande.offre_id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+                }
+              }
+            );
+            const response3 = await axios.get(`http://localhost:8000/api/getEntreprise/${response2.data.offre.idEntreprise}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+                }
+              }
+            );
             let myobject = {
               title: response2.data.offre.titre,
               description: response2.data.offre.description,

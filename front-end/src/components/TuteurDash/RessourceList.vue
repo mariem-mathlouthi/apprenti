@@ -171,7 +171,13 @@ export default {
   methods: {
     async fetchRessources() {
       try {
-        const response = await axios.get("http://localhost:8000/api/ressources");
+        const response = await axios.get("http://localhost:8000/api/ressources",
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        );
         this.ressources = response.data.filter(
           ressource => ressource.idCours === parseInt(this.idCours)
         );
@@ -183,7 +189,13 @@ export default {
     async deleteRessource(id) {
       if(confirm("Êtes-vous sûr de vouloir supprimer cette ressource ?")) {
         try {
-          await axios.delete(`http://localhost:8000/api/ressources/${id}`);
+          await axios.delete(`http://localhost:8000/api/ressources/${id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          );
           this.ressources = this.ressources.filter(r => r.id !== id);
           toast.success("Ressource supprimée avec succès");
         } catch (error) {

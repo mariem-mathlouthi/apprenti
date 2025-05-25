@@ -210,7 +210,12 @@ export default {
     async fetchCoursTuteur() {
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/cours-by-tuteur?tuteurId=${this.tuteurId}`
+          `http://localhost:8000/api/cours-by-tuteur?tuteurId=${this.tuteurId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            },
+          }
         );
         this.coursListe = response.data.cours || [];
       } catch (error) {
@@ -275,7 +280,13 @@ export default {
             score: question.score,
           };
 
-          return axios.post("http://localhost:8000/api/quizz", payload);
+          return axios.post("http://localhost:8000/api/quizz", payload,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+              },
+            }
+          );
         });
 
         await Promise.all(requests);

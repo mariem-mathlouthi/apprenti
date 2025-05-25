@@ -72,7 +72,13 @@ export default {
   },
   methods: {
     fetchStudents() {
-      axios.get('http://localhost:8000/api/studentsAdmin')
+      axios.get('http://localhost:8000/api/studentsAdmin',
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+          }
+        }
+      )
         .then(response => {
           this.students = response.data.students;
         })
@@ -86,7 +92,13 @@ export default {
       }
     },
     deleteStudent(id) {
-      axios.delete(`http://localhost:8000/api/deleteStudentAdmin/${id}`)
+      axios.delete(`http://localhost:8000/api/deleteStudentAdmin/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+          }
+        }
+      )
         .then(response => {
           console.log('Étudiant supprimé avec succès:', response.data);
      

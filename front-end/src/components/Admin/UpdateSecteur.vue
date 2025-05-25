@@ -92,7 +92,12 @@
         try {
           this.loading = true;
           const response = await axios.get(
-            `http://localhost:8000/api/secteurs/${this.secteurId}`
+            `http://localhost:8000/api/secteurs/${this.secteurId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+              },
+            }
           );
   
           if (response.data?.success && response.data?.secteur) {
@@ -134,7 +139,8 @@
             {
               headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
               },
               validateStatus: (status) => status >= 200 && status < 500
             }
@@ -174,6 +180,11 @@
             `http://localhost:8000/api/secteurs/${this.secteurId}`,
             {
               validateStatus: (status) => status === 200 || status === 404
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+              },
             }
           );
   

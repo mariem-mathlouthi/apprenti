@@ -116,7 +116,13 @@ export default {
   methods: {
 
     async fetchCoursDetails() {
-      const coure = await axios.get(`http://localhost:8000/api/cours/${this.idCours}`)
+      const coure = await axios.get(`http://localhost:8000/api/cours/${this.idCours}`,
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+          }
+        }
+      )
         .then(response => {
           this.tutuerId = response.data.cours.idTuteur;
         })
@@ -140,7 +146,12 @@ export default {
 
       await axios.post(
         "http://localhost:8000/api/notification",
-        notificationData
+        notificationData,
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+          }
+        }
       )
 
     },
@@ -169,6 +180,11 @@ export default {
             cours_id: Number(this.idCours),
             note: Number(this.form.note),
             commentaire: this.form.commentaire.trim()
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
           }
         );
 

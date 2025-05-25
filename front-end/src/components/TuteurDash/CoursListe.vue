@@ -177,7 +177,12 @@ export default {
       try {
         const tuteurId = JSON.parse(localStorage.getItem("TuteurAccountInfo")).id;
         const response = await axios.get(
-          `http://localhost:8000/api/cours-by-tuteur?tuteurId=${tuteurId}`
+          `http://localhost:8000/api/cours-by-tuteur?tuteurId=${tuteurId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            },
+          }
         );
         this.coursListe = response.data.cours.map(cours => ({
           ...cours,
@@ -191,7 +196,13 @@ export default {
 
     async deleteCours(id) {
       try {
-        await axios.delete(`http://localhost:8000/api/cours/${id}`);
+        await axios.delete(`http://localhost:8000/api/cours/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            },
+          }
+        );
         toast.success("Cours supprimé avec succès !");
         this.fetchCours();
       } catch (error) {

@@ -121,7 +121,13 @@ export default {
 
     async fetchQuestions() {
       try {
-        const response = await axios.get(`http://localhost:8000/api/quizz/${this.idCours}/${this.titreQuizz}`)
+        const response = await axios.get(`http://localhost:8000/api/quizz/${this.idCours}/${this.titreQuizz}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        )
         this.questions = response.data.map(question => ({
           ...question,
           question: this.cleanAnswerText(question.question),

@@ -201,7 +201,13 @@
 
         await axios.post(
           "http://localhost:8000/api/notification",
-          notificationData
+          notificationData,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+              
+            },
+          }
         )
 
       },
@@ -229,7 +235,13 @@
           // Création de l'offre
           const response = await axios.post(
             "http://localhost:8000/api/addOffre",
-            formData
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+              },
+            }
           )
   
           if (response.data.check) {

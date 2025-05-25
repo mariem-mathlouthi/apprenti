@@ -144,7 +144,13 @@ export default {
   methods: {
     async fetchCategories() {
       try {
-        const response = await axios.get("http://localhost:8000/api/categories");
+        const response = await axios.get("http://localhost:8000/api/categories",
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        );
         this.categories = response.data || [];
       } catch (error) {
         console.error("Erreur lors de la récupération des catégories :", error);
@@ -152,7 +158,13 @@ export default {
     },
     async fetchCoursDetails() {
       try {
-        const response = await axios.get(`http://localhost:8000/api/cours/${this.coursId}`);
+        const response = await axios.get(`http://localhost:8000/api/cours/${this.coursId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        );
         this.form = response.data.cours;
       } catch (error) {
         console.error("Erreur lors de la récupération des détails du cours :", error);
@@ -161,7 +173,13 @@ export default {
     async updateCours() {
       this.loading = true;
       try {
-        const response = await axios.put(`http://localhost:8000/api/cours/${this.coursId}`, this.form);
+        const response = await axios.put(`http://localhost:8000/api/cours/${this.coursId}`, this.form,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        );
         if (response.data.success) {
           toast.success("Cours mis à jour avec succès !");
           this.form = response.data.cours;

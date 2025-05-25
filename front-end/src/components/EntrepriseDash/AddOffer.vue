@@ -202,7 +202,13 @@
 
       async fetchTypeStages() {
         try {
-          const response = await axios.get("http://localhost:8000/api/type-stages")
+          const response = await axios.get("http://localhost:8000/api/type-stages",
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+              },
+            }
+          )
           this.typeStages = response.data
         } catch (error) {
           toast.error("Erreur de chargement des types de stage")
@@ -212,7 +218,13 @@
 
       async fetchDomaines() {
         try {
-          const response = await axios.get("http://localhost:8000/api/domaines")
+          const response = await axios.get("http://localhost:8000/api/domaines",
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+              },
+            }
+          )
           this.domaines = response.data
         } catch (error) {
           toast.error("Erreur de chargement des domaines")
@@ -239,7 +251,12 @@
 
         await axios.post(
           "http://localhost:8000/api/notification",
-          notificationData
+          notificationData,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            },
+          }
         )
 
       },
@@ -270,7 +287,8 @@
             formData,
             {
               headers: {
-                "Content-Type": "multipart/form-data"
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
               }
             }
           )

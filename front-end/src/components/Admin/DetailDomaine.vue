@@ -53,7 +53,13 @@
     methods: {
       async fetchDomaineDetails() {
         try {
-          const response = await axios.get(`http://localhost:8000/api/domaines/${this.$route.params.id}`);
+          const response = await axios.get(`http://localhost:8000/api/domaines/${this.$route.params.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          );
           this.domaineDetails = response.data;
         } catch (error) {
           console.error("Erreur de chargement", error);

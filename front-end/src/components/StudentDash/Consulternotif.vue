@@ -256,8 +256,20 @@ export default {
         
         // Get all notifications
         const [notifResponse, attestResponse] = await Promise.all([
-          axios.get("http://localhost:8000/api/getAllNotifications"),
-          axios.get(`http://localhost:8000/api/getAttestation/${this.idEtudiant}`)
+          axios.get("http://localhost:8000/api/getAllNotifications",
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          ),
+          axios.get(`http://localhost:8000/api/getAttestation/${this.idEtudiant}`,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          )
         ])
 
         // Process notifications

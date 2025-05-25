@@ -130,7 +130,13 @@ export default {
       const month = String(currentDate.getMonth() + 1).padStart(2, '0');
       const year = currentDate.getFullYear();
       const formattedDate = `${day}-${month}-${year}`;
-      const offerResponse = await axios.get(`http://localhost:8000/api/offreDetail2/${offerId}`);
+      const offerResponse = await axios.get(`http://localhost:8000/api/offreDetail2/${offerId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+          },
+        }
+      );
       let offerName= offerResponse.data.offre.titre;
       let message=entrepriseName + " a envoyer une attestation en " + offerName;
       let formData = new FormData();
@@ -141,7 +147,13 @@ export default {
         formData.append('date', formattedDate);
         formData.append('attestation', this.attestation);
         console.log(formData);
-        const response = await axios.post("http://localhost:8000/api/attestation",formData);
+        const response = await axios.post("http://localhost:8000/api/attestation",formData,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            },
+          }
+        );
         if (response.data.check === true) {
           toast.success("attestation envoyer  avec succès!", { autoClose: 2000 });
         } 
@@ -154,17 +166,35 @@ export default {
         const idEntreprise = JSON.parse(storedData).id;
 
         // Récupérer toutes les offres de stage de l'entreprise
-        const response = await axios.get(`http://localhost:8000/api/getOffres/${idEntreprise}`);
+        const response = await axios.get(`http://localhost:8000/api/getOffres/${idEntreprise}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            },
+          }
+        );
 
         if (response.data.check) {
           for (const offre of response.data.offres) {
             // Récupérer toutes les demandes liées à chaque offre
-            const demandeResponse = await axios.get(`http://localhost:8000/api/getDemandeByOfferId/${offre.id}`);
+            const demandeResponse = await axios.get(`http://localhost:8000/api/getDemandeByOfferId/${offre.id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+                },
+              }
+            );
 
             if (demandeResponse.data.check) {
               for (const demande of demandeResponse.data.demandes) {
                 // Récupérer les détails de l'étudiant pour chaque demande
-                const studentResponse = await axios.get(`http://localhost:8000/api/getStudentDetail/${demande.idEtudiant}`);
+                const studentResponse = await axios.get(`http://localhost:8000/api/getStudentDetail/${demande.idEtudiant}`,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+                    },
+                  }
+                );
                 const student = studentResponse.data.student;
 
                 const myObject = {
@@ -200,7 +230,13 @@ export default {
     // Supprimer une demande par son ID
     async deleteDemande(id) {
       try {
-        const response = await axios.delete(`http://localhost:8000/api/deleteDemande/${id}`);
+        const response = await axios.delete(`http://localhost:8000/api/deleteDemande/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            },
+          }
+        );
         if (response.data.delete === true) {
           this.demands = this.demands.filter(demande => demande.demandeId !== id);
           toast.success("La demande a été supprimée avec succès!", { autoClose: 2000 });

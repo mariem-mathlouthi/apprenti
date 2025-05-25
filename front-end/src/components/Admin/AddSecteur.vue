@@ -67,7 +67,13 @@
       async addSecteur() {
         this.loading = true;
         try {
-          await axios.post("http://localhost:8000/api/secteurs", this.secteur);
+          await axios.post("http://localhost:8000/api/secteurs", this.secteur,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          );
           this.message = "Secteur ajouté avec succès !";
           toast.success(this.message, { autoClose: 2000 });
           this.secteur.description = "";

@@ -83,7 +83,7 @@
     methods: {
       async fetchTuteurDetails() {
         try {
-          const token = localStorage.getItem('token');
+          const token = JSON.parse(sessionStorage.getItem("token"));
           const response = await axios.get(`http://localhost:8000/api/tuteurs/${this.tuteurId}`, {
             headers: { Authorization: `Bearer ${token}` }
           });
@@ -96,7 +96,13 @@
       },
       async updateTuteurStatus(status) {
         try {
-          await axios.put(`http://localhost:8000/api/tuteurs/${this.tuteurId}/status`, { status });
+          await axios.put(`http://localhost:8000/api/tuteurs/${this.tuteurId}/status`, { status },
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+              },
+            }
+          );
           this.tuteur.status = status;
           toast.success("Statut mis à jour avec succès");
         } catch (error) {
@@ -107,7 +113,13 @@
       async deleteTuteur() {
         if (confirm("Voulez-vous vraiment supprimer ce tuteur ?")) {
           try {
-            await axios.delete(`http://localhost:8000/api/tuteurs/${this.tuteurId}`);
+            await axios.delete(`http://localhost:8000/api/tuteurs/${this.tuteurId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+                },
+              }
+            );
             toast.success("Tuteur supprimé avec succès");
             this.$router.push("/TuteursListAdmin");
           } catch (error) {

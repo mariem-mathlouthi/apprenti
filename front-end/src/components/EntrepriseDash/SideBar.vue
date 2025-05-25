@@ -104,7 +104,13 @@ export default {
       this.idEntreprise = JSON.parse(storedData).id;
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/getEntreprise/${this.idEntreprise}`);
+          `http://localhost:8000/api/getEntreprise/${this.idEntreprise}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            },
+          }
+        );
         if (response.data.check) {
           this.logoURL = "http://localhost:8000" + response.data.entreprise.logo;
         } else {

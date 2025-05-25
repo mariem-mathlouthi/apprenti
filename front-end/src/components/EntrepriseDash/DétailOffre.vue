@@ -107,7 +107,13 @@ export default {
       let storedData = localStorage.getItem("EntrepriseAccountInfo");
       this.idEntreprise = JSON.parse(storedData).id;
       try {
-        const response = await axios.get(`http://localhost:8000/api/offreDetail/${this.idEntreprise}/${id}`);
+        const response = await axios.get(`http://localhost:8000/api/offreDetail/${this.idEntreprise}/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            }
+          }
+        );
         if (response.data.check) {
           this.offerDetails = response.data.offre;
         } else {
@@ -127,7 +133,13 @@ export default {
         id: this.offerId,
       };
       try {
-        const response = await axios.post("http://localhost:8000/api/deleteOffre", myjson2);
+        const response = await axios.post("http://localhost:8000/api/deleteOffre", myjson2,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            }
+          }
+        );
         if (response.data.delete === true) {
           this.$router.push('/OffersList');
         } else {

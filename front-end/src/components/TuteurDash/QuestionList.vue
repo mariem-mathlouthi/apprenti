@@ -118,7 +118,10 @@
           this.loading = true;
           const tuteurData = JSON.parse(localStorage.getItem("TuteurAccountInfo"));
           const response = await axios.get("http://localhost:8000/api/quizz-by-tuteur", {
-            params: { tuteurId: tuteurData?.id }
+            params: { tuteurId: tuteurData?.id },
+            headers: {
+              Authorization: `Bearer ${tuteurData?.token}`
+            }
           });
   
           this.quizzListe = response.data.map(q => ({
@@ -136,7 +139,13 @@
       async deleteQuizz(id) {
         if (!confirm("Supprimer cette question définitivement ?")) return;
         try {
-          await axios.delete(`http://localhost:8000/api/quizz/${id}`);
+          await axios.delete(`http://localhost:8000/api/quizz/${id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          );
           this.quizzListe = this.quizzListe.filter(q => q.id !== id);
           toast.success("Question supprimée avec succès");
         } catch (error) {

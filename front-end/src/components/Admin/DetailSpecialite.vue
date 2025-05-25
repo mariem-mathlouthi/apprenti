@@ -83,7 +83,13 @@
     methods: {
       async fetchSpecialiteDetails() {
         try {
-          const response = await axios.get(`http://localhost:8000/api/specialites/${this.specialiteId}`);
+          const response = await axios.get(`http://localhost:8000/api/specialites/${this.specialiteId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          );
           this.specialiteDetails = response.data;
         } catch (error) {
           console.error("Erreur :", error);
@@ -99,7 +105,13 @@
       async deleteSpecialite() {
         this.loading = true;
         try {
-          await axios.delete(`http://localhost:8000/api/specialites/${this.specialiteId}`);
+          await axios.delete(`http://localhost:8000/api/specialites/${this.specialiteId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          );
           toast.success("Suppression réussie !", { autoClose: 2000 });
           this.$router.push("/SpecialiteList");
         } catch (error) {

@@ -99,15 +99,33 @@ export default {
   methods: {
     async fetchDemandeDetails(id) {
       try {
-        const response = await axios.get(`http://localhost:8000/api/getDemandeById/${id}`);
+        const response = await axios.get(`http://localhost:8000/api/getDemandeById/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        );
         if (response.data.check === true) {
           const demande = response.data.demande[0];
           this.demandeId = demande.id;
           this.statut = demande.statut;
           this.cv = demande.cv;
-          const responseOffre = await axios.get(`http://localhost:8000/api/offreDetail2/${demande.offre_id}`);
+          const responseOffre = await axios.get(`http://localhost:8000/api/offreDetail2/${demande.offre_id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          );
           this.offreDeStage = responseOffre.data.offre.titre;
-          const responseEtudiant = await axios.get(`http://localhost:8000/api/getStudentDetail/${demande.idEtudiant}`);
+          const responseEtudiant = await axios.get(`http://localhost:8000/api/getStudentDetail/${demande.idEtudiant}`,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          );
           const student = responseEtudiant.data.student;
           this.email = student.email;
           this.fullname = student.fullname;
@@ -120,7 +138,13 @@ export default {
     },
     async deleteDemande() {
       try {
-        const response = await axios.delete(`http://localhost:8000/api/deleteDemande/${this.demandeId}`);
+        const response = await axios.delete(`http://localhost:8000/api/deleteDemande/${this.demandeId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        );
         if (response.data.delete === true) {
           this.$router.push('/TreatedRequest');
         } else {

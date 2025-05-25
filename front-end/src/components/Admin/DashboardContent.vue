@@ -91,7 +91,13 @@ export default {
   },
   methods: {
     fetchDashboardData() {
-      axios.get('http://localhost:8000/api/states') // Supposant que vous avez une route pour les données du tableau de bord
+      axios.get('http://localhost:8000/api/states',
+      {
+        headers: {
+          Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+        }
+      }
+      ) // Supposant que vous avez une route pour les données du tableau de bord
         .then(response => {
           console.log(response);
           this.newOrders = response.data.newOrders;
@@ -108,7 +114,9 @@ export default {
           `http://localhost:8000/api/getAllOffreAdmin`, 
           { 
             headers: { 
-              'Cache-Control': 'no-cache' // Assurer qu'il n'y a pas de mise en cache
+              'Cache-Control': 'no-cache', // Assurer qu'il n'y a pas de mise en cache
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+
             } 
           }
         );
@@ -116,7 +124,13 @@ export default {
           console.log(response.data.offres);
           for(let i=0; i < response.data.offres.length; i++){
             const response2 = await axios.get(
-            `http://localhost:8000/api/getEntreprise/${response.data.offres[i].idEntreprise}`);
+            `http://localhost:8000/api/getEntreprise/${response.data.offres[i].idEntreprise}`,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          );
             if (response2.data.check==true) {
               console.log(response.data);
               let logoURL = response2.data.entreprise.logo;

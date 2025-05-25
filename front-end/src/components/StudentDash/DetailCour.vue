@@ -137,7 +137,13 @@ export default {
     async fetchCoursDetails() {
       try {
         const coursId = this.$route.params.id;
-        const response = await axios.get(`http://localhost:8000/api/cours/${coursId}`);
+        const response = await axios.get(`http://localhost:8000/api/cours/${coursId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+            },
+          }
+        );
         this.cours = response.data.cours;
         localStorage.setItem("coursDetails", JSON.stringify(this.cours));
         // this.checkPaymentStatus();
@@ -169,6 +175,9 @@ export default {
           params: {
             etudiant_id: studentId,
             tuteur_id: tuteurId
+          },
+          headers: {
+            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
           }
         });
         this.isPaid = response.data.isSubscribed;

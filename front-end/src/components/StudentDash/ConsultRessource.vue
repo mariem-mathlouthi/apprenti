@@ -327,7 +327,13 @@ export default {
   methods: {
     async fetchRessources() {
       try {
-        const response = await axios.get("http://localhost:8000/api/ressources");
+        const response = await axios.get("http://localhost:8000/api/ressources",
+          {
+            headers: {
+              'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            }
+          }
+        );
         this.ressources = response.data.filter(
           ressource => ressource.idCours === parseInt(this.idCours)
         );
@@ -342,7 +348,7 @@ export default {
       this.feedbackError = null;
       
       try {
-        const token = localStorage.getItem('token');
+        const token = JSON.parse(sessionStorage.getItem("token"));
         const response = await axios.get(
           `http://localhost:8000/api/feedbacks/course/${this.idCours}`,
           {
@@ -419,7 +425,7 @@ export default {
     async confirmDeleteFeedback(feedbackId) {
       if (confirm('Êtes-vous sûr de vouloir supprimer votre avis ? Cette action est irréversible.')) {
         try {
-          const token = localStorage.getItem('token');
+          const token = JSON.parse(sessionStorage.getItem("token"));
           await axios.delete(
             `http://localhost:8000/api/feedbacks/${feedbackId}`,
             {

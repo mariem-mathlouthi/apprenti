@@ -80,7 +80,13 @@
       async getAllSecteurs() {
         this.loading = true;
         try {
-          const response = await axios.get("http://localhost:8000/api/secteurs");
+          const response = await axios.get("http://localhost:8000/api/secteurs",
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          );
           this.secteurs = response.data;
         } catch (error) {
           console.error("Erreur:", error);

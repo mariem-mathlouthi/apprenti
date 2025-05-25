@@ -84,14 +84,24 @@ import axios from "axios";
 
         try {
             const response = await axios.get(
-              `http://localhost:8000/api/offreDetail2/${id}`
+              `http://localhost:8000/api/offreDetail2/${id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+                }
+              }
             );
             if (response.data.check === true) {
               console.log(response.data.offre);
              
              
               const response2 = await axios.get(
-                `http://localhost:8000/api/getEntreprise/${response.data.offre.idEntreprise}`
+                `http://localhost:8000/api/getEntreprise/${response.data.offre.idEntreprise}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
+                  }
+                }
                 );
                 console.log(response2.data.entreprise.name);
                 let myObject ={

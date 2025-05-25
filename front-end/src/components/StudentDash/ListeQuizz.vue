@@ -107,8 +107,20 @@ export default {
     async fetchQuizz() {
       try {
         const [quizzResponse, coursResponse] = await Promise.all([
-          axios.get(`http://localhost:8000/api/quizz`),
-          axios.get(`http://localhost:8000/api/cours/${this.idCours}`)
+          axios.get(`http://localhost:8000/api/quizz`,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          ),
+          axios.get(`http://localhost:8000/api/cours/${this.idCours}`,
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          )
         ])
 
         this.coursTitre = coursResponse.data.titre
