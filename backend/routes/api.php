@@ -47,6 +47,13 @@ Route::post('/login', [authController::class, 'LoginUser']);
 Route::post('/forgot-password', [authController::class, 'forgot_password']);
 Route::post('/reset-password', [authController::class, 'changer_password']);
 
+Route::get('/secteurs', [SecteurController::class, 'getAllSecteurs']);
+Route::get('/niveaux', [NiveauController::class, 'getAllNiveaux']);
+Route::get('/domaines', [DomaineController::class, 'getAllDomaines']);
+Route::get('/specialites', [SpecialiteController::class, 'getAllSpecialites']);
+
+
+
 // Authenticated routes
 // All routes within this group will require sanctum authentication and have CORS middleware applied
 Route::middleware(['auth:sanctum', 'cors'])->group(function () {
@@ -190,28 +197,24 @@ Route::middleware(['auth:sanctum', 'cors'])->group(function () {
     Route::put('/feedbacks/{id}', [FeedbackController::class, 'updateFeedback']);
 
     // Specialite routes
-    Route::get('/specialites', [SpecialiteController::class, 'getAllSpecialites']);
     Route::post('/specialites', [SpecialiteController::class, 'createSpecialite']);
     Route::get('/specialites/{id}', [SpecialiteController::class, 'getSpecialiteById']);
     Route::put('/specialites/{id}', [SpecialiteController::class, 'updateSpecialite']);
     Route::delete('/specialites/{id}', [SpecialiteController::class, 'deleteSpecialite']);
 
     // Domaine routes
-    Route::get('/domaines', [DomaineController::class, 'getAllDomaines']);
     Route::post('/domaines', [DomaineController::class, 'createDomaine']);
     Route::get('/domaines/{id}', [DomaineController::class, 'getDomaineById']);
     Route::put('/domaines/{id}', [DomaineController::class, 'updateDomaine']);
     Route::delete('/domaines/{id}', [DomaineController::class, 'deleteDomaine']);
 
     // Niveau routes
-    Route::get('/niveaux', [NiveauController::class, 'getAllNiveaux']);
     Route::post('/niveaux', [NiveauController::class, 'createNiveau']);
     Route::get('/niveaux/{id}', [NiveauController::class, 'getNiveauById']);
     Route::put('/niveaux/{id}', [NiveauController::class, 'updateNiveau']);
     Route::delete('/niveaux/{id}', [NiveauController::class, 'deleteNiveau']);
 
     // Secteur routes
-    Route::get('/secteurs', [SecteurController::class, 'getAllSecteurs']);
     Route::post('/secteurs', [SecteurController::class, 'createSecteur']);
     Route::get('/secteurs/{id}', [SecteurController::class, 'getSecteurById']);
     Route::put('/secteurs/{id}', [SecteurController::class, 'updateSecteur']);
