@@ -20,10 +20,10 @@
         </svg>
 
         <span
-          v-if="notifications.length > 0"
+          v-if="visibleNotificationsCount > 0"
           class="absolute -top-1 -right-1 flex items-center justify-center h-4 w-4 bg-red-600 rounded-full text-white text-[0.65rem] font-bold"
         >
-          {{ notifications.length }}
+          {{ visibleNotificationsCount }}
         </span>
       </div>
     </div>
@@ -56,11 +56,18 @@
 
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
       notifications: [],
     };
+  },
+  computed: {
+    visibleNotificationsCount() {
+      return this.notifications.filter(notif => notif.visibility === 'shown').length;
+    }
   },
   methods: {
     getNotifications() {
@@ -69,11 +76,40 @@ export default {
         this.notifications = JSON.parse(storedData).notifications;
       }
     },
-    goToNotifications() {
-      this.$router.push('/Consulternotif');
-      this.notifications = [];
-      localStorage.setItem("notifications", JSON.stringify({ notifications: [] }));
-      this.$root.$emit('notifications-cleared');
+    async goToNotifications() {
+      try {
+        // Get the authorization token
+        const token = JSON.parse(sessionStorage.getItem('token'));
+        const headers = {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        };
+
+        // Update visibility for each shown notification
+        const shownNotifications = this.notifications.filter(n => n.visibility === 'shown');
+        await Promise.all(shownNotifications.map(notification => 
+          axios.put(
+            `http://localhost:8000/notification/${notification.id}/visibility`,
+            { visibility: 'hidden' },
+            { headers }
+          )
+        ));
+
+        // Update local state
+        const updatedNotifications = this.notifications.map(n => ({ ...n, visibility: 'hidden' }));
+        localStorage.setItem("notifications", JSON.stringify({ notifications: updatedNotifications }));
+        this.notifications = updatedNotifications;
+        
+        // Emit event for other components
+        this.$root.$emit('notifications-cleared');
+
+        // Navigate to notifications page
+        this.$router.push('/Consulternotif');
+      } catch (error) {
+        console.error('Error updating notification visibility:', error);
+        // Still navigate even if the update fails
+        this.$router.push('/Consulternotif');
+      }
     }
   },
   mounted() {

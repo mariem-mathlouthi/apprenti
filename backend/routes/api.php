@@ -88,8 +88,8 @@ Route::middleware(['auth:sanctum', 'cors'])->group(function () {
     Route::get('feedback/{id}/reponses', [ReponseFeedbackController::class, 'getReponsesByFeedback']);
 
     // Notifications2 routes
-    Route::post('/send-notification', [Notifications2Controller::class, 'sendNotification']);
-    Route::get('/notifications', [Notifications2Controller::class, 'getNotificationsByUserId']);
+    // Route::post('/send-notification', [Notifications2Controller::class, 'sendNotification']);
+    // Route::get('/notifications', [Notifications2Controller::class, 'getNotificationsByUserId']);
 
     // CoursSubscriptions routes
     Route::get('/etudiants', [CoursSubscriptionsController::class, 'getAllStudentsSubscriptedCours']);
@@ -156,6 +156,7 @@ Route::middleware(['auth:sanctum', 'cors'])->group(function () {
     // Notification (old system) routes
     Route::post('/notification', [notificationController::class, 'notification']);
     Route::get('/getAllNotifications', [notificationController::class, 'getAllNotifications']);
+    Route::put('/notification/{id}/visibility', [notificationController::class, 'updateNotificationVisibility']);
 
     // Attestation routes
     Route::post('/attestation', [attestationController::class, 'addAttestation']);

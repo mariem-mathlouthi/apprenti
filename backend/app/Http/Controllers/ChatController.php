@@ -14,7 +14,8 @@ class ChatController extends Controller
     {
         $request->validate([
             'tuteur_id' => 'required|exists:tuteurs,id',
-            'message' => 'required|string',
+            'message' => 'nullable|string|required_without:file',
+            'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048' // Max 2MB
         ]);
 
         // Verify that the student is connected to the tutor through any course subscription
@@ -29,10 +30,22 @@ class ChatController extends Controller
             ], 403);
         }
 
+        $filePath = null;
+        $fileType = null;
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $fileName = $file->getClientOriginalName();
+            $filePath = $file->storeAs('chat_files', $fileName, 'public');
+            $fileType = $file->getClientMimeType();
+        }
+
         $chat = Chat::create([
             'etudiant_id' => Auth::id(),
             'tuteur_id' => $request->tuteur_id,
             'message' => $request->message,
+            'file_path' => $filePath,
+            'file_type' => $fileType,
             // 'cours_id' => $subscription->cours_id, // Use the first available course subscription
             'sender_type' => 'etudiant'
         ]);
@@ -51,7 +64,8 @@ class ChatController extends Controller
     {
         $request->validate([
             'etudiant_id' => 'required|exists:etudiants,id',
-            'message' => 'required|string'
+            'message' => 'nullable|string|required_without:file',
+            'file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048' // Max 2MB
         ]);
 
         // Verify that the tutor is connected to the student through any course subscription
@@ -66,10 +80,22 @@ class ChatController extends Controller
             ], 403);
         }
 
+        $filePath = null;
+        $fileType = null;
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $fileName = time().'_'.$file->getClientOriginalName();
+            $filePath = $file->storeAs('chat_files', $fileName, 'public');
+            $fileType = $file->getClientMimeType();
+        }
+
         $chat = Chat::create([
             'tuteur_id' => Auth::id(),
             'etudiant_id' => $request->etudiant_id,
             'message' => $request->message,
+            'file_path' => $filePath,
+            'file_type' => $fileType,
             // 'cours_id' => $subscription->cours_id, // Use the first available course subscription
             'sender_type' => 'tuteur'
         ]);

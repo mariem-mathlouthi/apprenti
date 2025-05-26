@@ -76,6 +76,16 @@ class notificationController extends Controller
     public function getAllNotifications()
     {
         $notifications = Notification::all();
+        $user = auth()->user()->id;
+        if (!$user) {
+            return response()->json([
+               'message' => 'Unauthorized',
+                'check' => false,
+            ], 403);
+        }
+        $notifications = $notifications->filter(function ($notification) use ($user) {
+            return $notification->idEtudiant == $user || $notification->idEtudiant == 0 || $notification->idEntreprise == $user || $notification->idEntreprise == 0 || $notification->idTuteur == $user || $notification->idTuteur == 0;
+        });
         return response()->json([
             'notifications' => $notifications,
             'message' => 'notifications  fetched successfully',
@@ -83,12 +93,31 @@ class notificationController extends Controller
         ]);
     }
 
+    public function updateNotificationVisibility(Request $request, $id)
+    {
+        // Validate the request
+        $request->validate([
+            'visibility' => 'required|in:shown,hidden',
+        ]);
 
+        // Find the notification
+        $notification = Notification::find($id);
 
+        // Check if notification exists
+        if (!$notification) {
+            return response()->json([
+                'message' => 'Notification not found',
+                'check' => false,
+            ], 404);
+        }
 
+        // Update the visibility
+        $notification->visibility = $request->visibility;
+        $notification->save();
 
-
-
-
-
+        return response()->json([
+            'message' => 'Notification visibility updated successfully',
+            'check' => true,
+        ]);
+    }
 }

@@ -1,11 +1,3 @@
-/**
- * Mock API Service for Chat Functionality
- * 
- * This file provides mock implementations of the backend API endpoints
- * required for the chat feature. In a production environment, these would
- * be replaced with actual API calls to the backend server.
- */
-
 import axios from 'axios';
 import Pusher from 'pusher-js';
 
@@ -150,13 +142,14 @@ const chatApiService = {
             success: true,
             messages: response.data.data.map(msg => ({
               id: msg.id,
-              // Ensure consistent naming if backend provides sender_id/receiver_id or tuteur_id/etudiant_id
               tuteur_id: msg.tuteur_id, 
               etudiant_id: msg.etudiant_id,
               message: msg.message,
+              file_path: msg.file_path,
+              file_type: msg.file_type,
               read_at: msg.read_at,
               created_at: msg.created_at,
-              sender_type: msg.sender_type // This indicates who sent the message
+              sender_type: msg.sender_type 
             }))
           }
         };
@@ -242,7 +235,25 @@ const chatApiService = {
     try {
       // Get the appropriate token based on user role
       let authToken;
-      if (messageData.senderRole === 'tuteur') {
+      let senderRole;
+      
+      // Determine if we're sending a FormData or regular message
+      const isFormData = messageData instanceof FormData;
+      
+      // Extract the sender role from the FormData or messageData
+      if (isFormData) {
+        // For FormData, we need to check if it contains etudiant_id or tuteur_id
+        if (messageData.has('etudiant_id')) {
+          senderRole = 'tuteur';
+        } else {
+          senderRole = 'etudiant';
+        }
+      } else {
+        senderRole = messageData.senderRole;
+      }
+      
+      // Get the appropriate token based on user role
+      if (senderRole === 'tuteur') {
         const tuteurInfo = JSON.parse(localStorage.getItem('TuteurAccountInfo'));
         authToken = tuteurInfo ? tuteurInfo.token : null;
       } else {
@@ -260,42 +271,34 @@ const chatApiService = {
         };
       }
 
-      // Determine if we're sending a file or regular message
-      const isFormData = messageData instanceof FormData;
-      
-      // Prepare the message data and endpoint based on sender role
-      let apiEndpoint;
-      let apiMessageData;
+      // Prepare the headers
       let headers = {
         Authorization: `Bearer ${authToken}`
       };
 
-      if (isFormData) {
-        // For file uploads, use FormData and don't set Content-Type (browser will set it automatically)
-        apiMessageData = messageData;
+      // Use the correct API endpoint based on sender role
+      let apiEndpoint;
+      if (senderRole === 'tuteur') {
+        apiEndpoint = 'http://127.0.0.1:8000/api/chat/tutor/send';
       } else {
-        // For regular messages, use JSON
+        apiEndpoint = 'http://127.0.0.1:8000/api/chat/student/send';
+      }
+
+      // For regular messages (not FormData), set Content-Type and prepare data
+      let apiMessageData = messageData;
+      if (!isFormData) {
         headers['Content-Type'] = 'application/json';
-        if (messageData.senderRole === 'tuteur') {
-          apiEndpoint = 'http://127.0.0.1:8000/api/chat/tutor/send';
+        if (senderRole === 'tuteur') {
           apiMessageData = {
             etudiant_id: messageData.receiverId,
             message: messageData.content,
           };
         } else {
-          apiEndpoint = 'http://127.0.0.1:8000/api/chat/student/send';
           apiMessageData = {
             tuteur_id: messageData.receiverId,
             message: messageData.content,
           };
         }
-      }
-
-      // Set the appropriate endpoint for file uploads
-      if (isFormData) {
-        apiEndpoint = messageData.senderRole === 'tuteur' 
-          ? 'http://127.0.0.1:8000/api/chat/tutor/send-file'
-          : 'http://127.0.0.1:8000/api/chat/student/send-file';
       }
 
       // Send the message to the server
@@ -310,15 +313,7 @@ const chatApiService = {
           data: {
             success: true,
             message: 'Message sent successfully',
-            messageData: {
-              id: response.data.message.id,
-              tuteur_id: response.data.message.tuteur_id,
-              etudiant_id: response.data.message.etudiant_id,
-              message: response.data.message.message,
-              read_at: response.data.message.read_at,
-              created_at: response.data.message.created_at,
-              sender_type: response.data.message.sender_type
-            }
+            messageData: response.data.data || response.data.message
           }
         };
       } else {
@@ -372,12 +367,6 @@ const chatApiService = {
     return { pusher, channel };
   },
 
-  /**
-   * Mark a message as read
-   * @param {string} token - Authentication token
-   * @param {number} messageId - Single message ID to mark as read
-   * @returns {Promise} - Promise resolving to the API response
-   */
   markMessagesAsRead: async (token, messageId) => {
     try {
       if (!token) {

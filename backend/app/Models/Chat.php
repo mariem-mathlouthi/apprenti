@@ -13,6 +13,8 @@ class Chat extends Model
         'tuteur_id',
         'etudiant_id',
         'message',
+        'file_path',
+        'file_type',
         'read_at',
         'sender_type'
     ];

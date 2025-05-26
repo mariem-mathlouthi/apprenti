@@ -45,20 +45,23 @@
           </div>
           <div :class="[message.sender_type === currentUserRole ? 'receiver' : 'sender', 'message-bubble mb-2']">
             <div :class="[message.sender_type === currentUserRole ? 'bg-blue-600 text-white' : 'bg-white text-gray-800 border border-gray-200', 'rounded-lg py-2 px-3 max-w-xs md:max-w-sm inline-block shadow-sm text-sm']">
-              <div v-if="message.file" class="mb-2">
-                <div v-if="message.file.type.startsWith('image/')" class="mb-2">
-                  <img :src="message.file.url" :alt="message.file.name" class="max-w-full rounded-lg" />
+              <div v-if="message.file_path" class="mb-2">
+                <div v-if="message.file_type && message.file_type.startsWith('image/')" class="flex items-center space-x-2 p-2">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <a :href="`http://localhost:8000/storage/${message.file_path}`" target="_blank" class="underline hover:text-opacity-75">View Image</a>
                 </div>
-                <div v-else-if="message.file.type === 'application/pdf'" class="flex items-center space-x-2 p-2 bg-opacity-10 bg-gray-500 rounded">
+                <div v-else-if="message.file_type === 'application/pdf'" class="flex items-center space-x-2 p-2">
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                   </svg>
-                  <a :href="message.file.url" target="_blank" class="underline hover:text-opacity-75">{{ message.file.name }}</a>
+                  <a :href="`http://localhost:8000/storage/${message.file_path}`" target="_blank" class="underline hover:text-opacity-75">View PDF</a>
                 </div>
               </div>
               <p v-if="message.content">{{ message.content }}</p>
               <span class="text-xs block mt-1 opacity-75">{{ formatTime(message.timestamp) }}</span>
-          </div>
+            </div>
           </div>
         </template>
       </template>
@@ -68,28 +71,23 @@
     <div class="chat-input border-t border-gray-100 p-3">
       <form @submit.prevent="sendMessage" class="flex flex-col space-y-2">
         <div class="flex items-center space-x-2">
-          <input 
-            v-model="newMessage" 
-            type="text" 
-            placeholder="Tapez votre message..." 
-            class="flex-grow border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-          />
           <input
-            type="file"
-            ref="fileInput"
-            @change="handleFileSelect"
-            accept="image/*,.pdf"
-            class="hidden"
+            v-model="newMessage"
+            type="text"
+            class="flex-1 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Tapez votre message..."
+            :disabled="sending"
           />
-          <button
-            type="button"
-            @click="$refs.fileInput.click()"
-            class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-          >
-            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
-            </svg>
-          </button>
+          
+          <!-- Replace the file input button with ChatFileUpload component -->
+          <ChatFileUpload 
+            :disabled="sending" 
+            :maxSizeMB="2"
+            @file-selected="onFileSelected"
+            @file-removed="onFileRemoved"
+            ref="fileUpload"
+          />
+          
           <button 
             type="submit" 
             class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
@@ -101,7 +99,7 @@
             <div v-else class="w-5 h-5 border-t-2 border-white rounded-full animate-spin"></div>
           </button>
         </div>
-        <div v-if="selectedFile" class="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
+        <!-- <div v-if="selectedFile" class="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
           <div class="flex items-center space-x-2">
             <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -117,7 +115,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
-        </div>
+        </div> -->
       </form>
     </div>
   </div>
@@ -125,8 +123,12 @@
 
 <script>
 import chatApiService from './chatApiService';
+import ChatFileUpload from './ChatFileUpload.vue';
 
 export default {
+  components: {
+    ChatFileUpload
+  },
   name: 'ChatComponent',
   props: {
     chatPartner: {
@@ -157,7 +159,8 @@ export default {
       firstUnreadMessageIndex: -1, // Initialize with -1 (no unread messages)
       unreadMessagesCount: 0, // To store the count of unread messages
       selectedFile: null, // To store the selected file for upload
-      allowedFileTypes: ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'] // Allowed file types
+      allowedFileTypes: ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'], // Allowed file types
+      _tempFileUrl: null // To store temporary file URL for cleanup
     };
   },
   mounted() {
@@ -165,10 +168,20 @@ export default {
     this.loadChatHistory();
   },
   beforeUnmount() {
+    // Clean up Pusher subscription
     if (this.channel) {
       this.channel.unbind_all();
       this.pusher.unsubscribe(this.channelName);
     }
+    
+    // Clean up any temporary file URLs
+    if (this._tempFileUrl) {
+      URL.revokeObjectURL(this._tempFileUrl);
+      this._tempFileUrl = null;
+    }
+    
+    // Clean up any file input
+    this.selectedFile = null;
   },
   watch: {
     messages() {
@@ -263,6 +276,7 @@ export default {
           this.chatPartner.id,
           this.chatPartner.role
         );
+        console.log("sender::", response.data)
         
         if (response.data.success) {
           this.messages = response.data.messages.map(msg => ({
@@ -270,11 +284,12 @@ export default {
             tuteur_id: msg.tuteur_id,
             etudiant_id: msg.etudiant_id,
             content: msg.message, 
+            file_path: msg.file_path,
+            file_type: msg.file_type,
             sender_type: msg.sender_type, 
             timestamp: new Date(msg.created_at),
             read_at: msg.read_at ? new Date(msg.read_at) : null 
           }));
-          console.log("sender::", this.messages)
           this.findFirstUnreadMessage();
         }
       } catch (error) {
@@ -286,56 +301,42 @@ export default {
       }
     },
     
-    handleFileSelect(event) {
-      const file = event.target.files[0];
-      if (file) {
-        if (this.allowedFileTypes.includes(file.type)) {
-          if (file.size <= 10 * 1024 * 1024) { // 10MB max size
-            this.selectedFile = file;
-          } else {
-            this.$emit('error', 'Le fichier est trop volumineux. Taille maximale : 10MB');
-            event.target.value = '';
-          }
-        } else {
-          this.$emit('error', 'Type de fichier non autorisé. Formats acceptés : JPG, PNG, GIF, PDF');
-          event.target.value = '';
-        }
-      }
+    onFileSelected(file) {
+      this.selectedFile = file;
     },
-
-    removeSelectedFile() {
+    
+    onFileRemoved() {
       this.selectedFile = null;
-      if (this.$refs.fileInput) {
-        this.$refs.fileInput.value = '';
+      if (this._tempFileUrl) {
+        URL.revokeObjectURL(this._tempFileUrl);
+        this._tempFileUrl = null;
       }
     },
-
+    
     async sendMessage() {
       if ((!this.newMessage.trim() && !this.selectedFile) || this.sending) return;
       
       this.sending = true;
       
       try {
-        let messageData = {
-          senderId: this.currentUserId,
-          senderRole: this.currentUserRole,
-          receiverId: this.chatPartner.id,
-          receiverRole: this.chatPartner.role,
-          timestamp: new Date()
-        };
-
-        if (this.selectedFile) {
-          const formData = new FormData();
-          formData.append('file', this.selectedFile);
-          Object.keys(messageData).forEach(key => {
-            formData.append(key, messageData[key]);
-          });
-          if (this.newMessage.trim()) {
-            formData.append('content', this.newMessage.trim());
-          }
-          messageData = formData;
+        // Create FormData for sending both message and file
+        const formData = new FormData();
+        
+        // Add message data based on sender role
+        if (this.currentUserRole === 'tuteur') {
+          formData.append('etudiant_id', this.chatPartner.id);
         } else {
-          messageData.content = this.newMessage.trim();
+          formData.append('tuteur_id', this.chatPartner.id);
+        }
+        
+        // Add message content if provided
+        if (this.newMessage.trim()) {
+          formData.append('message', this.newMessage.trim());
+        }
+        
+        // Add file if selected
+        if (this.selectedFile) {
+          formData.append('file', this.selectedFile);
         }
         
         // Optimistically add message to UI
@@ -344,19 +345,32 @@ export default {
           senderId: this.currentUserId,
           sender_type: this.currentUserRole,
           timestamp: new Date(),
-          file: this.selectedFile ? {
-            name: this.selectedFile.name,
-            type: this.selectedFile.type
-          } : null
+          file_path: `chat_files/${this.selectedFile? this.selectedFile.name : null}`,
+          file_type: this.selectedFile? this.selectedFile.type : null,
+          // file: this.selectedFile ? {
+          //   name: this.selectedFile.name,
+          //   type: this.selectedFile.type,
+          //   url: URL.createObjectURL(this.selectedFile) // Create temporary URL for preview
+          // } : null
         };
+        
+        // Store the temporary URL to revoke it later
+        // if (this.selectedFile) {
+        //   this._tempFileUrl = previewMessage.file.url;
+        // }
+        console.log("previewMessage::", previewMessage.file_path)
+        
         this.messages.push(previewMessage);
         
         // Clear input fields
         this.newMessage = '';
-        this.removeSelectedFile();
+        if (this.$refs.fileUpload) {
+          this.$refs.fileUpload.reset();
+        }
         this.scrollToBottom();
         
-        const response = await chatApiService.sendMessage(messageData);
+        // Send the message to the server
+        const response = await chatApiService.sendMessage(formData);
         
         if (!response.data.success) {
           console.error('Failed to send message:', response.data.message);

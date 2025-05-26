@@ -45,6 +45,7 @@ class ChatEvent implements ShouldBroadcast
             'etudiant_id' => $this->chat->etudiant_id,
             'tuteur_id' => $this->chat->tuteur_id,
             'message' => $this->chat->message,
+            'file' => $this->chat->file,
             'cours_id' => $this->chat->cours_id,
             'created_at' => $this->chat->created_at,
             'read_at' => $this->chat->read_at,

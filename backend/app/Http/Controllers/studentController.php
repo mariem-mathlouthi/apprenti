@@ -7,6 +7,9 @@ use App\Models\CoursSubscriptions;
 use Illuminate\Http\Request;
 use App\Models\Etudiant;
 
+use App\Models\Offre; // Added for Offre model
+use Illuminate\Support\Facades\Auth; // Added for Auth facade
+
 class studentController extends Controller
 {
     //
