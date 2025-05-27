@@ -29,7 +29,7 @@
             <!-- Prix -->
             <div class="flex items-center">
               <span class="font-medium text-gray-700">Prix :</span>
-              <span class="ml-2 text-gray-900">{{ cours.prix }} €</span>
+              <span class="ml-2 text-gray-900">{{ cours.prix }} dt</span>
             </div>
 
             <!-- Durée -->
@@ -51,7 +51,7 @@
               :to="`/ajouter-ressource/${cours.id}`"
               class="btn-submit"
             >
-              Ajouter une Ressource
+              Gérer Ressources
             </router-link>
           </div>
         </div>

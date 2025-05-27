@@ -1,15 +1,23 @@
 <template>
   <div id="app" class="flex flex-col h-screen">
-    <NavbarTuteur />
-    <SidebarTuteur />
+    <!-- Navbar fixe en haut -->
+    <NavbarTuteur class="fixed top-0 w-full z-50 h-16" />
 
-    <section id="content" class="flex-1 flex justify-center items-center py-6">
-      <div class="container mx-auto p-6">
-        <h1 class="text-3xl font-bold text-indigo-700 text-center mb-6">
-          Ajouter un Cours
-        </h1>
+    <!-- Sidebar fixe -->
+    <SidebarTuteur class="fixed left-0 top-16 h-[calc(100vh-4rem)] z-40" />
 
-        <div class="bg-white p-8 rounded-lg shadow-lg w-full sm:w-96 max-w-4xl mx-auto">
+    <!-- Contenu principal -->
+    <section 
+      id="content" 
+      class="flex-1 mt-16 pb-6 overflow-y-auto z-10"
+      :style="{ height: 'calc(100vh - 4rem)' }"
+    >
+      <div class="container mx-auto p-6 flex justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-lg w-full md:w-3/4 lg:w-2/3 max-w-4xl">
+          <h1 class="text-3xl font-bold text-black text-center mb-6">
+            Ajouter un Cours
+          </h1>
+
           <form @submit.prevent="createCours" class="space-y-6">
             <!-- Titre -->
             <div>
@@ -36,7 +44,7 @@
 
             <!-- Prix -->
             <div>
-              <label class="label">Prix (€)</label>
+              <label class="label">Prix (dt)</label>
               <input type="number" v-model="prix" required class="input" placeholder="Entrez le prix" />
             </div>
 
@@ -127,24 +135,24 @@ export default {
     },
 
     showNotification(title, options) {
-            if (Notification.permission === "granted") {
-                new Notification(title, options);
-            } else if (Notification.permission !== "denied") {
-                this.requestNotificationPermission();
-            }
-        },
-            
+      if (Notification.permission === "granted") {
+        new Notification(title, options);
+      } else if (Notification.permission !== "denied") {
+        this.requestNotificationPermission();
+      }
+    },
+    
     requestNotificationPermission() {
-        if ("Notification" in window) {
-            Notification.requestPermission().then((permission) => {
-            if (permission === "granted") {
-                console.log("Notification permission granted");
-            }
-            });
-        }
+      if ("Notification" in window) {
+        Notification.requestPermission().then((permission) => {
+          if (permission === "granted") {
+            console.log("Notification permission granted");
+          }
+        });
+      }
     },
 
-    async sendNotification(idEtudiant, idEntreprise, idTuteur ,message, destination, type, date, appointmentId) {
+    async sendNotification(idEtudiant, idEntreprise, idTuteur, message, destination, type, date, appointmentId) {
       const notificationData = {
         idEtudiant: idEtudiant,
         idEntreprise: idEntreprise,
@@ -155,7 +163,7 @@ export default {
         visibility: "shown",
         date: date,
         appointmentId: appointmentId,
-      }
+      };
 
       await axios.post(
         "http://localhost:8000/api/notification",
@@ -165,10 +173,8 @@ export default {
             Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
           },
         }
-      )
-
+      );
     },
-
 
     async createCours() {
       if (!this.idTuteur) {
@@ -190,7 +196,6 @@ export default {
       }
 
       try {
-        // Création du cours
         const response = await axios.post("http://localhost:8000/api/cours", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -199,25 +204,11 @@ export default {
         });
 
         if (response.data.success) {
-          // Création de la notification
-          // const Tuteur = JSON.parse(localStorage.getItem("TuteurAccountInfo"));
           const notificationMessage = `${this.tuteurName} a ajouté un nouveau cours : ${this.titre}`;
           this.sendNotification(0, null, this.idTuteur, notificationMessage, "Etudiant", "cours", new Date().toISOString().split('T')[0], null);
           this.showNotification("Nouveau cours ajouté", {
             body: notificationMessage,
           });
-        // const notificationData = {
-        //     idEtudiant: 0,
-        //     idEntreprise: 0,
-        //     idTuteur: this.idTuteur,
-        //     message: `${this.tuteurName} a ajouté un nouveau cours : ${this.titre}`,
-        //     destination: "Etudiant",
-        //     type: "cours",
-        //     visibility: "shown",
-        //     date: new Date().toISOString().split('T')[0] // Format YYYY-MM-DD
-        //   };
-
-          // await axios.post("http://localhost:8000/api/notification", notificationData);
 
           toast.success("Cours ajouté avec succès !");
           this.$router.push("/cours");
@@ -244,6 +235,7 @@ export default {
   border-radius: 6px;
   transition: border-color 0.2s;
 }
+
 .input:focus {
   border-color: #4f46e5;
   outline: none;
@@ -258,6 +250,7 @@ export default {
   font-weight: bold;
   transition: background-color 0.2s;
 }
+
 .btn-submit:hover {
   background-color: #4338ca;
 }
@@ -267,5 +260,17 @@ export default {
   margin-bottom: 8px;
   font-weight: 500;
   color: #374151;
+}
+
+@media (max-width: 640px) {
+  #content {
+    margin-top: 3.5rem;
+    height: calc(100vh - 3.5rem) !important;
+  }
+  
+  .fixed.left-0 {
+    top: 3.5rem;
+    height: calc(100vh - 3.5rem);
+  }
 }
 </style>

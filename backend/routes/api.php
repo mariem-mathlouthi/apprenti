@@ -93,7 +93,7 @@ Route::middleware(['auth:sanctum', 'cors'])->group(function () {
 
     // CoursSubscriptions routes
     Route::get('/etudiants', [CoursSubscriptionsController::class, 'getAllStudentsSubscriptedCours']);
-    Route::get('subscribtions/cours/{id}', [CoursSubscriptionsController::class, 'getIsStudentSubscribedToCourse']);
+    Route::get('subscriptions/cours/{id}', [CoursSubscriptionsController::class, 'getIsStudentSubscribedToCourse']);
     Route::get('/subcsriptWithTueur', [CoursSubscriptionsController::class, 'getAllTutorsSubscripted']);
     Route::get('/subcsriptionEtudiant', [CoursSubscriptionsController::class, 'getAllStudentsSubscripted']);
     

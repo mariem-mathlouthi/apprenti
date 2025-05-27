@@ -1,9 +1,15 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50/20">
-    <NavbarTuteur class="fixed top-0 left-0 w-full z-50 shadow-sm bg-white/90 backdrop-blur-md" />
-    <SidebarTuteur class="fixed left-0 top-0 h-full z-40" />
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50/20 relative">
+    <!-- Navbar fixe -->
+    <NavBarStd class="fixed top-0 left-0 w-full z-50 shadow-sm bg-white/90 backdrop-blur-md" />
+    
+    <!-- Sidebar fixe -->
+    <div class="fixed left-0 top-16 h-[calc(100vh-4rem)] z-40 w-72">
+      <Sidebar />
+    </div>
 
-    <main class="pt-24 pl-72 pr-8 pb-8 min-h-screen">
+    <!-- Contenu principal -->
+    <main class="pt-24 ml-72 pr-8 pb-8 min-h-screen">
       <div class="max-w-4xl mx-auto space-y-12">
         <!-- En-tête animé -->
         <div class="relative group">
@@ -15,7 +21,6 @@
 
         <!-- Carte détaillée -->
         <div class="relative bg-white/95 backdrop-blur-xl rounded-[2rem] shadow-2xl p-8 border border-white/20 hover:shadow-3xl transition-shadow duration-300">
-          <!-- Effet de halo au survol -->
           <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-purple-500/5 opacity-0 hover:opacity-100 rounded-[2rem] transition-opacity duration-300 -z-10"></div>
 
           <div class="space-y-6">
@@ -52,7 +57,7 @@
                   </svg>
                   <div>
                     <p class="text-sm font-medium text-gray-500">Prix</p>
-                    <p class="text-lg font-semibold text-gray-900">{{ cours.prix }} €</p>
+                    <p class="text-lg font-semibold text-gray-900">{{ cours.prix }} dt</p>
                   </div>
                 </div>
 
@@ -81,7 +86,6 @@
 
             <!-- Bouton d'action -->
             <div class="pt-6 text-center">
-              <!-- Bouton S'inscrire si l'étudiant n'a pas payé -->
               <router-link 
                 v-if="!isPaid"
                 :to="'/Payment/' + cours.id"
@@ -93,7 +97,6 @@
                 </svg>
               </router-link>
               
-              <!-- Bouton Ressources si l'étudiant a déjà payé -->
               <router-link 
                 v-if="isPaid"
                 :to="'/DetailsCours/' + cours.id"
@@ -113,8 +116,8 @@
 </template>
 
 <script>
-import NavbarTuteur from "./NavBarStd.vue";
-import SidebarTuteur from "./Sidebar.vue";
+import NavBarStd from "./NavBarStd.vue";
+import Sidebar from "./Sidebar.vue";
 import axios from "axios";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -122,8 +125,8 @@ import "vue3-toastify/dist/index.css";
 export default {
   name: "CoursDetails",
   components: {
-    NavbarTuteur,
-    SidebarTuteur,
+    NavBarStd,
+    Sidebar,
   },
   data() {
     return {
@@ -146,7 +149,7 @@ export default {
         );
         this.cours = response.data.cours;
         localStorage.setItem("coursDetails", JSON.stringify(this.cours));
-        // this.checkPaymentStatus();
+        this.checkPaymentStatus();
       } catch (error) {
         console.error("Erreur :", error);
         toast.error("Erreur de chargement des détails", {
@@ -166,15 +169,12 @@ export default {
         
         const coursId = this.$route.params.id;
         const studentId = this.studentInfo.id;
-        const tuteurId = this.tuteurId;
         
-        // console.log("etudiant id:::", studentId);
-        // Vérifier si l'étudiant a déjà payé pour ce cours
-        const response = await axios.get(`http://localhost:8000/api/subscribtions/cours/${coursId}`, 
+        const response = await axios.get(`http://localhost:8000/api/subscriptions/cours/${coursId}`, 
         {
           params: {
             etudiant_id: studentId,
-            tuteur_id: tuteurId
+            tuteur_id: this.tuteurId
           },
           headers: {
             Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
@@ -182,21 +182,17 @@ export default {
         });
         this.isPaid = response.data.isSubscribed;
       } catch (error) {
-        console.error("Erreur lors de la vérification du paiement :", error);
-        // Si l'API renvoie une erreur 404, cela signifie que l'étudiant n'a pas payé
-        if (error.response && error.response.status === 404) {
+        if (error.response?.status === 404) {
           this.isPaid = false;
         }
       }
     },
   },
   mounted() {
-    this.checkPaymentStatus();
     this.fetchCoursDetails();
   },
   
   created() {
-    // Vérifier si l'étudiant est connecté
     const studentInfo = localStorage.getItem("StudentAccountInfo");
     if (studentInfo) {
       this.studentInfo = JSON.parse(studentInfo);
@@ -232,5 +228,18 @@ export default {
 
 .backdrop-blur-xl {
   backdrop-filter: blur(24px);
+}
+
+/* Correction pour le défilement mobile */
+@media (max-width: 768px) {
+  main {
+    margin-left: 0;
+    padding: 1rem;
+    padding-top: 6rem;
+  }
+  
+  .fixed.w-72 {
+    display: none; /* Cacher la sidebar sur mobile */
+  }
 }
 </style>
