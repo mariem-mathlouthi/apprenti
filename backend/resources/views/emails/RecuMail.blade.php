@@ -100,7 +100,7 @@
                 
                 <div class="detail-row">
                     <span class="detail-label">Montant</span>
-                    <span class="detail-value">{{ $amount ?? '123,00 €' }}</span>
+                    <span class="detail-value">{{ $amount ?? '123,00 dt' }}</span>
                 </div>
                 
                 <div class="detail-row">
@@ -110,12 +110,12 @@
                 
                 <div class="detail-row">
                     <span class="detail-label">Frais de service</span>
-                    <span class="detail-value">{{ $service_fee ?? '0,00 €' }}</span>
+                    <span class="detail-value">{{ $service_fee ?? '0,00 dt' }}</span>
                 </div>
                 
                 <div class="detail-row total">
                     <span class="detail-label">Total</span>
-                    <span class="detail-value">{{ $total ?? '123,00 €' }}</span>
+                    <span class="detail-value">{{ $total ?? '123,00 dt' }}</span>
                 </div>
             </div>
             
