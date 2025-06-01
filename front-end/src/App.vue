@@ -3,16 +3,19 @@
   <div id="app">
     <router-view></router-view>
     <NotifPopup v-if="isUserLoggedIn"/>
+    <GeminiChatbot />
   </div>
 </template>
 
 <script>
 import NotifPopup from './components/NotifPopup.vue'
+import GeminiChatbot from './components/GeminiChatbot.vue'
 import { computed, ref } from 'vue'
 
 export default{
   components:{
-    NotifPopup
+    NotifPopup,
+    GeminiChatbot
   },
   
   setup() {
