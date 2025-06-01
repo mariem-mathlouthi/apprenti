@@ -537,7 +537,7 @@ export default {
         const tuteurId = this.tuteurId;
         
         // Vérifier si l'étudiant a déjà payé pour ce cours
-        const response = await axios.get(`http://localhost:8000/api/subscribtions/cours/${coursId}`, 
+        const response = await axios.get(`http://localhost:8000/api/subscriptions/cours/${coursId}`, 
         {
           params: {
             etudiant_id: studentId,
