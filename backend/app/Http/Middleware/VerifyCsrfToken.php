@@ -50,7 +50,12 @@ class VerifyCsrfToken extends Middleware
         'api/enterprisesAdmin',
         'api/enterprisesAdmin/{id}',
         'api/studentsAdmin',
-        'api/deleteStudentAdmin/{id}'
+        'api/deleteStudentAdmin/{id}',
+
+
+
+        // Gemini AI routes
+        'api/gemini/*'
         
     ];
 }

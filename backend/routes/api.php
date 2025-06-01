@@ -26,6 +26,7 @@ use App\Http\Controllers\ReponseFeedbackController;
 use App\Http\Controllers\SecteurController;
 use App\Http\Controllers\TypeStageController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\GeminiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -71,6 +72,13 @@ Route::middleware(['auth:sanctum', 'cors'])->group(function () {
         Route::post('/mark-read', [ChatController::class, 'markAsRead']);
         Route::get('/unread-count/{role}', [ChatController::class, 'getUnreadCount']);
         Route::get('/contacts/{role}', [ChatController::class, 'getContacts']);
+    });
+
+     // Gemini AI Chatbot routes
+    Route::prefix('gemini')->group(function () {
+        Route::post('/chat', [GeminiController::class, 'chat']);
+        Route::get('/suggestions', [GeminiController::class, 'getQuickSuggestions']);
+        Route::get('/health', [GeminiController::class, 'healthCheck']);
     });
 
     // Appointment routes
