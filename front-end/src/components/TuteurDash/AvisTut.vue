@@ -370,6 +370,10 @@ export default {
   components: { NavBarTuteur, SidebarTuteur },
   data() {
     return {
+      badWords: [
+        "bhim",
+        "yaayef"
+      ],
       idCours: this.$route.params.id,
       showAvis: false,
       listeAvis: [],
@@ -416,6 +420,45 @@ export default {
     created() {
       this.loadUserInfos();
     },
+
+    async checkComment(comment) {
+      this.warning = "";
+
+      const lower = comment.toLowerCase();
+      if (this.badWords.some((word) => lower.includes(word))) {
+        return false;
+      }
+
+      const apiKey = "AIzaSyD_Q97rsq5y0y-kWFuSQCtcMdu6kEsATHA"; 
+      const endpoint = `https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=${apiKey}`;
+
+      const body = {
+        comment: { text: comment },
+        languages: ["fr"],
+        requestedAttributes: { TOXICITY: {} },
+      };
+
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+        const result = await response.json();
+        const score = result.attributeScores.TOXICITY.summaryScore.value;
+
+        if (score > 0.7) {
+          return false;
+        } else {
+          return true;
+        }
+      } catch (err) {
+        console.error("Perspective API error:", err);
+        return false;
+      }
+    },
+
     async fetchAvis() {
       this.isLoadingFeedbacks = true;
       this.feedbackError = null;
@@ -546,48 +589,53 @@ export default {
         return;
       }
 
-      try {
-        const token = JSON.parse(localStorage.getItem('TuteurAccountInfo')).token;
-        const userRole = this.selectedReponse.user_role;
-        const response = await axios.put(
-          `http://localhost:8000/api/reponse/${this.selectedReponse.id}`,
-          { 
-            reponse: this.editReponseText,
-            user_role: userRole
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
+      if (!await this.checkComment(this.editReponseText)) {
+        toast.error('Votre réponse contient des mots inappropriés');
+        return;
+      } else {
+        try {
+          const token = JSON.parse(localStorage.getItem('TuteurAccountInfo')).token;
+          const userRole = this.selectedReponse.user_role;
+          const response = await axios.put(
+            `http://localhost:8000/api/reponse/${this.selectedReponse.id}`,
+            { 
+              reponse: this.editReponseText,
+              user_role: userRole
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
             }
-          }
-        );
-
-        if (response.status === 200) {
-          const updatedReponseFromServer = {
-             ...response.data.reponse, 
-             contenu: response.data.reponse.reponse || this.editReponseText, // Ensure 'contenu' is correctly mapped
-             user_role: response.data.reponse.user_role || 'tuteur' // ensure user_role is present
-            };
-
-          const feedbackId = this.selectedFeedbackId;
-          if (this.feedbackReponses[feedbackId]) {
-            const index = this.feedbackReponses[feedbackId].findIndex(r => r.id === updatedReponseFromServer.id);
-            if (index !== -1) {
-              this.feedbackReponses[feedbackId].splice(index, 1, updatedReponseFromServer);
-              // Use nextTick to ensure DOM updates if direct splice isn't reactive enough for complex objects/arrays
-              await nextTick(); 
+          );
+  
+          if (response.status === 200) {
+            const updatedReponseFromServer = {
+               ...response.data.reponse, 
+               contenu: response.data.reponse.reponse || this.editReponseText, // Ensure 'contenu' is correctly mapped
+               user_role: response.data.reponse.user_role || 'tuteur' // ensure user_role is present
+              };
+  
+            const feedbackId = this.selectedFeedbackId;
+            if (this.feedbackReponses[feedbackId]) {
+              const index = this.feedbackReponses[feedbackId].findIndex(r => r.id === updatedReponseFromServer.id);
+              if (index !== -1) {
+                this.feedbackReponses[feedbackId].splice(index, 1, updatedReponseFromServer);
+                // Use nextTick to ensure DOM updates if direct splice isn't reactive enough for complex objects/arrays
+                await nextTick(); 
+              }
             }
+            toast.success("Réponse modifiée avec succès !");
+            this.showEditReponseModal = false;
+            this.selectedReponse = null;
+            this.editReponseText = "";
+          } else {
+            toast.error(response.data.message || "Erreur lors de la modification de la réponse.");
           }
-          toast.success("Réponse modifiée avec succès !");
-          this.showEditReponseModal = false;
-          this.selectedReponse = null;
-          this.editReponseText = "";
-        } else {
-          toast.error(response.data.message || "Erreur lors de la modification de la réponse.");
+        } catch (error) {
+          console.error("Erreur lors de la modification de la réponse:", error);
+          toast.error(error.response?.data?.message || "Impossible de modifier la réponse.");
         }
-      } catch (error) {
-        console.error("Erreur lors de la modification de la réponse:", error);
-        toast.error(error.response?.data?.message || "Impossible de modifier la réponse.");
       }
     },
 
@@ -665,34 +713,41 @@ export default {
         return;
       }
 
-      try {
-        const token = JSON.parse(sessionStorage.getItem("token"));
-        const tuteurId = JSON.parse(localStorage.getItem('TuteurAccountInfo')).id;
-        const response = await axios.post(
-          `http://localhost:8000/api/feedbacks/${this.selectedFeedback.id}/reponse`,
-          {
-            reponse: this.reponseText,
-            user_id: tuteurId,
-            user_role: 'tuteur'
-          },
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          }
-        );
+      if (!await this.checkComment(this.reponseText)) {
+        toast.error('Votre réponse contient des mots inappropriés');
+        return;
+      }else {
 
-        if (response.status === 200) {
-          toast.success('Votre réponse a été envoyée avec succès');
-          this.showReponseModal = false;
-          this.fetchReponses(this.selectedFeedback.id);
-        } else {
-          throw new Error(response.data.message || 'Erreur lors de l\'envoi de la réponse');
+        try {
+          const token = JSON.parse(sessionStorage.getItem("token"));
+          const tuteurId = JSON.parse(localStorage.getItem('TuteurAccountInfo')).id;
+          const response = await axios.post(
+            `http://localhost:8000/api/feedbacks/${this.selectedFeedback.id}/reponse`,
+            {
+              reponse: this.reponseText,
+              user_id: tuteurId,
+              user_role: 'tuteur'
+            },
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            }
+          );
+  
+          if (response.status === 200) {
+            toast.success('Votre réponse a été envoyée avec succès');
+            this.showReponseModal = false;
+            this.fetchReponses(this.selectedFeedback.id);
+          } else {
+            throw new Error(response.data.message || 'Erreur lors de l\'envoi de la réponse');
+          }
+        } catch (error) {
+          console.error('Erreur lors de l\'envoi de la réponse:', error);
+          toast.error(error.response?.data?.message || 'Erreur lors de l\'envoi de la réponse');
         }
-      } catch (error) {
-        console.error('Erreur lors de l\'envoi de la réponse:', error);
-        toast.error(error.response?.data?.message || 'Erreur lors de l\'envoi de la réponse');
       }
+
     }
   },
   mounted() {
