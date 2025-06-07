@@ -29,7 +29,7 @@ class authController extends Controller
             'domaine_id' => 'required|integer|exists:domaines,id',
             'specialite_id' => 'required|integer|exists:specialites,id',
             'etablissement' => 'required|string|max:255',
-            'image' => 'sometimes|nullable|string'
+            'image' => 'sometimes|nullable|string|max:50000' 
         ]);
     
         if ($validator->fails()) {
@@ -76,7 +76,7 @@ class authController extends Controller
             'password' => 'required|min:6',
             'name' => 'required|string|max:255',
             'secteur_id' => 'required|integer|exists:secteurs,id', 
-            'logo' => 'sometimes|nullable|string',
+            'logo' => 'sometimes|nullable|string|max:50000',
             'description' => 'required|string',
             'link' => 'required|string'
         ]);
@@ -126,7 +126,8 @@ class authController extends Controller
             'specialite_id' => 'required|integer|exists:specialites,id',
             'experience' => 'required|integer|min:0',
             'phone' => 'required|unique:tuteurs,phone',
-            'image' => 'sometimes|nullable|string'
+            'image' => 'sometimes|nullable|string|max:50000',
+            'cv' => 'sometimes|nullable|string|max:50000'
         ]);
 
         if ($validator->fails()) {
@@ -145,6 +146,7 @@ class authController extends Controller
                 'experience' => $requestData['experience'],
                 'phone' => $requestData['phone'],
                 'image' => $requestData['image'] ?? null,
+                'cv' => $requestData['cv'] ?? null,
                 'status' => 'en attente' // Valeur par défaut
             ]);
 
