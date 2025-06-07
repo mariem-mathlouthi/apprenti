@@ -122,6 +122,7 @@ import TuteurRequests from "../components/Admin/TuteurRequests.vue";
 import ForgotPassword from "../components/Auth/ForgotPassword.vue";
 import ChangePassword from "../components/Auth/ChangePassword.vue";
 
+import AiResume from "../components/StudentDash/AiResume.vue";  
 const routes = [
   {
     path: "/",
@@ -631,6 +632,14 @@ const routes = [
     component:ChangePassword,
     props: true
   },
+
+ {
+    path: '/ai-resume',
+    name: '/AiResume',
+    component: AiResume,
+    props: true
+  },
+
   
 ];
 
