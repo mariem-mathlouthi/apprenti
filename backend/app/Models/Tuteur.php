@@ -13,7 +13,7 @@ class Tuteur extends Authenticatable
     use HasApiTokens;
 
     protected $fillable = ['fullname', 'email', 'password', 'specialite_id', 'experience', 'phone', 'status',
-        'password_token', 'password_token_send_at'];
+        'password_token', 'password_token_send_at', 'image', 'cv'];
 
     protected $attributes = [
         'status' => 'en attente'
