@@ -51,6 +51,30 @@
             />
           </div>
 
+          <!-- Champ pour l'image de profil -->
+          <div>
+            <label class="font-medium">Photo de profil (optionnel)</label>
+            <input
+              type="file"
+              @change="handleImageUpload"
+              accept="image/*"
+              class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+            />
+            <p class="text-xs text-gray-500 mt-1">Formats acceptés: JPG, PNG, etc.</p>
+          </div>
+
+          <!-- Champ pour le CV -->
+          <div>
+            <label class="font-medium">CV (optionnel)</label>
+            <input
+              type="file"
+              @change="handleCvUpload"
+              accept=".pdf,.doc,.docx"
+              class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+            />
+            <p class="text-xs text-gray-500 mt-1">Formats acceptés: PDF, DOC, DOCX</p>
+          </div>
+
           <!-- Indicateur de progression -->
           <div class="max-w-lg mx-auto px-4 sm:px-0">
             <ul aria-label="Steps" class="flex items-center">
@@ -127,7 +151,9 @@ export default {
       selectedSpecialite: "",
       experience: 0,
       specialites: [],
-      loading: false
+      loading: false,
+      imageFile: null,
+      cvFile: null
     };
   },
   created() {
@@ -147,15 +173,58 @@ export default {
       }
     },
 
+    handleImageUpload(event) {
+      this.imageFile = event.target.files[0];
+    },
+
+    handleCvUpload(event) {
+      this.cvFile = event.target.files[0];
+    },
+
+    async uploadFile(file, type) {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      try {
+        const response = await axios.post(
+          'http://localhost:8000/api/upload', 
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+        );
+        return response.data.filePath;
+      } catch (error) {
+        console.error(`Erreur lors de l'upload du ${type}:`, error);
+        return null;
+      }
+    },
+
     async signUp() {
       this.loading = true;
       const storedData = JSON.parse(localStorage.getItem("Tuteur"));
       
+      // Upload des fichiers si présents
+      let imagePath = null;
+      let cvPath = null;
+      
+      if (this.imageFile) {
+        imagePath = await this.uploadFile(this.imageFile, 'image');
+      }
+      
+      if (this.cvFile) {
+        cvPath = await this.uploadFile(this.cvFile, 'CV');
+      }
+
       const tuteurData = {
         ...storedData,
         fullname: this.fullname,
         specialite_id: this.selectedSpecialite,
         experience: this.experience,
+        image: imagePath,
+        cv: cvPath
       };
 
       try {
