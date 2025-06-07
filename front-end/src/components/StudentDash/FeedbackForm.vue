@@ -102,6 +102,10 @@ export default {
         note: 0,
         commentaire: ""
       },
+      badWords: [
+        "bhim",
+        "yaayef" 
+      ],
       isSubmitting: false,
       tutuerId: null,
       ratingDescriptions: {
@@ -114,6 +118,44 @@ export default {
     };
   },
   methods: {
+
+    async checkComment(comment) {
+      this.warning = "";
+
+      const lower = comment.toLowerCase();
+      if (this.badWords.some((word) => lower.includes(word))) {
+        return false;
+      }
+
+      const apiKey = "AIzaSyD_Q97rsq5y0y-kWFuSQCtcMdu6kEsATHA"; 
+      const endpoint = `https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=${apiKey}`;
+
+      const body = {
+        comment: { text: comment },
+        languages: ["fr"],
+        requestedAttributes: { TOXICITY: {} },
+      };
+
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+        const result = await response.json();
+        const score = result.attributeScores.TOXICITY.summaryScore.value;
+
+        if (score > 0.7) {
+          return false;
+        } else {
+          return true;
+        }
+      } catch (err) {
+        console.error("Perspective API error:", err);
+        return false;
+      }
+    },
 
     async fetchCoursDetails() {
       const coure = await axios.get(`http://localhost:8000/api/cours/${this.idCours}`,
@@ -168,52 +210,60 @@ export default {
         return;
       }
 
-      this.isSubmitting = true;
+      if (!await this.checkComment(this.form.commentaire)) {
+        toast.error("Votre commentaire contient des mots inappropriés");
+        return;
+      }else {
 
-      try {
-        const student_id = JSON.parse(localStorage.getItem('StudentAccountInfo'))['id'];
-        // Envoi du feedback
-        const response = await axios.post(
-          "http://localhost:8000/api/feedbacks",
-          {
-            etudiant_id: student_id,
-            cours_id: Number(this.idCours),
-            note: Number(this.form.note),
-            commentaire: this.form.commentaire.trim()
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+        this.isSubmitting = true;
+
+        try {
+          const student_id = JSON.parse(localStorage.getItem('StudentAccountInfo'))['id'];
+          // Envoi du feedback
+          const response = await axios.post(
+            "http://localhost:8000/api/feedbacks",
+            {
+              etudiant_id: student_id,
+              cours_id: Number(this.idCours),
+              note: Number(this.form.note),
+              commentaire: this.form.commentaire.trim()
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+              }
+            }
+          );
+  
+          if ([200, 201].includes(response.status)) {
+            await this.sendNotification(null, null, this.tutuerId, "Votre cours a été noté avec etudiant", "Tuteur", "cours", new Date(), null)
+            toast.success("Merci pour votre feedback!");
+            this.$router.push({
+              name: 'Avis',
+              params: { id: this.idCours }
+            });
+          }
+        } catch (error) {
+          console.error("Erreur soumission:", error.response?.data || error);
+          
+          let errorMessage = "Erreur lors de l'envoi";
+          
+          if (error.response) {
+            if (error.response.status === 422) {
+              errorMessage = error.response.data.message || 
+                "Vous avez déjà soumis un feedback pour ce cours";
+            } else {
+              errorMessage = error.response.data?.message || errorMessage;
             }
           }
-        );
-
-        if ([200, 201].includes(response.status)) {
-          await this.sendNotification(null, null, this.tutuerId, "Votre cours a été noté avec etudiant", "Tuteur", "cours", new Date(), null)
-          toast.success("Merci pour votre feedback!");
-          this.$router.push({
-            name: 'Avis',
-            params: { id: this.idCours }
-          });
+          
+          toast.error(errorMessage);
+        } finally {
+          this.isSubmitting = false;
         }
-      } catch (error) {
-        console.error("Erreur soumission:", error.response?.data || error);
-        
-        let errorMessage = "Erreur lors de l'envoi";
-        
-        if (error.response) {
-          if (error.response.status === 422) {
-            errorMessage = error.response.data.message || 
-              "Vous avez déjà soumis un feedback pour ce cours";
-          } else {
-            errorMessage = error.response.data?.message || errorMessage;
-          }
-        }
-        
-        toast.error(errorMessage);
-      } finally {
-        this.isSubmitting = false;
       }
+
+
     }
   },
   mounted() {

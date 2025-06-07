@@ -104,6 +104,10 @@ export default {
         note: 0,
         commentaire: ""
       },
+      badWords: [
+        "bhim",
+        "yaayef" 
+      ],
       isSubmitting: false,
       isLoading: true,
       tutuerId: null,
@@ -120,6 +124,44 @@ export default {
     await this.fetchFeedback();
   },
   methods: {
+
+    async checkComment(comment) {
+
+      const lower = comment.toLowerCase();
+      if (this.badWords.some((word) => lower.includes(word))) {
+        return false;
+      }
+
+      const apiKey = "AIzaSyD_Q97rsq5y0y-kWFuSQCtcMdu6kEsATHA"; 
+      const endpoint = `https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=${apiKey}`;
+
+      const body = {
+        comment: { text: comment },
+        languages: ["fr"],
+        requestedAttributes: { TOXICITY: {} },
+      };
+
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+        const result = await response.json();
+        const score = result.attributeScores.TOXICITY.summaryScore.value;
+
+        if (score > 0.7) {
+          return false;
+        } else {
+          return true;
+        }
+      } catch (err) {
+        console.error("Perspective API error:", err);
+        return false;
+      }
+    },
+
 
     async fetchCoursDetails() {
       const coure = await axios.get(`http://localhost:8000/api/cours/${this.idCours}`,
@@ -199,51 +241,58 @@ export default {
         return;
       }
 
-      this.isSubmitting = true;
-
-      try {
-        const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
-        const token = JSON.parse(sessionStorage.getItem("token"));
+      if (!await this.checkComment(this.form.commentaire)) {
+        toast.error("Votre commentaire contient des mots inappropriés et ne peut pas être soumis.");
+        return;
+      }else {
         
-        // Update the feedback
-        const response = await axios.put(
-          `http://localhost:8000/api/feedbacks/${this.id}`,
-          {
-            etudiant_id: studentInfo.id,
-            note: Number(this.form.note),
-            commentaire: this.form.commentaire.trim()
-          },
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`
+        this.isSubmitting = true;
+  
+        try {
+          const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
+          const token = JSON.parse(sessionStorage.getItem("token"));
+          
+          // Update the feedback
+          const response = await axios.put(
+            `http://localhost:8000/api/feedbacks/${this.id}`,
+            {
+              etudiant_id: studentInfo.id,
+              note: Number(this.form.note),
+              commentaire: this.form.commentaire.trim()
+            },
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            }
+          );
+  
+          if ([200, 201].includes(response.status)) {
+            await this.sendNotification(null, null, this.tutuerId, "Vous avez un modification au feedback", "Tuteur", "cours", new Date(), null)
+            toast.success("Votre avis a été mis à jour avec succès!");
+            this.$router.push({
+              name: 'Avis',
+              params: { id: this.idCours }
+            });
+          }
+        } catch (error) {
+          console.error("Erreur mise à jour:", error.response?.data || error);
+          
+          let errorMessage = "Erreur lors de la mise à jour";
+          
+          if (error.response) {
+            if (error.response.status === 403) {
+              errorMessage = "Action non autorisée";
+            } else {
+              errorMessage = error.response.data?.message || errorMessage;
             }
           }
-        );
+          
+          toast.error(errorMessage);
+        } finally {
+          this.isSubmitting = false;
+        }
 
-        if ([200, 201].includes(response.status)) {
-          await this.sendNotification(null, null, this.tutuerId, "Vous avez un modification au feedback", "Tuteur", "cours", new Date(), null)
-          toast.success("Votre avis a été mis à jour avec succès!");
-          this.$router.push({
-            name: 'Avis',
-            params: { id: this.idCours }
-          });
-        }
-      } catch (error) {
-        console.error("Erreur mise à jour:", error.response?.data || error);
-        
-        let errorMessage = "Erreur lors de la mise à jour";
-        
-        if (error.response) {
-          if (error.response.status === 403) {
-            errorMessage = "Action non autorisée";
-          } else {
-            errorMessage = error.response.data?.message || errorMessage;
-          }
-        }
-        
-        toast.error(errorMessage);
-      } finally {
-        this.isSubmitting = false;
       }
     }
   },

@@ -437,6 +437,10 @@ export default {
   },
   data() {
     return {
+      badWords: [
+        "bhim",
+        "yaayef" 
+      ],
       isTuteur: false, // This will be set based on user role
       ressources: [],
       idCours: this.$route.params.id,
@@ -484,6 +488,44 @@ export default {
     }
   },
   methods: {
+
+    async checkComment(comment) {
+
+      const lower = comment.toLowerCase();
+      if (this.badWords.some((word) => lower.includes(word))) {
+        return false;
+      }
+
+      const apiKey = "AIzaSyD_Q97rsq5y0y-kWFuSQCtcMdu6kEsATHA"; 
+      const endpoint = `https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=${apiKey}`;
+
+      const body = {
+        comment: { text: comment },
+        languages: ["fr"],
+        requestedAttributes: { TOXICITY: {} },
+      };
+
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+        const result = await response.json();
+        const score = result.attributeScores.TOXICITY.summaryScore.value;
+
+        if (score > 0.7) {
+          return false;
+        } else {
+          return true;
+        }
+      } catch (err) {
+        console.error("Perspective API error:", err);
+        return false;
+      }
+    },
+
 
     async fetchCoursDetails() {
       const coure = await axios.get(`http://localhost:8000/api/cours/${this.idCours}`,
@@ -555,12 +597,6 @@ export default {
           this.isSubscript = false;
         }
       }
-    },
-
-    repondreAuFeedback(feedback) {
-      // Handle reply action here
-      console.log('Replying to feedback:', feedback);
-      // You can implement a modal or navigation to reply form
     },
 
     async fetchRessources() {
@@ -724,32 +760,37 @@ export default {
         toast.error('Veuillez entrer une réponse');
         return;
       }
-      
-      try {
-        const token = JSON.parse(localStorage.getItem('StudentAccountInfo')).token;
-        const userRole = this.selectedReponse.user_role;
-        const response = await axios.put(
-          `http://localhost:8000/api/reponse/${this.selectedReponse.id}`,
-          { 
-            reponse: this.editReponseText,
-            user_role: userRole
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
+
+      if (!await this.checkComment(this.editReponseText)) {
+        toast.error('Votre réponse contient des mots inappropriés');
+        return;
+      }else{
+        try {
+          const token = JSON.parse(localStorage.getItem('StudentAccountInfo')).token;
+          const userRole = this.selectedReponse.user_role;
+          const response = await axios.put(
+            `http://localhost:8000/api/reponse/${this.selectedReponse.id}`,
+            { 
+              reponse: this.editReponseText,
+              user_role: userRole
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
             }
+          );
+          
+          if (response.status === 200) {
+            await this.sendNotification(null, null, this.tutuerId, "Vous avez un modification au reponse du feedback", "Tuteur", "cours", new Date(), null)
+            toast.success('Réponse modifiée avec succès');
+            this.showEditReponseModal = false;
+            this.fetchReponses(this.selectedFeedbackId);
           }
-        );
-        
-        if (response.status === 200) {
-          await this.sendNotification(null, null, this.tutuerId, "Vous avez un modification au reponse du feedback", "Tuteur", "cours", new Date(), null)
-          toast.success('Réponse modifiée avec succès');
-          this.showEditReponseModal = false;
-          this.fetchReponses(this.selectedFeedbackId);
+        } catch (error) {
+          console.error('Erreur lors de la modification de la réponse:', error);
+          toast.error(error.response?.data?.message || 'Erreur lors de la modification de la réponse');
         }
-      } catch (error) {
-        console.error('Erreur lors de la modification de la réponse:', error);
-        toast.error(error.response?.data?.message || 'Erreur lors de la modification de la réponse');
       }
     },
     
@@ -842,33 +883,39 @@ export default {
         return;
       }
 
-      try {
-        const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
-        const response = await axios.post(
-          `http://localhost:8000/api/feedbacks/${this.selectedFeedback.id}/reponse`,
-          { 
-            reponse: this.reponseText,
-            user_id: studentInfo.id,
-            user_role: 'etudiant'
-           },
-          {
-            headers: {
-              'Authorization': `Bearer ${studentInfo.token}`
+      if (!await this.checkComment(this.reponseText)) {
+        toast.error('Votre réponse contient des mots inappropriés');
+        return;
+      }else {
+        try {
+          const studentInfo = JSON.parse(localStorage.getItem('StudentAccountInfo'));
+          const response = await axios.post(
+            `http://localhost:8000/api/feedbacks/${this.selectedFeedback.id}/reponse`,
+            { 
+              reponse: this.reponseText,
+              user_id: studentInfo.id,
+              user_role: 'etudiant'
+             },
+            {
+              headers: {
+                'Authorization': `Bearer ${studentInfo.token}`
+              }
             }
+          );
+             console.log(response)
+          if (response.status === 200) {
+            await this.sendNotification(null, null, this.tutuerId, "Vous avez un reponse au feedback", "Tuteur", "cours", new Date(), null)
+            toast.success('Réponse ajoutée avec succès');
+            this.showReponseModal = false;
+            // window.location.reload(); // Reload the page after adding the reply
+            this.fetchAvis();
           }
-        );
-           console.log(response)
-        if (response.status === 200) {
-          await this.sendNotification(null, null, this.tutuerId, "Vous avez un reponse au feedback", "Tuteur", "cours", new Date(), null)
-          toast.success('Réponse ajoutée avec succès');
-          this.showReponseModal = false;
-          // window.location.reload(); // Reload the page after adding the reply
-          this.fetchAvis();
+        } catch (error) {
+          console.error('Erreur lors de l\'ajout de la réponse:', error);
+          toast.error(error.response?.data?.message || 'Erreur lors de l\'ajout de la réponse');
         }
-      } catch (error) {
-        console.error('Erreur lors de l\'ajout de la réponse:', error);
-        toast.error(error.response?.data?.message || 'Erreur lors de l\'ajout de la réponse');
       }
+
     },
   },
   mounted() {
