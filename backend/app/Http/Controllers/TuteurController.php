@@ -37,26 +37,41 @@ class TuteurController extends Controller
 }
 
 
-
-    public function getTuteurDetail(Request $request, $id)
+// Dans la méthode getTuteurDetail
+public function getTuteurDetail(Request $request, $id)
 {
-    // Récupérer les détails du tuteur par ID
-    $tuteur = Tuteur::where('id', $id)->first();
+    try {
+        $tuteur = Tuteur::with('specialite')->find($id);
 
-    // Vérifier si le tuteur existe
-    if (!$tuteur) {
+        if (!$tuteur) {
+            return response()->json([
+                'message' => 'Tuteur non trouvé',
+                'check' => false,
+            ], 404);
+        }
+
         return response()->json([
-            'message' => 'Tuteur non trouvé',
+            'tuteur' => [
+                'id' => $tuteur->id,
+                'fullname' => $tuteur->fullname,
+                'email' => $tuteur->email,
+                'specialite' => $tuteur->specialite ? $tuteur->specialite->description : null,
+                'experience' => $tuteur->experience,
+                'phone' => $tuteur->phone,
+                'status' => $tuteur->status,
+                'image' => $tuteur->image,
+                'cv' => $tuteur->cv, // Ajout du champ CV
+            ],
+            'message' => 'Détails du tuteur récupérés avec succès',
+            'check' => true,
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Erreur serveur : ' . $e->getMessage(),
             'check' => false,
-        ], 404);
+        ], 500);
     }
-
-    // Retourner les détails du tuteur
-    return response()->json([
-        'tuteur' => $tuteur,
-        'message' => 'Détails du tuteur récupérés avec succès',
-        'check' => true,
-    ]);
 }
 
     /**

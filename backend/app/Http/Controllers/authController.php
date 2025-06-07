@@ -113,56 +113,112 @@ class authController extends Controller
             ], 500);
         }
     }
-
-    public function signUpTuteur(Request $request)
+ public function signUpTuteur(Request $request)
     {
-        $requestData = $request->all();
-
-        // Validation avec règles Laravel
-        $validator = Validator::make($requestData, [
-            'fullname' => 'required|string|max:255',
-            'email' => 'required|email|unique:tuteurs,email',
-            'password' => 'required|min:6',
-            'specialite_id' => 'required|integer|exists:specialites,id',
-            'experience' => 'required|integer|min:0',
-            'phone' => 'required|unique:tuteurs,phone',
-            'image' => 'sometimes|nullable|string|max:50000',
-            'cv' => 'sometimes|nullable|string|max:50000'
+        $request->validate([
+            'fullname' => 'required|string',
+            'email' => 'required|email|unique:tuteurs',
+            'password' => 'required|string|min:8',
+            'specialite_id' => 'required|exists:specialites,id',
+            'experience' => 'required|integer',
+            'phone' => 'required|string|unique:tuteurs',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'cv' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => $validator->errors()->first(),
-                'check' => false
-            ], 422);
+        $tuteurData = $request->except(['password', 'image', 'cv']);
+        $tuteurData['password'] = Hash::make($request->password);
+        $tuteurData['status'] = 'en attente';
+
+        // Gestion de l'image
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time().'_'.$image->getClientOriginalName();
+            $image->move(public_path('storage/uploads/tuteurs'), $imageName);
+            $tuteurData['image'] = 'storage/uploads/tuteurs/'.$imageName;
         }
 
-        try {
-            $newTuteur = Tuteur::create([
-                'fullname' => $requestData['fullname'],
-                'email' => $requestData['email'],
-                'password' => Hash::make($requestData['password']),
-                'specialite_id' => $requestData['specialite_id'],
-                'experience' => $requestData['experience'],
-                'phone' => $requestData['phone'],
-                'image' => $requestData['image'] ?? null,
-                'cv' => $requestData['cv'] ?? null,
-                'status' => 'en attente' // Valeur par défaut
-            ]);
-
-            return response()->json([
-                'message' => 'Compte créé avec succès',
-                'check' => true,
-                'tuteur' => $newTuteur
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Erreur de création : ' . $e->getMessage(),
-                'check' => false
-            ], 500);
+        // Gestion du CV
+        if ($request->hasFile('cv')) {
+            $cv = $request->file('cv');
+            $cvName = time().'_'.$cv->getClientOriginalName();
+            $cv->move(public_path('storage/uploads/tuteurs/cv'), $cvName);
+            $tuteurData['cv'] = 'storage/uploads/tuteurs/cv/'.$cvName;
         }
+
+        $tuteur = Tuteur::create($tuteurData);
+
+        return response()->json([
+            'message' => 'Tuteur enregistré avec succès, en attente de validation',
+            'tuteur' => $tuteur,
+            'check' => true,
+        ], 201);
     }
+
+    public function getTuteur($id)
+    {
+        $tuteur = Tuteur::findOrFail($id);
+        
+        return response()->json([
+            'tuteur' => $tuteur,
+            'message' => 'Tuteur récupéré avec succès',
+            'check' => true,
+        ]);
+    }
+
+    public function downloadCV($id)
+    {
+        $tuteur = Tuteur::findOrFail($id);
+        
+        if (empty($tuteur->cv)) {
+            return response()->json([
+                'message' => 'CV non trouvé',
+                'check' => false,
+            ], 404);
+        }
+
+        $filePath = public_path($tuteur->cv);
+
+        if (!file_exists($filePath)) {
+            return response()->json([
+                'message' => 'Fichier CV non trouvé sur le serveur',
+                'check' => false,
+            ], 404);
+        }
+
+        $originalName = basename($tuteur->cv);
+        
+        return response()->download($filePath, $originalName, [
+            'Content-Type' => 'application/octet-stream',
+            'Content-Disposition' => 'attachment; filename="'.$originalName.'"',
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache'
+        ]);
+    }
+
+    public function getImage($id)
+    {
+        $tuteur = Tuteur::findOrFail($id);
+        
+        if (empty($tuteur->image)) {
+            return response()->json([
+                'message' => 'Image non trouvée',
+                'check' => false,
+            ], 404);
+        }
+
+        $filePath = public_path($tuteur->image);
+
+        if (!file_exists($filePath)) {
+            return response()->json([
+                'message' => 'Fichier image non trouvé sur le serveur',
+                'check' => false,
+            ], 404);
+        }
+
+        return response()->file($filePath);
+    }
+
 
 
     public function LoginUser(Request $request)

@@ -235,6 +235,12 @@ Route::middleware(['auth:sanctum', 'cors'])->group(function () {
     Route::get('/type-stages/{id}', [TypeStageController::class, 'getTypeStageById']);
     Route::put('/type-stages/{id}', [TypeStageController::class, 'updateTypeStage']);
     Route::delete('/type-stages/{id}', [TypeStageController::class, 'deleteTypeStage']);
+
+
+    Route::post('/tuteur/signup', [authController::class, 'signup']);
+    Route::get('/tuteur/{id}', [authController::class, 'getTuteur']);
+    Route::get('/tuteur/{id}/cv', [authController::class, 'downloadCV']);
+    Route::get('/tuteur/{id}/image', [authController::class, 'getImage']);
 });
 
 

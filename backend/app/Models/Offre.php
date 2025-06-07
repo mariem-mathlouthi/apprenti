@@ -13,4 +13,9 @@ class Offre extends Model
     {
         return $this->hasMany(Demande::class);
     }
+    public function domaine() 
+    {
+        return $this->belongsTo(Domaine::class);
+    }
+    
 }

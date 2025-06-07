@@ -19,5 +19,10 @@ class Tuteur extends Authenticatable
         'status' => 'en attente'
     ];
 
+     public function specialite()
+    {
+        return $this->belongsTo(Specialite::class);
+    }
+
 }
 
