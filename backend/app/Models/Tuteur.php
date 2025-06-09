@@ -14,11 +14,6 @@ class Tuteur extends Authenticatable
 
     protected $fillable = ['fullname', 'email', 'password', 'specialite_id', 'experience', 'phone', 'status',
         'password_token', 'password_token_send_at', 'image', 'cv'];
-<<<<<<< HEAD
-    
-=======
->>>>>>> 8f6cd94df03ea0e9fea2870c2d234501e22ca3fa
-
     protected $attributes = [
         'status' => 'en attente'
     ];
