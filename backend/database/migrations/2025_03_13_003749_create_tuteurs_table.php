@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+     public function up(): void
     {
         Schema::create('tuteurs', function (Blueprint $table) {
             $table->id();
@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('phone')->unique();
             $table->enum('status', ['en attente', 'accepté', 'refusé'])->default('en attente');
             $table->string('image')->nullable();
+            $table->string('cv')->nullable(); // ajout intégré ici
             $table->timestamps();
         });
     }
