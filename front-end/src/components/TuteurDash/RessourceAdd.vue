@@ -133,7 +133,7 @@ export default {
         const response = await axios.post("http://localhost:8000/api/upload", formData, {
           headers: {
             "Content-Type": "multipart/form-data", // Définir le bon type de contenu
-            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
+            "Authorization": `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`
           },
         });
         return response.data.filePath; // Supposons que l'API renvoie le chemin du fichier
@@ -203,16 +203,14 @@ export default {
             params: {
               tuteur_id: JSON.parse(localStorage.getItem('TuteurAccountInfo')).id,
               cours_id: this.form.idCours 
-            }
-          },
-          {
+            },
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("token"))}`,
             }
           }
         );
-
+        
         idEtudiantsSubscripted.data.students.forEach(etudiant => {
           console.log(etudiant.etudiant_id);
           this.sendNotification(etudiant.etudiant_id, null, JSON.parse(localStorage.getItem('TuteurAccountInfo')).id, "Un nouveau fichier a été ajouté à votre cours", "Etudiant", "ressource", new Date(), null);
