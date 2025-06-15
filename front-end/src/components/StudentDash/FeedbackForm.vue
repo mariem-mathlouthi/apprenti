@@ -127,7 +127,7 @@ export default {
         return false;
       }
 
-      const apiKey = "AIzaSyD_Q97rsq5y0y-kWFuSQCtcMdu6kEsATHA"; 
+      const apiKey = "AIzaSyDxVVTlk-qV6Zx3-leiYY-w3YaIBzN66UI"; 
       const endpoint = `https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=${apiKey}`;
 
       const body = {

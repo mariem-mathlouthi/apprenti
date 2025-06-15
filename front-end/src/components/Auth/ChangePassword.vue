@@ -38,7 +38,7 @@
 
         <button
           type="submit"
-          class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700"
+          class="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-green-700"
         >
           Réinitialiser
         </button>

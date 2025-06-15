@@ -23,7 +23,7 @@
                 <button @click="updateOfferStatus('refusé')" class="px-6 py-2 rounded text-black text-sm tracking-wider font-medium outline-none border-2 border-orange-600 hover:bg-orange-600 hover:text-white transition-all duration-300">Refuser</button>
                 
                 <form @submit.prevent="deleteOffre">
-                  <button type="submit" class="px-6 py-2 rounded text-black text-sm tracking-wider font-medium outline-none border-2 border-orange-600 hover:bg-orange-600 hover:text-white transition-all duration-300" @click="confirmDelete">Delete</button>
+                  <button type="submit" class="px-6 py-2 rounded text-black text-sm tracking-wider font-medium outline-none border-2 border-orange-600 hover:bg-orange-600 hover:text-white transition-all duration-300" @click="confirmDelete">Supprimet</button>
                 </form>
               </div>
             </div>

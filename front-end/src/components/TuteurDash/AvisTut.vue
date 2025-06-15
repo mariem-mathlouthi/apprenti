@@ -32,7 +32,7 @@
       <!-- Section Avis -->
       <div class="mt-6 bg-gray-100 rounded-lg p-6 -mx-8">
         <div class="max-w-6xl mx-auto">
-          <h1 class="text-2xl font-bold text-gray-800 mb-6">Avis des Étudiants</h1>
+          <h1 class="text-2xl font-bold text-gray-800 mb-6">Feedback des Étudiants</h1>
 
           <!-- Barre de recherche et filtre -->
           <div class="flex flex-col sm:flex-row gap-4 mb-6">
@@ -40,7 +40,7 @@
               <input
                 type="text"
                 v-model="searchQuery"
-                placeholder="Rechercher des avis..."
+                placeholder="Rechercher un feedback..."
                 class="w-full pl-10 pr-10 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <svg
@@ -97,7 +97,7 @@
           <!-- État de chargement -->
           <div v-if="isLoadingFeedbacks" class="text-center py-10">
             <i class="fas fa-spinner fa-spin text-blue-500 text-2xl"></i>
-            <p class="mt-2 text-gray-600">Chargement des avis...</p>
+            <p class="mt-2 text-gray-600">Chargement des feedback...</p>
           </div>
 
           <!-- Message d'erreur -->
@@ -231,7 +231,7 @@
 
               <!-- Message si aucune réponse -->
               <div v-else-if="!loadingReponses[feedback.id]" class="ml-8 text-gray-500">
-                Aucune réponse pour cet avis
+                Aucune réponse pour ce feedback
               </div>
             </div>
               <!-- <div class="mt-4 space-y-4">
@@ -262,7 +262,7 @@
 
 
             <div v-if="!isLoadingFeedbacks && filteredAvis.length === 0" class="text-center py-10">
-              <p class="text-gray-500">Aucun avis disponible pour ce cours.</p>
+              <p class="text-gray-500">Aucun feedback disponible pour ce cours.</p>
             </div>
           </div>
         </div>
@@ -274,7 +274,7 @@
   <div v-if="showReponseModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-lg max-w-lg w-full p-6">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-gray-900">Répondre à l'avis</h3>
+        <h3 class="text-lg font-semibold text-gray-900">Répondre à feedback</h3>
         <button @click="showReponseModal = false" class="text-gray-400 hover:text-gray-500">
           <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -429,7 +429,7 @@ export default {
         return false;
       }
 
-      const apiKey = "AIzaSyD_Q97rsq5y0y-kWFuSQCtcMdu6kEsATHA"; 
+      const apiKey = "AIzaSyDxVVTlk-qV6Zx3-leiYY-w3YaIBzN66UI"; 
       const endpoint = `https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=${apiKey}`;
 
       const body = {

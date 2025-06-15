@@ -1,97 +1,149 @@
 <template>
-    <main class="w-full flex">
-      <div class="flex-1 hidden lg:block">
+  <main class="w-full flex">
+    <div class="flex-1 hidden lg:block">
       <img src="https://images.unsplash.com/photo-1697135807547-5fa9fd22d9ec?auto=format&fit=crop&q=80&w=3387&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="w-full h-screen object-cover" />
     </div>
-      <div class="flex-1 flex items-center justify-center h-screen">
-        <div
-          class="w-full max-w-md space-y-8 px-4 bg-white text-gray-600 sm:px-0"
-        >
-          <div class="">
-            <img
-              src="https://floatui.com/logo.svg"
-              width="150"
-              class="lg:hidden"
+    <div class="flex-1 flex items-center justify-center h-screen">
+      <div class="w-full max-w-md space-y-8 px-4 bg-white text-gray-600 sm:px-0">
+        <div class="">
+          <img src="https://floatui.com/logo.svg" width="150" class="lg:hidden" />
+          <div class="mt-5 space-y-2">
+            <h3 class="text-gray-800 text-2xl font-bold sm:text-3xl">
+              Inscription Entreprise
+            </h3>
+            <p class="">
+              Vous avez déjà un compte ?
+              <router-link
+                to="/signin"
+                class="font-medium text-indigo-600 hover:text-indigo-500"
+                >Connectez-vous</router-link>
+            </p>
+          </div>
+        </div>
+
+        <form @submit.prevent="validerEtape1" class="space-y-5">
+          <!-- Numéro SIRET -->
+          <div>
+            <label class="font-medium">Numéro SIRET*</label>
+            <input
+              type="text"
+              v-model="numeroSIRET"
+              @blur="validerSIRET"
+              required
+              class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+              :class="{ 'border-red-500': erreurs.numeroSIRET }"
             />
-            <div class="mt-5 space-y-2">
-              <h3 class="text-gray-800 text-2xl font-bold sm:text-3xl">
-                Sign up
-              </h3>
-              <p class="">
-                Already have an account?
-                <router-link
-                  to="/signin"
-                  class="font-medium text-indigo-600 hover:text-indigo-500"
-                  >Log in </router-link>
-                
-              </p>
+            <p v-if="erreurs.numeroSIRET" class="text-red-500 text-sm mt-1">
+              Le numéro SIRET doit contenir exactement 14 chiffres
+            </p>
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label class="font-medium">Email*</label>
+            <input
+              type="email"
+              v-model="email"
+              @blur="validerEmail"
+              required
+              class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+              :class="{ 'border-red-500': erreurs.email }"
+            />
+            <p v-if="erreurs.email" class="text-red-500 text-sm mt-1">
+              Veuillez entrer une adresse email valide
+            </p>
+          </div>
+
+          <!-- Mot de passe -->
+          <div>
+            <label class="font-medium">Mot de passe*</label>
+            <div class="relative">
+              <input
+                :type="afficherMotDePasse ? 'text' : 'password'"
+                v-model="password"
+                @input="validerMotDePasse"
+                required
+                class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+                :class="{ 'border-red-500': erreurs.password }"
+              />
+              <button
+                type="button"
+                @click="afficherMotDePasse = !afficherMotDePasse"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+              >
+                <i :class="afficherMotDePasse ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+              </button>
+            </div>
+            <div v-if="erreurs.password" class="mt-2 text-xs">
+              <p :class="{'text-red-500': !criteresMotDePasse.longueur}">• 8 caractères minimum</p>
+              <p :class="{'text-red-500': !criteresMotDePasse.chiffre}">• Au moins un chiffre</p>
+              <p :class="{'text-red-500': !criteresMotDePasse.majuscule}">• Au moins une majuscule</p>
             </div>
           </div>
-     
-          <form  @submit.prevent="next" class="space-y-5">
-            <div>
-              <label class="font-medium">numeroSIRET</label>
-              <input
-                type="text"
-                v-model="numeroSIRET"
-                required
-                class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
-              />
-            </div>
-            <div>
-              <label class="font-medium">Email</label>
-              <input
-                type="email"
-                v-model="email"
-                required
-                class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
-              />
-            </div>
-            <div>
-              <label class="font-medium">Password</label>
-              <input
-                type="password"
-                v-model="password"
-                required
-                class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
-              />
-            </div>
-            <div>
-              <label class="font-medium">Confirm Password</label>
-              <input
-                type="password"
-                v-model="confirmPassword"
-                required
-                class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
-              />
-            </div>
-            <div class="max-w-lg mx-auto px-4 sm:px-0">
-        <ul aria-label="Steps" class="flex items-center">
-            <li v-for="(item, idx) in stepsCount" :key="idx" :aria-current="currentStep == idx + 1 ? 'step' : false" class="flex-1 last:flex-none flex items-center">
-                <div :class="{'w-8 h-8 rounded-full border-2 flex-none flex items-center justify-center': true, 'bg-indigo-600 border-indigo-600': currentStep > idx + 1, 'border-indigo-600': currentStep == idx + 1}">
-                    <span :class="{'w-2.5 h-2.5 rounded-full bg-indigo-600': true, 'hidden': currentStep != idx + 1}"></span>
-                    <template v-if="currentStep > idx + 1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-white">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                        </svg>
-                    </template>
-                </div>
-                <hr :class="{'w-full border': true, 'hidden': idx + 1 == stepsCount.length, 'border-indigo-600': currentStep > idx + 1}" />
-            </li>
-        </ul>
-    </div>
-            
-            <button
-              class="w-full px-4 py-2 text-white font-medium bg-gray-800 hover:bg-gray-700 active:bg-gray-700 rounded-lg duration-150"
-            >
-              Suivant
-            </button>
-          </form>
-        </div>
-      </div>
-    </main>
-  </template>
 
+          <!-- Confirmation mot de passe -->
+          <div>
+            <label class="font-medium">Confirmer le mot de passe*</label>
+            <div class="relative">
+              <input
+                :type="afficherConfirmation ? 'text' : 'password'"
+                v-model="confirmPassword"
+                @input="validerConfirmationMotDePasse"
+                required
+                class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
+                :class="{ 'border-red-500': erreurs.confirmPassword }"
+              />
+              <button
+                type="button"
+                @click="afficherConfirmation = !afficherConfirmation"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+              >
+                <i :class="afficherConfirmation ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+              </button>
+            </div>
+            <p v-if="erreurs.confirmPassword" class="text-red-500 text-sm mt-1">
+              Les mots de passe ne correspondent pas
+            </p>
+          </div>
+
+          <!-- Indicateur d'étapes -->
+          <div class="max-w-lg mx-auto px-4 sm:px-0">
+            <ul aria-label="Steps" class="flex items-center">
+              <li v-for="(item, idx) in stepsCount" :key="idx" :aria-current="currentStep == idx + 1 ? 'step' : false" class="flex-1 last:flex-none flex items-center">
+                <div :class="{
+                  'w-8 h-8 rounded-full border-2 flex-none flex items-center justify-center': true, 
+                  'bg-indigo-600 border-indigo-600': currentStep > idx + 1, 
+                  'border-indigo-600': currentStep == idx + 1
+                }">
+                  <span :class="{
+                    'w-2.5 h-2.5 rounded-full bg-indigo-600': true, 
+                    'hidden': currentStep != idx + 1
+                  }"></span>
+                  <template v-if="currentStep > idx + 1">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-white">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                  </template>
+                </div>
+                <hr :class="{
+                  'w-full border': true, 
+                  'hidden': idx + 1 == stepsCount.length, 
+                  'border-indigo-600': currentStep > idx + 1
+                }" />
+              </li>
+            </ul>
+          </div>
+          
+          <button
+            class="w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 rounded-lg duration-150"
+          >
+            Suivant
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+</template>
 
 <script>
 import { toast } from "vue3-toastify";
@@ -102,48 +154,94 @@ export default {
     return {
       stepsCount: [1, 2],
       currentStep: 1,
-      numeroSIRET:"",
+      numeroSIRET: "",
       email: "",
       password: "",
-      confirmPassword:"",
+      confirmPassword: "",
+      afficherMotDePasse: false,
+      afficherConfirmation: false,
+      erreurs: {
+        numeroSIRET: false,
+        email: false,
+        password: false,
+        confirmPassword: false
+      },
+      criteresMotDePasse: {
+        longueur: false,
+        chiffre: false,
+        majuscule: false
+      }
     };
   },
   methods: {
+    validerSIRET() {
+      const regexSIRET = /^\d{14}$/;
+      this.erreurs.numeroSIRET = !regexSIRET.test(this.numeroSIRET);
+      return !this.erreurs.numeroSIRET;
+    },
 
-    async next() {
-      if(this.password==this.confirmPassword){
-        let entreprise = {
-        numeroSIRET:this.numeroSIRET,
-        email:this.email,
-        password:this.password,
-      }
-      console.log(entreprise);
-      localStorage.setItem("Entreprise",JSON.stringify(entreprise));
-      window.location.href = "/signupEntreprisePart2";
-      }
-      else{
-        toast.error("Confirm your passwordd !", {
-              autoClose: 2000, 
+    validerEmail() {
+      const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      this.erreurs.email = !regexEmail.test(this.email);
+      return !this.erreurs.email;
+    },
+
+    validerMotDePasse() {
+      this.criteresMotDePasse = {
+        longueur: this.password.length >= 8,
+        chiffre: /\d/.test(this.password),
+        majuscule: /[A-Z]/.test(this.password)
+      };
+
+      this.erreurs.password = !(
+        this.criteresMotDePasse.longueur && 
+        this.criteresMotDePasse.chiffre && 
+        this.criteresMotDePasse.majuscule
+      );
+
+      this.validerConfirmationMotDePasse();
+      return !this.erreurs.password;
+    },
+
+    validerConfirmationMotDePasse() {
+      this.erreurs.confirmPassword = this.password !== this.confirmPassword;
+      return !this.erreurs.confirmPassword;
+    },
+
+    validerEtape1() {
+      const estValide = 
+        this.validerSIRET() && 
+        this.validerEmail() && 
+        this.validerMotDePasse() && 
+        this.validerConfirmationMotDePasse();
+
+      if (estValide) {
+        this.suivant();
+      } else {
+        toast.error("Veuillez corriger les erreurs avant de continuer", {
+          autoClose: 2000,
         });
       }
-     
-          
-      
     },
-    
+
+    suivant() {
+      const entreprise = {
+        numeroSIRET: this.numeroSIRET,
+        email: this.email,
+        password: this.password
+      };
+      localStorage.setItem("Entreprise", JSON.stringify(entreprise));
+      this.$router.push("/signupEntreprisePart2");
+    }
   },
-  mounted() {
-   
-  },
-  watch:{
+  watch: {
     confirmPassword(value) {
-    if (value === this.password) {
-      this.currentStep++;
+      if (value === this.password && value !== "") {
+        this.currentStep = 2;
+      } else {
+        this.currentStep = 1;
+      }
     }
-    if (value != this.password) {
-      this.currentStep=1;
-    }
-  },
   }
 };
 </script>

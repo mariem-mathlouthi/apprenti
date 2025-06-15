@@ -213,7 +213,7 @@ export default {
         
         idEtudiantsSubscripted.data.students.forEach(etudiant => {
           console.log(etudiant.etudiant_id);
-          this.sendNotification(etudiant.etudiant_id, null, JSON.parse(localStorage.getItem('TuteurAccountInfo')).id, "Un nouveau fichier a été ajouté à votre cours", "Etudiant", "ressource", new Date(), null);
+          this.sendNotification(etudiant.id, null, JSON.parse(localStorage.getItem('TuteurAccountInfo')).id, "Un nouveau fichier a été ajouté à votre cours", "Etudiant", "ressource", new Date(), null);
         });
         // Rediriger vers la liste des ressources
         this.$router.push({ name: "RessourceList", params: { id: this.form.idCours } });

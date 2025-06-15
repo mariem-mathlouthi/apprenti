@@ -6,14 +6,14 @@
     <div class="flex-1 flex items-center justify-center h-screen">
       <div class="w-full max-w-md space-y-8 px-4 bg-white text-gray-600 sm:px-0">
         <div class="mt-5 space-y-2">
-          <h3 class="text-gray-800 text-2xl font-bold sm:text-3xl">Sign up</h3>
+          <h3 class="text-gray-800 text-2xl font-bold sm:text-3xl">Inscription</h3>
           <p class="">
-            Already have an account?
+            Vous avez déjà un compte ?
             <router-link
               to="/signin"
               class="font-medium text-indigo-600 hover:text-indigo-500"
             >
-              Log in
+              Connectez-vous
             </router-link>
           </p>
         </div>
@@ -21,22 +21,25 @@
         <form @submit.prevent="next" class="space-y-5">
           <div class="grid grid-cols-2 gap-x-3">
             <div>
-              <label class="font-medium">Full Name</label>
+              <label class="font-medium">Nom Complet</label>
               <input
                 v-model="fullname"
                 type="text"
                 required
+                @blur="validateFullName"
                 class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
               />
+              <p v-if="errors.fullname" class="text-red-500 text-sm mt-1">{{ errors.fullname }}</p>
             </div>
             <div>
               <label class="font-medium">Niveau</label>
               <select
                 v-model="selectedNiveauId"
                 required
+                @change="validateNiveau"
                 class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
               >
-                <option disabled value="">Select a level</option>
+                <option disabled value="">Sélectionnez un niveau</option>
                 <option 
                   v-for="niveau in niveaux" 
                   :key="niveau.id"
@@ -45,17 +48,20 @@
                   {{ niveau.description }}
                 </option>
               </select>
+              <p v-if="errors.selectedNiveauId" class="text-red-500 text-sm mt-1">{{ errors.selectedNiveauId }}</p>
             </div>
           </div>
 
           <div>
-            <label class="font-medium">Cin</label>
+            <label class="font-medium">CIN</label>
             <input
               v-model="cin"
               type="text"
               required
+              @blur="validateCin"
               class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
             />
+            <p v-if="errors.cin" class="text-red-500 text-sm mt-1">{{ errors.cin }}</p>
           </div>
 
           <div>
@@ -64,28 +70,34 @@
               v-model="email"
               type="email"
               required
+              @blur="validateEmail"
               class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
             />
+            <p v-if="errors.email" class="text-red-500 text-sm mt-1">{{ errors.email }}</p>
           </div>
 
           <div class="grid grid-cols-2 gap-x-3">
             <div>
-              <label class="font-medium">Password</label>
+              <label class="font-medium">Mot de passe</label>
               <input
                 v-model="password"
                 type="password"
                 required
+                @blur="validatePassword"
                 class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
               />
+              <p v-if="errors.password" class="text-red-500 text-sm mt-1">{{ errors.password }}</p>
             </div>
             <div>
-              <label class="font-medium">Confirm Password</label>
+              <label class="font-medium">Confirmer le mot de passe</label>
               <input
                 v-model="confirmPassword"
                 type="password"
                 required
+                @blur="validateConfirmPassword"
                 class="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
               />
+              <p v-if="errors.confirmPassword" class="text-red-500 text-sm mt-1">{{ errors.confirmPassword }}</p>
             </div>
           </div>
 
@@ -124,9 +136,9 @@
           </div>
 
           <button
-            class="w-full px-4 py-2 text-white font-medium bg-gray-800 hover:bg-gray-700 active:bg-gray-700 rounded-lg duration-150"
+            class="w-full px-4 py-2 text-white font-medium bg-indigo-600 hover:bg-indigo-500 rounded-lg duration-150"
           >
-            Next
+            Suivant
           </button>
         </form>
       </div>
@@ -150,13 +162,90 @@ export default {
       email: "",
       password: "",
       confirmPassword: "",
-      niveaux: []
+      niveaux: [],
+      errors: {
+        fullname: "",
+        selectedNiveauId: "",
+        cin: "",
+        email: "",
+        password: "",
+        confirmPassword: ""
+      }
     };
   },
   methods: {
+    validateFullName() {
+      if (!this.fullname) {
+        this.errors.fullname = "Le nom complet est requis";
+      } else if (this.fullname.length < 3) {
+        this.errors.fullname = "Le nom doit contenir au moins 3 caractères";
+      } else {
+        this.errors.fullname = "";
+      }
+    },
+    
+    validateNiveau() {
+      if (!this.selectedNiveauId) {
+        this.errors.selectedNiveauId = "Veuillez sélectionner un niveau";
+      } else {
+        this.errors.selectedNiveauId = "";
+      }
+    },
+    
+    validateCin() {
+      if (!this.cin) {
+        this.errors.cin = "Le CIN est requis";
+      } else if (!/^\d{8}$/.test(this.cin)) {
+        this.errors.cin = "Le CIN doit contenir 8 chiffres";
+      } else {
+        this.errors.cin = "";
+      }
+    },
+    
+    validateEmail() {
+      if (!this.email) {
+        this.errors.email = "L'email est requis";
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email)) {
+        this.errors.email = "Veuillez entrer un email valide";
+      } else {
+        this.errors.email = "";
+      }
+    },
+    
+    validatePassword() {
+      if (!this.password) {
+        this.errors.password = "Le mot de passe est requis";
+      } else if (this.password.length < 6) {
+        this.errors.password = "Le mot de passe doit contenir au moins 6 caractères";
+      } else {
+        this.errors.password = "";
+      }
+    },
+    
+    validateConfirmPassword() {
+      if (!this.confirmPassword) {
+        this.errors.confirmPassword = "Veuillez confirmer votre mot de passe";
+      } else if (this.password !== this.confirmPassword) {
+        this.errors.confirmPassword = "Les mots de passe ne correspondent pas";
+      } else {
+        this.errors.confirmPassword = "";
+      }
+    },
+    
+    validateForm() {
+      this.validateFullName();
+      this.validateNiveau();
+      this.validateCin();
+      this.validateEmail();
+      this.validatePassword();
+      this.validateConfirmPassword();
+      
+      return !Object.values(this.errors).some(error => error !== "");
+    },
+    
     async next() {
-      if (this.password !== this.confirmPassword) {
-        toast.error("Password confirmation does not match!", { autoClose: 2000 });
+      if (!this.validateForm()) {
+        toast.error("Veuillez corriger les erreurs dans le formulaire", { autoClose: 2000 });
         return;
       }
 
@@ -170,18 +259,19 @@ export default {
 
       try {
         localStorage.setItem("Etudiant", JSON.stringify(etudiant));
-        window.location.href = "/signupEtudiantPart2";
+        this.$router.push("/signupEtudiantPart2");
       } catch (error) {
-        toast.error("Error saving data!", { autoClose: 2000 });
+        toast.error("Erreur lors de l'enregistrement des données !", { autoClose: 2000 });
       }
     },
+    
     async fetchNiveaux() {
       try {
         const response = await axios.get("http://localhost:8000/api/niveaux");
         this.niveaux = response.data;
       } catch (error) {
-        toast.error("Failed to load levels", { autoClose: 2000 });
-        console.error("Error loading niveaux:", error);
+        toast.error("Échec du chargement des niveaux", { autoClose: 2000 });
+        console.error("Erreur:", error);
       }
     }
   },
