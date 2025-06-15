@@ -202,7 +202,7 @@ export default {
       
       localStorage.setItem("EntrepriseAccountInfo", JSON.stringify(compteEntreprise));
       sessionStorage.setItem("CurrentUser", JSON.stringify('entreprise'));
-      sessionStorage.setItem('token', response.data.token);
+      sessionStorage.setItem('token', JSON.stringify(response.data.token));
       
       toast.success("Connexion réussie!", { autoClose: 1500 });
       this.$router.push("/EntrepriseDash");
@@ -224,7 +224,7 @@ export default {
       
       localStorage.setItem("StudentAccountInfo", JSON.stringify(compteEtudiant));
       sessionStorage.setItem("CurrentUser", JSON.stringify('etudiant'));
-      sessionStorage.setItem('token', response.data.token);
+      sessionStorage.setItem('token', JSON.stringify(response.data.token));
       
       toast.success("Connexion réussie!", { autoClose: 1500 });
       this.$router.push("/StudentDash");
@@ -244,7 +244,7 @@ export default {
       
       localStorage.setItem("TuteurAccountInfo", JSON.stringify(compteTuteur));
       sessionStorage.setItem("CurrentUser", JSON.stringify('tuteur'));
-      sessionStorage.setItem('token', response.data.token);
+      sessionStorage.setItem('token', JSON.stringify(response.data.token));
       
       toast.success("Connexion réussie!", { autoClose: 1500 });
       this.$router.push("/TuteurDashboard");
@@ -252,7 +252,7 @@ export default {
     
     gererAdmin(response) {
       sessionStorage.setItem("CurrentUser", JSON.stringify('admin'));
-      sessionStorage.setItem('token', response.data.token);
+      sessionStorage.setItem('token', JSON.stringify(response.data.token));
       
       toast.success("Connexion administrateur réussie!", { autoClose: 1500 });
       this.$router.push("/Admin");
